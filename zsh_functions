@@ -1,0 +1,72 @@
+kp() {
+  PID=$(echo $(lsof -n -i4TCP:$1) | awk 'NR==1{print $11}')
+  kill -9 $PID
+}
+
+wu(){
+  lsof -i tcp:$1
+}
+
+cln(){
+  git clone $1
+  code "$(basename "$1" .git)"
+}
+
+mcd () {
+  mkdir -p $1
+  cd $1
+}
+
+lpmh () {
+  #babel
+  npm i -D @babel/eslint-parser @babel/preset-env @babel/plugin-proposal-class-properties
+  #eslint
+  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-prettier@latest eslint-plugin-promise
+  #prettier
+  npm i -D --save-exact prettier
+  #husky and commitlint
+  npm i -D husky@4 @commitlint/cli @commitlint/config-conventional
+  #mocha and chai
+  npm i -D mocha chai
+
+  echo '{
+  "env": {
+      "es2021": true,
+      "node": true,
+      "mocha": true
+    },
+    "extends": ["standard", "plugin:prettier/recommended"],
+    "parser": "@babel/eslint-parser",
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "module"
+    },
+    "rules": {}
+  }' > .eslintrc.json
+
+  echo '{
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  }' > .prettierrc.json
+
+  echo '{
+    "extends": ["@commitlint/config-conventional"]
+  }' > .commitlintrc.json
+
+  echo '{
+    "presets": ["@babel/preset-env"],
+    "plugins": ["@babel/plugin-proposal-class-properties"]
+  }' > .babelrc.json
+
+  echo '{
+    "diff": true,
+    "extension": ["js"],
+    "package": "./package.json",
+    "recursive": true,
+    "spec": ["test/**/*.spec.js"]
+  }' > .mocharc.json
+}

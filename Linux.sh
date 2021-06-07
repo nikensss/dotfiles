@@ -39,7 +39,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 # variables
 dir=$HOME/dotfiles
 olddir=$HOME/dotfiles_old
-files="vimrc zshrc p10k.zsh"
+files="vimrc zshrc p10k.zsh zsh_aliases zsh_functions"
 
 # create backup folder
 mkdir -p $olddir
