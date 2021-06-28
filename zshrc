@@ -117,3 +117,5 @@ if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-clou
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
