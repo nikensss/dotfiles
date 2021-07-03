@@ -92,16 +92,22 @@ if empty(glob('~/.vim/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 call plug#begin('~/.vim/plugged')
+
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'pangloss/vim-javascript'    " JavaScript support
 Plug 'leafgarland/typescript-vim' " TypeScript syntax
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
 Plug 'vim-airline/vim-airline'
-call plug#end()
-let g:coc_global_extensions = [ 'coc-tsserver' ]
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
 
+call plug#end()
+
+let g:coc_global_extensions = [ 'coc-tsserver' ]
+let g:prettier#config#single_quote = 'true'
+let g:prettier#config#trailing_comma = 'all'
 let g:airline_powerline_fonts = 1
+
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
