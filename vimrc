@@ -39,6 +39,7 @@ set scrolloff=8
 set signcolumn=yes
 set colorcolumn=80,100,120
 set cmdheight=2
+set background=dark
 
 " Fixes common backspace problems
 set backspace=indent,eol,start
@@ -86,6 +87,7 @@ endif
 " Plugins
 call plug#begin('~/.vim/plugged')
 
+Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
@@ -93,6 +95,7 @@ Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
 Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
 
@@ -100,8 +103,16 @@ call plug#end()
 
 let g:coc_global_extensions = [ 'coc-tsserver' ]
 let g:prettier#config#single_quote = 'true'
-let g:prettier#config#trailing_comma = 'all'
+let g:prettier#config#trailing_comma = 'none'
 let g:airline_powerline_fonts = 1
+
+let g:airline_theme='powerlineish'
+let g:airline#extensions#tabline#enabled = 1
+
+" Git remaps
+nmap <leader>gj :diffget //3<CR>
+nmap <leader>gf :diffget //2<CR>
+nmap <leader>gs :G<CR>
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
