@@ -17,6 +17,7 @@ set nowrap
 nnoremap <F2> :set invpaste paste?<CR>
 imap <F2> <C-O>:set invpaste paste?<CR>
 set pastetoggle=<F2>
+set autochdir
 " Uncomment below to set the max textwidth. Use a value corresponding to the
 " width of your screen.
 set textwidth=80
@@ -32,6 +33,8 @@ set nu
 set nohlsearch
 set noerrorbells
 set hidden
+set nobackup
+set nowritebackup
 set scrolloff=8
 set signcolumn=yes
 set colorcolumn=80,100,120
@@ -86,11 +89,12 @@ call plug#begin('~/.vim/plugged')
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-Plug 'pangloss/vim-javascript'    " JavaScript support
-Plug 'leafgarland/typescript-vim' " TypeScript syntax
+Plug 'pangloss/vim-javascript'
+Plug 'leafgarland/typescript-vim'
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
 Plug 'vim-airline/vim-airline'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+Plug 'tpope/vim-commentary'
 
 call plug#end()
 
@@ -118,3 +122,5 @@ let g:solarized_termtrans=1
 " Modify cursor style
 let &t_SI="\033[4 q" " start insert mode
 let &t_EI="\033[1 q" " end insert mode
+
+let g:prettier#autoformat_require_pragma = 0
