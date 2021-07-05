@@ -1,3 +1,11 @@
+up(){
+  local AMOUNT=$1
+  for i in {1..$AMOUNT}
+  do
+    cd ..
+  done
+}
+
 kp() {
   PID=$(echo $(lsof -n -i4TCP:$1) | awk 'NR==1{print $11}')
   kill -9 $PID
