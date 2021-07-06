@@ -25,12 +25,6 @@ setup_colors
 echo "${BLUE}installing zsh${RESET}"
 apt-get install -y wget zsh vim
 
-echo "${GREEN}installing vim surround${RESET}"
-mkdir -p ~/.vim/pack/tpope/start
-cd ~/.vim/pack/tpope/start
-git clone https://tpope.io/vim/surround.git
-vim -u NONE -c "helptags surround/doc" -c q
-
 # install oh-my-zsh
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended

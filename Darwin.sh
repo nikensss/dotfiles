@@ -30,6 +30,9 @@ xcode-select --install
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
+# install iterm2
+brew install iterm2
+
 # install oh-my-zsh
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
