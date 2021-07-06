@@ -87,6 +87,7 @@ endif
 " Plugins
 call plug#begin('~/.vim/plugged')
 
+Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
