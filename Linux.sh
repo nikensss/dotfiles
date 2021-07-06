@@ -72,3 +72,6 @@ else
 fi
 
 exec zsh -l
+
+echo "${BLUE}installing vim plugins${RESET}"
+vim +'PlugInstall --sync' +qa
