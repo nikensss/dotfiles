@@ -67,8 +67,8 @@ set smartcase
 set viminfo='100,<9999,s100
 
 " Map the <Space> key to toggle a selected fold opened/closed.
-nnoremap <silent> <Space> @=(foldlevel('.')?'za':"\<Space>")<CR>
-vnoremap <Space> zf
+nnoremap <silent> <Space>f @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space>f zf
 
 " Automatically save and load folds
 autocmd BufWinLeave *.* mkview
@@ -99,6 +99,7 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
+Plug 'easymotion/vim-easymotion'
 
 call plug#end()
 
@@ -114,6 +115,20 @@ let g:airline#extensions#tabline#enabled = 1
 nmap <leader>gj :diffget //3<CR>
 nmap <leader>gf :diffget //2<CR>
 nmap <leader>gs :G<CR>
+
+" Prettier remaps
+nnoremap <leader>p :Prettier<CR>
+
+" Autoclose brackets
+inoremap " ""<left>
+inoremap ' ''<left>
+inoremap ( ()<left>
+inoremap [ []<left>
+inoremap [<CR> [<CR>]<ESC>O
+inoremap [;<CR> [<CR>];<ESC>O
+inoremap { {}<left>
+inoremap {<CR> {<CR>}<ESC>O
+inoremap {;<CR> {<CR>};<ESC>O
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
