@@ -119,6 +119,9 @@ nmap <leader>gs :G<CR>
 " Prettier remaps
 nnoremap <leader>p :Prettier<CR>
 
+" Easymotion remaps
+map <leader>e <Plug>(easymotion-prefix)
+
 " Autoclose brackets
 inoremap " ""<left>
 inoremap ' ''<left>
