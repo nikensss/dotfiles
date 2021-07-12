@@ -33,6 +33,9 @@ echo "${GREEN}installing homebrew${RESET}"
 # install iterm2
 brew install iterm2
 
+# install nvim
+brew install neovim
+
 # install oh-my-zsh
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
@@ -47,7 +50,9 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 # variables
 dir=$HOME/dotfiles
 olddir=$HOME/dotfiles_old
+oldconfig=$HOME/oldconfig
 files="vimrc zshrc p10k.zsh zsh_aliases zsh_functions"
+config="nvim"
 
 # create backup folder
 mkdir -p $olddir
@@ -59,8 +64,19 @@ for file in $files; do
   echo "${LBLUE}backing $file up ($olddir)${RESET}"
   mv ~/.$file $olddir
   echo "${CYAN}creating symlink to $file${RESET}"
-  ln -s $dir/$file ~/.$file
+  ln -s $dir/$file .$file
 done
+
+# symlinks for .config
+mkdir ~/oldconfig
+mkdir ~/.config
+cd ~/.config
+
+for file in $config; do
+  echo "${LBLUE}backing $file up ($olddir)${RESET}"
+  mv .$file $oldconfig
+  echo "${CYAN}creating symlink to $file${RESET}"
+  ln -s $dir/$file $file
 echo "${GREEN}We are done! 🥳${RESET}"
 
 # change to zsh

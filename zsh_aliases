@@ -1,3 +1,4 @@
+alias vim=nvim
 alias py=python
 alias mongodefault='mongod --config /usr/local/etc/mongod.conf'
 alias balenaEtcher='sudo /Applications/balenaEtcher.app/Contents/MacOS/balenaEtcher'
