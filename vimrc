@@ -122,17 +122,6 @@ nnoremap <leader>p :Prettier<CR>
 " Easymotion remaps
 map <leader>e <Plug>(easymotion-prefix)
 
-" Autoclose brackets
-inoremap " ""<left>
-inoremap ' ''<left>
-inoremap ( ()<left>
-inoremap [ []<left>
-inoremap [<CR> [<CR>]<ESC>O
-inoremap [;<CR> [<CR>];<ESC>O
-inoremap { {}<left>
-inoremap {<CR> {<CR>}<ESC>O
-inoremap {;<CR> {<CR>};<ESC>O
-
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
