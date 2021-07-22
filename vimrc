@@ -120,7 +120,7 @@ nmap <leader>gs :G<CR>
 nnoremap <leader>p :Prettier<CR>
 
 " Force max line length in entire file
-nnoremap <leader>fa gg V G gq
+nnoremap <leader>fa gg V G gq<Esc>
 
 " Easymotion remaps
 map <leader>e <Plug>(easymotion-prefix)
