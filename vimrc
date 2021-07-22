@@ -20,7 +20,7 @@ set pastetoggle=<F2>
 set autochdir
 " Uncomment below to set the max textwidth. Use a value corresponding to the
 " width of your screen.
-set textwidth=80
+set textwidth=79
 set formatoptions=tcrqn1
 set tabstop=2
 set shiftwidth=2
@@ -118,6 +118,9 @@ nmap <leader>gs :G<CR>
 
 " Prettier remaps
 nnoremap <leader>p :Prettier<CR>
+
+" Force max line length in entire file
+nnoremap <leader>fa gg V G gq
 
 " Easymotion remaps
 map <leader>e <Plug>(easymotion-prefix)
