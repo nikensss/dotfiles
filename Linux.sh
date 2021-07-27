@@ -65,7 +65,7 @@ else
   echo "${GREEN}Shell successfully changed to '$zsh'.${RESET}"
 fi
 
-exec zsh -l
-
 echo "${BLUE}installing vim plugins${RESET}"
 vim +'PlugInstall --sync' +qa
+
+exec zsh -l

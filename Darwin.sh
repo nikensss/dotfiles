@@ -89,7 +89,7 @@ else
   echo "${GREEN}Shell successfully changed to '$zsh'.${RESET}"
 fi
 
-exec zsh -l
-
 # after creating the symlink to vimrc, install plugins with
 vim +'PlugInstall --sync' +qa
+
+exec zsh -l
