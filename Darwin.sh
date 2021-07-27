@@ -26,6 +26,9 @@ setup_colors
 echo "${GREEN}installing delevoper tools...${RESET}"
 xcode-select --install
 
+# install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
 # install homebrew
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
@@ -79,6 +82,9 @@ for file in $config; do
   ln -s $dir/$file $file
 echo "${GREEN}We are done! 🥳${RESET}"
 
+# after creating the symlink to vimrc, install plugins with
+nvim +'PlugInstall --sync' +qa
+
 # change to zsh
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
@@ -88,8 +94,5 @@ else
   export SHELL="$zsh"
   echo "${GREEN}Shell successfully changed to '$zsh'.${RESET}"
 fi
-
-# after creating the symlink to vimrc, install plugins with
-vim +'PlugInstall --sync' +qa
 
 exec zsh -l

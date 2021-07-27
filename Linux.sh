@@ -23,7 +23,10 @@ setup_colors() {
 setup_colors
 
 echo "${BLUE}installing zsh${RESET}"
-apt-get install -y wget zsh vim
+apt-get install -y wget zsh neovim
+
+# install nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
 # install oh-my-zsh
 echo "${BLUE}installing oh-my-zsh${RESET}"
@@ -55,6 +58,21 @@ for file in $files; do
 done
 echo "${GREEN}We are done! 🥳${RESET}"
 
+# symlinks for .config
+mkdir ~/oldconfig
+mkdir ~/.config
+cd ~/.config
+
+for file in $config; do
+  echo "${LBLUE}backing $file up ($olddir)${RESET}"
+  mv .$file $oldconfig
+  echo "${CYAN}creating symlink to $file${RESET}"
+  ln -s $dir/$file $file
+echo "${GREEN}We are done! 🥳${RESET}"
+
+echo "${BLUE}installing vim plugins${RESET}"
+nvim +'PlugInstall --sync' +qa
+
 # change to zsh
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
@@ -64,8 +82,5 @@ else
   export SHELL="$zsh"
   echo "${GREEN}Shell successfully changed to '$zsh'.${RESET}"
 fi
-
-echo "${BLUE}installing vim plugins${RESET}"
-vim +'PlugInstall --sync' +qa
 
 exec zsh -l

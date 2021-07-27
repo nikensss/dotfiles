@@ -26,3 +26,7 @@ alias postcss-watch='postcss css/style.css -o css/output.css --no-map -u autopre
 alias rmnm='rm -rf node_modules'
 alias slogin='/usr/local/bin/zsh --login'
 alias brup='brew update && brew upgrade'
+alias unvm='curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash'
+alias uomz='sh ~/.oh-my-zsh/tools/upgrade.sh'
+alias uall='brup && unvm && uomz'
+
