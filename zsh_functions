@@ -78,3 +78,7 @@ lpmh () {
     "spec": ["test/**/*.spec.js"]
   }' > .mocharc.json
 }
+
+md2pdf(){
+  npx --yes markdown-pdf $1
+}
