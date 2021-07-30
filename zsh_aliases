@@ -29,4 +29,3 @@ alias brup='brew update && brew upgrade'
 alias unvm='curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash'
 alias uomz='sh ~/.oh-my-zsh/tools/upgrade.sh'
 alias uall='brup && unvm && uomz'
-

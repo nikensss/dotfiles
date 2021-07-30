@@ -203,3 +203,7 @@ fesu(){
   npx --yes husky add .husky/pre-commit "cd hosting && npm run pretty:check && npm run lint"
   git add --all
 }
+
+md2pdf(){
+  npx --yes markdown-pdf $1
+}
