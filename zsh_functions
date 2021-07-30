@@ -32,10 +32,19 @@ lpmh () {
   npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-prettier@latest eslint-plugin-promise
   #prettier
   npm i -D --save-exact prettier
-  #husky and commitlint
-  npm i -D husky@4 @commitlint/cli @commitlint/config-conventional
+  #commitlint
+  npm i -D @commitlint/cli @commitlint/config-conventional
   #mocha and chai
   npm i -D mocha chai
+
+  npm set-script pretty "prettier --write src/**/*.ts"
+  npm set-script pretty:check "prettier --check src/**/*.ts"
+  npm set-script lint "eslint src/**/*.ts"
+  npm set-script prepare "husky install"
+  npm run prepare
+
+  npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
+  git add .husky/pre-commit
 
   echo '{
   "env": {
@@ -43,7 +52,7 @@ lpmh () {
       "node": true,
       "mocha": true
     },
-    "extends": ["standard", "plugin:prettier/recommended"],
+    "extends": ["standard", "plugin:prettier/recommended","prettier"],
     "parser": "@babel/eslint-parser",
     "parserOptions": {
       "ecmaVersion": 12,
@@ -77,4 +86,120 @@ lpmh () {
     "recursive": true,
     "spec": ["test/**/*.spec.js"]
   }' > .mocharc.json
+}
+
+basu(){
+  npm i -D typescript ts-node @types/node
+  #eslint
+  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-react eslint-plugin-prettier@latest @typescript-eslint/parser @typescript-eslint/eslint-plugin
+  #prettier
+  npm i -D --save-exact prettier
+  #commitlint
+  npm i -D @commitlint/cli @commitlint/config-conventional
+
+  echo '{
+    "env": {
+      "es2021": true,
+      "node": true,
+      "mocha": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": ["./tsconfig.json"]
+    },
+    "plugins": ["@typescript-eslint"],
+    "rules": {}
+  }' > .eslintrc.json
+
+  echo '{
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  }' > .prettierrc.json
+
+  echo '{
+    "extends": ["@commitlint/config-conventional"]
+  }' > .commitlintrc.json
+
+  npm i -D husky
+
+  npm set-script pretty "prettier --write src/**/*.ts"
+  npm set-script pretty:check "prettier --check src/**/*.ts"
+  npm set-script lint "eslint src/**/*.ts"
+  npm set-script prepare "cd .. && husky install functions/.husky"
+  npm run prepare
+
+  npx --yes husky add .husky/pre-commit "cd functions && npm run pretty:check && npm run lint"
+  git add --all
+}
+
+fesu(){
+  #eslint
+  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-react eslint-plugin-prettier@latest @typescript-eslint/parser @typescript-eslint/eslint-plugin
+  #prettier
+  npm i -D --save-exact prettier
+  #commitlint
+  npm i -D @commitlint/cli @commitlint/config-conventional
+
+  echo '{
+    "env": {
+      "es2021": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "prettier"
+    ],
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaFeature": {
+        "jsx": true
+      },
+      "project": ["./tsconfig.json"]
+    },
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+      "@typescript-eslint/no-floating-promises": 2
+    },
+    "settings": {
+      "react": {
+        "version": "^17"
+      }
+    }
+  }' > .eslintrc.json
+
+  echo '{
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "arrowParens": "avoid"
+  }' > .prettierrc.json
+
+  echo '{
+    "extends": ["@commitlint/config-conventional"]
+  }' > .commitlintrc.json
+
+  npm i -D husky
+
+  npm set-script pretty "prettier --write src/**/*.tsx"
+  npm set-script pretty:check "prettier --check src/**/*.tsx"
+  npm set-script lint "eslint src/**/*.tsx"
+  npm set-script prepare "cd .. && husky install hosting/.husky"
+  npm run prepare
+
+  npx --yes husky add .husky/pre-commit "cd hosting && npm run pretty:check && npm run lint"
+  git add --all
 }
