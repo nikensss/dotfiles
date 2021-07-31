@@ -111,6 +111,37 @@ let g:airline_powerline_fonts = 1
 let g:airline_theme='powerlineish'
 let g:airline#extensions#tabline#enabled = 1
 
+" Yank to the end of the line
+nnoremap Y y$
+
+" Keep the cursor centered when joining lines or moving around
+nnoremap n nzzzv
+nnoremap N Nzzzv
+nnoremap J mzJ`z
+
+" Add more checkpoints when undoing changes
+inoremap , ,<c-g>u
+inoremap . .<c-g>u
+inoremap ; ;<c-g>u
+inoremap ! !<c-g>u
+inoremap ? ?<c-g>u
+inoremap [ [<c-g>u
+inoremap ] ]<c-g>u
+inoremap { {<c-g>u
+inoremap } }<c-g>u
+
+" Jumplist mutations (jump back points when moving more than 5 lines at a time)
+nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
+nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
+
+" Moving text
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+inoremap <C-j> <esc>:m .+1<CR>==
+inoremap <C-k> <esc>:m .-2<CR>==
+nnoremap <leader>j :m .+1<CR>==
+nnoremap <leader>k :m .-2<CR>==
+
 " Git remaps
 nmap <leader>gj :diffget //3<CR>
 nmap <leader>gf :diffget //2<CR>
