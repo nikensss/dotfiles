@@ -4,8 +4,6 @@ set nolist
 set rnu
 " Helps force plug-ins to load correctly when it is turned back on below.
 filetype off
-" Turn on syntax highlighting.
-syntax on
 " For plug-ins to load correctly.
 filetype plugin indent on
 " Turn off modelines
@@ -18,8 +16,6 @@ nnoremap <F2> :set invpaste paste?<CR>
 imap <F2> <C-O>:set invpaste paste?<CR>
 set pastetoggle=<F2>
 set autochdir
-" Uncomment below to set the max textwidth. Use a value corresponding to the
-" width of your screen.
 set textwidth=79
 set formatoptions=tcrqn1
 set tabstop=2
@@ -37,9 +33,9 @@ set nobackup
 set nowritebackup
 set scrolloff=8
 set signcolumn=yes
-set colorcolumn=80,100,120
+set colorcolumn=80
 set cmdheight=2
-set background=dark
+set clipboard+=unnamedplus
 
 " Fixes common backspace problems
 set backspace=indent,eol,start
@@ -100,6 +96,8 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
 Plug 'phaazon/hop.nvim'
+Plug 'sheerun/vim-polyglot'
+Plug 'joshdick/onedark.vim'
 
 call plug#end()
 
@@ -110,7 +108,25 @@ let g:airline_powerline_fonts = 1
 :highlight CocErrorFloat ctermbg=Red
 :highlight CocErrorFloat ctermfg=White
 
-let g:airline_theme='powerlineish'
+"Credit joshdick
+"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
+"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
+"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
+if (empty($TMUX))
+  if (has("nvim"))
+    "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
+    let $NVIM_TUI_ENABLE_TRUE_COLOR=1
+  endif
+  "For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
+  "Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
+  " < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif
+
+syntax on
+colorscheme onedark
 let g:airline#extensions#tabline#enabled = 1
 
 " Remove all marks
@@ -159,10 +175,10 @@ nnoremap <leader>p :Prettier<CR>
 nnoremap <leader>fa ggVGgq<Esc>
 
 " Easymotion (hop) remaps
-map <leader><leader>w :HopWord<CR>
-map <leader><leader>l :HopLine<CR>
-map <leader><leader>c :HopChar1<CR>
-map <leader><leader>b :HopChar2<CR>
+map <leader>hw :HopWord<CR>
+map <leader>hl :HopLine<CR>
+map <leader>hc :HopChar1<CR>
+map <leader>hb :HopChar2<CR>
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
@@ -185,15 +201,6 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Color scheme (terminal)
-set t_Co=256
-set background=dark
-let g:solarized_termcolors=256
-let g:solarized_termtrans=1
-" put https://raw.github.com/altercation/vim-colors-solarized/master/colors/solarized.vim
-" in ~/.vim/colors/ and uncomment:
-" colorscheme solarized
-
 " Modify cursor style
 let &t_SI="\033[4 q" " start insert mode
 let &t_EI="\033[1 q" " end insert mode
@@ -203,3 +210,4 @@ let g:prettier#autoformat_require_pragma = 0
 lua << EOF
 require'hop'.setup()
 EOF
+:hi ColorColumn ctermbg=darkcyan guibg=darkcyan
