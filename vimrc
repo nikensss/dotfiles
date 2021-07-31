@@ -67,8 +67,8 @@ set smartcase
 set viminfo='100,<9999,s100
 
 " Map the <Space> key to toggle a selected fold opened/closed.
-nnoremap <silent> <Space>f @=(foldlevel('.')?'za':"\<Space>")<CR>
-vnoremap <Space>f zf
+nnoremap <silent> <Space>fd @=(foldlevel('.')?'za':"\<Space>")<CR>
+vnoremap <Space>fd zf
 
 " Automatically save and load folds
 autocmd BufWinLeave *.* mkview
@@ -99,17 +99,22 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
-Plug 'easymotion/vim-easymotion'
+Plug 'phaazon/hop.nvim'
 
 call plug#end()
 
-let g:coc_global_extensions = [ 'coc-tsserver' ]
+let g:coc_global_extensions = ['coc-tsserver']
 let g:prettier#config#single_quote = 'true'
 let g:prettier#config#trailing_comma = 'none'
 let g:airline_powerline_fonts = 1
+:highlight CocErrorFloat ctermbg=Red
+:highlight CocErrorFloat ctermfg=White
 
 let g:airline_theme='powerlineish'
 let g:airline#extensions#tabline#enabled = 1
+
+" Remove all marks
+nnoremap <leader>rm :delm!
 
 " Yank to the end of the line
 nnoremap Y y$
@@ -117,18 +122,18 @@ nnoremap Y y$
 " Keep the cursor centered when joining lines or moving around
 nnoremap n nzzzv
 nnoremap N Nzzzv
-nnoremap J mzJ`z
+nnoremap J mzJ`z:delm!<CR>
 
-" Add more checkpoints when undoing changes
-inoremap , ,<c-g>u
-inoremap . .<c-g>u
-inoremap ; ;<c-g>u
-inoremap ! !<c-g>u
-inoremap ? ?<c-g>u
-inoremap [ [<c-g>u
-inoremap ] ]<c-g>u
-inoremap { {<c-g>u
-inoremap } }<c-g>u
+" " Add more checkpoints when undoing changes
+" inoremap , ,<c-g>u
+" inoremap . .<c-g>u
+" inoremap ; ;<c-g>u
+" inoremap ! !<c-g>u
+" inoremap ? ?<c-g>u
+" inoremap [ [<c-g>u
+" inoremap ] ]<c-g>u
+" inoremap { {<c-g>u
+" inoremap } }<c-g>u
 
 " Jumplist mutations (jump back points when moving more than 5 lines at a time)
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
@@ -151,10 +156,13 @@ nmap <leader>gs :G<CR>
 nnoremap <leader>p :Prettier<CR>
 
 " Force max line length in entire file
-nnoremap <leader>fa gg V G gq<Esc>
+nnoremap <leader>fa ggVGgq<Esc>
 
-" Easymotion remaps
-map <leader>e <Plug>(easymotion-prefix)
+" Easymotion (hop) remaps
+map <leader><leader>w :HopWord<CR>
+map <leader><leader>l :HopLine<CR>
+map <leader><leader>c :HopChar1<CR>
+map <leader><leader>b :HopChar2<CR>
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
@@ -191,3 +199,7 @@ let &t_SI="\033[4 q" " start insert mode
 let &t_EI="\033[1 q" " end insert mode
 
 let g:prettier#autoformat_require_pragma = 0
+
+lua << EOF
+require'hop'.setup()
+EOF
