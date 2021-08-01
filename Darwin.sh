@@ -22,24 +22,22 @@ setup_colors() {
 }
 setup_colors
 
-# install developer tools
 echo "${GREEN}installing delevoper tools...${RESET}"
 xcode-select --install
 
-# install nvm
+echo "${BLUE}installing nvm${RESET}"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm install --lts
 
-# install homebrew
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-# install iterm2
+brew install git
 brew install iterm2
-
-# install nvim
 brew install neovim
 
-# install oh-my-zsh
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
 
@@ -50,16 +48,13 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.
 echo "${CYAN}installing power10k theme${RESET}"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
-# variables
 dir=$HOME/dotfiles
 olddir=$HOME/dotfiles_old
 oldconfig=$HOME/oldconfig
 files="vimrc zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
 config="nvim"
 
-# create backup folder
 mkdir -p $olddir
-# move to dotfiles folder
 cd $HOME
 
 echo "${BLUE}updating dotfiles${RESET}"
@@ -71,8 +66,8 @@ for file in $files; do
 done
 
 # symlinks for .config
-mkdir ~/oldconfig
-mkdir ~/.config
+mkdir -p ~/oldconfig
+mkdir -p ~/.config
 cd ~/.config
 
 for file in $config; do
@@ -80,12 +75,14 @@ for file in $config; do
   mv .$file $oldconfig
   echo "${CYAN}creating symlink to $file${RESET}"
   ln -s $dir/$file $file
-echo "${GREEN}We are done! 🥳${RESET}"
+done
 
-# after creating the symlink to vimrc, install plugins with
-nvim +'PlugInstall --sync' +qa
+echo "${CYAN}installing vim Plug${RESET}"
+curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-# change to zsh
+# echo "${BLUE}installing vim plugins${RESET}"
+# nvim +'PlugInstall --sync' +qa
+
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
 if ! chsh -s "$zsh"; then
@@ -95,4 +92,6 @@ else
   echo "${GREEN}Shell successfully changed to '$zsh'.${RESET}"
 fi
 
+cd $HOME
+echo "${GREEN}We are done! 🥳${RESET}"
 exec zsh -l
