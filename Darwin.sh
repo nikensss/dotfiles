@@ -37,6 +37,7 @@ echo "${GREEN}installing homebrew${RESET}"
 brew install git
 brew install iterm2
 brew install neovim
+brew install ngrok
 
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
