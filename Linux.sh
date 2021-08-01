@@ -23,7 +23,8 @@ setup_colors() {
 setup_colors
 
 echo "${BLUE}installing zsh${RESET}"
-apt-get install -y wget zsh neovim
+apt-get update
+apt-get install -y curl wget zsh neovim
 
 # install nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
@@ -84,3 +85,4 @@ else
 fi
 
 exec zsh -l
+
