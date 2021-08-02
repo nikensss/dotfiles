@@ -75,7 +75,8 @@ echo "${CYAN}installing vim Plug${RESET}"
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # echo "${BLUE}installing vim plugins${RESET}"
-# vim !silent colorscheme onedark +'PlugInstall --sync' +qa
+# nvim +'PlugInstall --sync' +qa
+# nvim +'CocInstall coc-json coc-tsserver' +qa
 
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
