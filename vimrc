@@ -97,12 +97,6 @@ call plug#end()
 
 set updatetime=300
 set shortmess+=c
-if has("nvim-0.5.0") || has("patch-8.1.1564")
-  " Recently vim can merge signcolumn and number column into one
-  set signcolumn=number
-else
-  set signcolumn=yes
-endif
 
 nnoremap <leader>cs :CocSearch 
 nnoremap <leader>fs <cmd>Telescope find_files<cr>
