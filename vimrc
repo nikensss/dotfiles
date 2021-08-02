@@ -63,8 +63,9 @@ set smartcase
 set viminfo='100,<9999,s100
 
 " Automatically save and load folds
-autocmd BufWinLeave *.* mkview
-autocmd BufWinEnter *.* silent loadview"
+" autocmd BufWinLeave *.* mkview
+" autocmd BufWinEnter *.* silent loadview"
+
 let mapleader = " "
 nnoremap <leader>w :w<cr>
 if empty(glob('~/.vim/autoload/plug.vim'))
@@ -82,6 +83,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'nvim-lua/popup.nvim'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
@@ -98,9 +100,12 @@ call plug#end()
 set updatetime=300
 set shortmess+=c
 
-nnoremap <leader>cs :CocSearch 
-nnoremap <leader>fs <cmd>Telescope find_files<cr>
 nnoremap <leader><cr> <cr><c-w>h:q<cr>
+nnoremap <leader>cs :CocSearch 
+nnoremap <leader>ff <cmd>Telescope find_files<cr>
+nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+nnoremap <leader>fb <cmd>Telescope buffers<cr>
+nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 
 let g:coc_global_extensions = ['coc-tsserver']
 let g:prettier#config#single_quote = 'true'
