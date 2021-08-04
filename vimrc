@@ -15,7 +15,7 @@ set nowrap
 nnoremap <F2> :set invpaste paste?<CR>
 imap <F2> <C-O>:set invpaste paste?<CR>
 set pastetoggle=<F2>
-set autochdir
+" set autochdir
 set textwidth=79
 set formatoptions=tcrqn1
 set tabstop=2
@@ -233,7 +233,7 @@ endfunction
 command! -nargs=0 Format :call CocAction('format')
 
 " Add `:OR` command for organize imports of the current buffer.
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+command! -nargs=0 OR :call CocAction('runCommand', 'editor.action.organizeImport')
 
 " Highlight the symbol and its references when holding the cursor.
 autocmd CursorHold * silent call CocActionAsync('highlight')
@@ -242,8 +242,8 @@ autocmd CursorHold * silent call CocActionAsync('highlight')
 nmap <leader>rn <Plug>(coc-rename)
 
 " Formatting selected code.
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
+xmap <leader>fs  <Plug>(coc-format-selected)
+nmap <leader>fs  <Plug>(coc-format-selected)
 
 augroup mygroup
   autocmd!
@@ -354,3 +354,14 @@ EOF
 " overwrite the column color set by the theme
 :hi ColorColumn guibg=darkcyan
 :highlight CocHighlightText guifg=darkcyan
+
+" highlight properly jsonc (json with comments)
+autocmd FileType json syntax match Comment +\/\/.\+$+
+
+let g:coc_global_extensions = [
+      \'coc-json',
+      \'coc-tsserver',
+      \'coc-prettier',
+      \'coc-highlight',
+      \'coc-eslint'
+      \]

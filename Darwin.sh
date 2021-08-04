@@ -84,7 +84,7 @@ curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.c
 
 # echo "${BLUE}installing vim plugins${RESET}"
 # nvim +'PlugInstall --sync' +qa
-# nvim +'CocInstall coc-json coc-tsserver' +qa
+# nvim +'CocInstall coc-json coc-tsserver coc-prettier coc-eslint coc-highlight' +qa
 
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
