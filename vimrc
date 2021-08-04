@@ -166,7 +166,7 @@ nmap <leader>gf :diffget //2<CR>
 nmap <leader>gs :G<CR>
 
 " Prettier remaps
-nnoremap <leader>p :Prettier<CR>
+nnoremap <leader>p :Prettier<CR>:w<CR>
 
 " Force max line length in entire file
 nnoremap <leader>fa ggVGgq<Esc>
@@ -213,8 +213,8 @@ inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
-nmap <silent> [g <Plug>(coc-diagnostic-prev)
-nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <silent> <g <Plug>(coc-diagnostic-prev)
+nmap <silent> >g <Plug>(coc-diagnostic-next)
 
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
