@@ -12,8 +12,8 @@ set modelines=0
 set nowrap
 " Vim's auto indentation feature does not work properly with text copied from
 " outside of Vim. Press the <F2> key to toggle paste mode on/off.
-nnoremap <F2> :set invpaste paste?<CR>
-imap <F2> <C-O>:set invpaste paste?<CR>
+nnoremap <F2> :set invpaste paste?<cr>
+imap <F2> <C-O>:set invpaste paste?<cr>
 set pastetoggle=<F2>
 " set autochdir
 set textwidth=79
@@ -100,14 +100,20 @@ call plug#end()
 set updatetime=300
 set shortmess+=c
 
-nnoremap <leader><cr> <cr><c-w>h:q<cr>
+nnoremap <leader><cr> :so ~/.config/nvim/init.vim<cr>
+nnoremap <leader>pv <c-w>v:Ex<cr>
+nnoremap <leader>+ :vertical resize +5<cr>
+nnoremap <leader>- :vertical resize -5<cr>
+nnoremap <leader>= <c-w>=
+nnoremap <leader>rp :vertical resize 120<cr>
+
 nnoremap <leader>cs :CocSearch 
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
 nnoremap <leader>fh <cmd>Telescope help_tags<cr>
-nnoremap <leader>gc <cmd>Telescope git_branches<cr>
 nnoremap <leader>fp <cmd>Telescope git_files<cr>
+nnoremap <leader>gc <cmd>Telescope git_branches<cr>
 
 let g:coc_global_extensions = ['coc-tsserver']
 let g:prettier#config#single_quote = 'true'
@@ -146,36 +152,36 @@ nnoremap Y y$
 " Keep the cursor centered when joining lines or moving around
 nnoremap n nzzzv
 nnoremap N Nzzzv
-nnoremap J mzJ`z:delm!<CR>
+nnoremap J mzJ`z:delm!<cr>
 
 " Jumplist mutations (jump back points when moving more than 5 lines at a time)
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
 
 " Moving text
-vnoremap J :m '>+1<CR>gv=gv
-vnoremap K :m '<-2<CR>gv=gv
-inoremap <C-j> <esc>:m .+1<CR>==
-inoremap <C-k> <esc>:m .-2<CR>==
-nnoremap <leader>j :m .+1<CR>==
-nnoremap <leader>k :m .-2<CR>==
+vnoremap J :m '>+1<cr>gv=gv
+vnoremap K :m '<-2<cr>gv=gv
+inoremap <C-j> <esc>:m .+1<cr>==
+inoremap <C-k> <esc>:m .-2<cr>==
+nnoremap <leader>j :m .+1<cr>==
+nnoremap <leader>k :m .-2<cr>==
 
 " Git remaps
-nmap <leader>gj :diffget //3<CR>
-nmap <leader>gf :diffget //2<CR>
-nmap <leader>gs :G<CR>
+nmap <leader>gj :diffget //3<cr>
+nmap <leader>gf :diffget //2<cr>
+nmap <leader>gs :G<cr>
 
 " Prettier remaps
-nnoremap <leader>p :Prettier<CR>:w<CR>
+nnoremap <leader>p :Prettier<cr>:w<cr>
 
 " Force max line length in entire file
 nnoremap <leader>fa ggVGgq<Esc>
 
 " Easymotion (hop) remaps
-map <leader>hw :HopWord<CR>
-map <leader>hl :HopLine<CR>
-map <leader>hc :HopChar1<CR>
-map <leader>hb :HopChar2<CR>
+map <leader>hw :HopWord<cr>
+map <leader>hl :HopLine<cr>
+map <leader>hc :HopChar1<cr>
+map <leader>hb :HopChar2<cr>
 
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
@@ -209,7 +215,7 @@ endif
 " Make <CR> auto-select the first completion item and notify coc.nvim to
 " format on enter, <cr> could be remapped by other vim plugin
 inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
-                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+                              \: "\<C-g>u\<cr>\<c-r>=coc#on_enter()\<cr>"
 
 " Use `[g` and `]g` to navigate diagnostics
 " Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
@@ -217,7 +223,7 @@ nmap <silent> <g <Plug>(coc-diagnostic-prev)
 nmap <silent> >g <Plug>(coc-diagnostic-next)
 
 " Use K to show documentation in preview window.
-nnoremap <silent> K :call <SID>show_documentation()<CR>
+nnoremap <silent> K :call <SID>show_documentation()<cr>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
