@@ -93,7 +93,7 @@ Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
 Plug 'phaazon/hop.nvim'
 Plug 'sheerun/vim-polyglot'
-Plug 'joshdick/onedark.vim'
+Plug 'navarasu/onedark.nvim'
 
 call plug#end()
 
@@ -140,6 +140,7 @@ if (empty($TMUX))
 endif
 
 syntax on
+let g:onedark_style = 'darker'
 colorscheme onedark
 let g:airline#extensions#tabline#enabled = 1
 
