@@ -77,6 +77,7 @@ endif
 " Plugins
 call plug#begin('~/.vim/plugged')
 
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
 Plug 'airblade/vim-gitgutter'
@@ -89,7 +90,6 @@ Plug 'leafgarland/typescript-vim'
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 Plug 'tpope/vim-commentary'
 Plug 'phaazon/hop.nvim'
 Plug 'sheerun/vim-polyglot'
@@ -115,12 +115,12 @@ nnoremap <leader>fh <cmd>Telescope help_tags<cr>
 nnoremap <leader>fp <cmd>Telescope git_files<cr>
 nnoremap <leader>gc <cmd>Telescope git_branches<cr>
 
-let g:coc_global_extensions = ['coc-tsserver']
-let g:prettier#config#single_quote = 'true'
-let g:prettier#config#trailing_comma = 'none'
 let g:airline_powerline_fonts = 1
 :highlight CocErrorFloat ctermbg=Red
 :highlight CocErrorFloat ctermfg=White
+
+autocmd BufNewFile,BufRead *.jsx set filetype=javascript.jsx " was javascript
+autocmd BufNewFile,BufRead *.tsx set filetype=typescript.tsx " was typescript
 
 "Credit joshdick
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
@@ -173,7 +173,8 @@ nmap <leader>gf :diffget //2<cr>
 nmap <leader>gs :G<cr>
 
 " Prettier remaps
-nnoremap <leader>p :Prettier<cr>:w<cr>
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+nnoremap <leader>p :Prettier<cr>
 
 " Force max line length in entire file
 nnoremap <leader>fa ggVGgq<Esc>
@@ -293,11 +294,37 @@ omap ac <Plug>(coc-classobj-a)
 let &t_SI="\033[4 q" " start insert mode
 let &t_EI="\033[1 q" " end insert mode
 
-let g:prettier#autoformat_require_pragma = 0
-
 " Load hop
 lua << EOF
 require'hop'.setup()
+EOF
+
+" Treesitter config
+lua << EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = true,
+    disable = {},
+  },
+  indent = {
+    enable = false,
+    disable = {},
+  },
+  ensure_installed = {
+    "bash",
+    "javascript",
+    "typescript",
+    "tsx",
+    "json",
+    "jsonc",
+    "html",
+    "css",
+    "scss"
+  },
+}
+
+local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
+parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 EOF
 
 " Load telescope defaults

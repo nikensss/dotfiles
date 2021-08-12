@@ -1,3 +1,9 @@
 {
+  "coc.preferences.formatOnSaveFiletypes": [
+    "json",
+    "jsonc",
+    "typescript",
+    "typescriptreact"
+  ],
   "coc.preferences.extensionUpdateCheck": "daily"
-} 
+}
