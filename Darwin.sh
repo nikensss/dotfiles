@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 setup_colors() {
   # Only use colors if connected to a terminal
@@ -30,15 +30,18 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install --lts
+npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier
 
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
-brew install git
-brew install iterm2
-brew install neovim
-brew install ngrok
-brew install ripgrep # for grep to work in telescope
+brew update
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit
+brew upgrade
+
+echo "${BLUE}installing vim-plug${RESET}"
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
 
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended

@@ -77,14 +77,11 @@ endif
 " Plugins
 call plug#begin('~/.vim/plugged')
 
-Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-Plug 'tpope/vim-surround'
 Plug 'tpope/vim-fugitive'
+Plug 'tpope/vim-surround'
+Plug 'navarasu/onedark.nvim'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 Plug 'airblade/vim-gitgutter'
-Plug 'nvim-lua/popup.nvim'
-Plug 'nvim-lua/plenary.nvim'
-Plug 'nvim-telescope/telescope.nvim'
-Plug 'nvim-telescope/telescope-fzy-native.nvim'
 Plug 'pangloss/vim-javascript'
 Plug 'leafgarland/typescript-vim'
 Plug 'neoclide/coc.nvim' , { 'branch' : 'release' }
@@ -93,7 +90,10 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'tpope/vim-commentary'
 Plug 'phaazon/hop.nvim'
 Plug 'sheerun/vim-polyglot'
-Plug 'navarasu/onedark.nvim'
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzy-native.nvim'
 
 call plug#end()
 
@@ -179,7 +179,7 @@ nnoremap <leader>p :Prettier<cr>
 " Force max line length in entire file
 nnoremap <leader>fa ggVGgq<Esc>
 
-" Easymotion (hop) remaps
+" Hop remaps
 map <leader>hw :HopWord<cr>
 map <leader>hl :HopLine<cr>
 map <leader>hc :HopChar1<cr>
