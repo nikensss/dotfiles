@@ -1,5 +1,12 @@
+let g:neoformat_try_formatprg=1
 
-autocmd BufWritePre,InsertLeave *.{js,jsx,ts,tsx} Neoformat
+autocmd BufWritePre,InsertLeave * Neoformat
 
-let g:neoformat_enabled_javascript = ['prettier']
-let g:neoformat_enabled_typescript = ['prettier']
+augroup NeoformatAutoFormat
+    autocmd!
+    autocmd FileType javascript,javascript.jsx,typescript,typescript.tsx setlocal formatprg=prettier\
+                \--stdin
+    autocmd BufWritePre *.js,*.jsx,*.ts,*.tsx Neoformat
+augroup END
+
+nnoremap <leader>p :Neoformat<cr>:w<cr>

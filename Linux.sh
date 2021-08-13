@@ -26,6 +26,9 @@ echo "${BLUE}installing zsh${RESET}"
 apt-get update
 apt-get install -y curl wget zsh neovim git
 
+echo "${BLUE}installing vim-plug${RESET}"
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
 echo "${BLUE}installing nvm${RESET}"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
