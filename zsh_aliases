@@ -1,8 +1,7 @@
 alias vim=nvim
-alias py=python
-alias mongodefault='mongod --config /usr/local/etc/mongod.conf'
-alias balenaEtcher='sudo /Applications/balenaEtcher.app/Contents/MacOS/balenaEtcher'
-alias usevenv='source venv/bin/activate'
+alias py=python3
+alias pip=/usr/local/bin/pip3
+alias uve='source venv/bin/activate'
 alias b='npm run build'
 alias t='npm test'
 alias tw='npm run test:watch'
