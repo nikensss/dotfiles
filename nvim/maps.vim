@@ -12,9 +12,6 @@ nnoremap x "_x
 nnoremap + <C-a>
 nnoremap - <C-x>
 
-" Delete a word backwards
-nnoremap dw vb"_d
-
 " Select all
 nmap <C-a> gg<S-v>G
 
@@ -47,8 +44,9 @@ nmap <Tab> :tabnext<Return>
 " Split window
 nmap ss :split<Return><C-w>w
 nmap sv :vsplit<Return><C-w>w
-" Move window
+" Swap between windows
 nmap <leader><leader> <C-w>w
+" Move window
 map s<left> <C-w>h
 map s<up> <C-w>k
 map s<down> <C-w>j
@@ -57,7 +55,12 @@ map sh <C-w>h
 map sk <C-w>k
 map sj <C-w>j
 map sl <C-w>l
+" Close last used window
+map sp <C-w>p<C-w>q
+" Close window
 map sq <C-w>q
+" Close other windows
+map so <C-w>o
 
 " Resize window
 nmap <C-w><left> <C-w><
