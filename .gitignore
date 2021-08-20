@@ -106,3 +106,5 @@ dist
 # VIM temp files
 *.swp
 *.swo
+
+.DS_Store
