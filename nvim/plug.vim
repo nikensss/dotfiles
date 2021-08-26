@@ -11,6 +11,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'cohama/lexima.vim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sheerun/vim-polyglot'
+Plug 'mattn/emmet-vim'
 
 if has("nvim")
   Plug 'phaazon/hop.nvim'
