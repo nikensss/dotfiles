@@ -1,6 +1,7 @@
 alias vim=nvim
 alias py=python3
 alias pip=/usr/local/bin/pip3
+alias cve='python3 -m venv --system-site-packages ./venv'
 alias uve='source venv/bin/activate'
 alias b='npm run build'
 alias t='npm test'
