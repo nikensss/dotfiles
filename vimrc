@@ -168,8 +168,8 @@ nnoremap <leader>j :m .+1<cr>==
 nnoremap <leader>k :m .-2<cr>==
 
 " Git remaps
-nmap <leader>gj :diffget //3<cr>
-nmap <leader>gf :diffget //2<cr>
+nmap <leader>gl :diffget //3<cr>
+nmap <leader>gh :diffget //2<cr>
 nmap <leader>gs :G<cr>
 
 " Prettier remaps
