@@ -15,6 +15,12 @@ nnoremap - <C-x>
 " Select all
 nmap <C-a> gg<S-v>G
 
+" Quickfix list mappings
+nnoremap <leader>qo :copen<CR>
+nnoremap <leader>qc :cclose<CR>
+nnoremap <leader>qn :cnext<CR>zz
+nnoremap <leader>qp :cprevious<CR>zz
+
 " Save with root permission
 command! W w !sudo tee > /dev/null %
 
