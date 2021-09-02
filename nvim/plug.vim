@@ -12,6 +12,7 @@ Plug 'cohama/lexima.vim'
 Plug 'navarasu/onedark.nvim'
 Plug 'sheerun/vim-polyglot'
 Plug 'mattn/emmet-vim'
+Plug 'szw/vim-maximizer'
 
 if has("nvim")
   Plug 'phaazon/hop.nvim'
