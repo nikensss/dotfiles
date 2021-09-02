@@ -82,13 +82,6 @@ for file in $config; do
   ln -s $dir/$file $file
 done
 
-echo "${CYAN}installing vim Plug${RESET}"
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# echo "${BLUE}installing vim plugins${RESET}"
-# nvim +'PlugInstall --sync' +qa
-# nvim +'CocInstall coc-json coc-tsserver coc-prettier coc-eslint coc-highlight' +qa
-
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
 if ! chsh -s "$zsh"; then
