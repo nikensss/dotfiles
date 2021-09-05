@@ -30,7 +30,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install --lts
-npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier
+npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier pyright
 
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"

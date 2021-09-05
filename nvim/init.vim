@@ -71,10 +71,12 @@ set tabstop=2
 set ai "Auto indent
 set si "Smart indent
 set nowrap "No Wrap lines
+set formatoptions-=t "do not automatically wrap text when typing
 set backspace=start,eol,indent
 " Finding files - Search down into subfolders
 set path+=**
 set wildignore+=*/node_modules/*
+set wildignore+=*/venv/**/*
 
 " Turn off paste mode when leaving insert
 autocmd InsertLeave * set nopaste

@@ -82,4 +82,6 @@ vim.api.nvim_set_keymap("s", "<S-Tab>", "v:lua.s_tab_complete()", { expr = true 
 EOF
 
 highlight link CompeDocumentation NormalFloat
+inoremap <silent><expr> <C-f> compe#scroll({'delta':+4})
+inoremap <silent><expr> <C-b> compe#scroll({'delta':-4})
 
