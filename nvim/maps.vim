@@ -19,7 +19,20 @@ nmap <C-a> gg<S-v>G
 nnoremap <leader>qo :copen<CR>
 nnoremap <leader>qc :cclose<CR>
 nnoremap <leader>qj :cnext<CR>zz
+nnoremap <leader>qJ :cfirst<CR>zz
 nnoremap <leader>qk :cprevious<CR>zz
+nnoremap <leader>qK :clast<CR>zz
+
+" Location list mappings
+nnoremap <leader>lo :lopen<CR>
+nnoremap <leader>lc :lclose<CR>
+nnoremap <leader>lj :lnext<CR>zz
+nnoremap <leader>lJ :lfirst<CR>zz
+nnoremap <leader>lk :lprevious<CR>zz
+nnoremap <leader>lK :llast<CR>zz
+
+" Autoclose tags
+inoremap <buffer> <C-t> <esc>yiwi<lt><esc>ea></><esc>hpF>i
 
 " Save with root permission
 command! W w !sudo tee > /dev/null %
