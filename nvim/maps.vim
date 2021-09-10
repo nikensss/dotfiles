@@ -15,6 +15,10 @@ nnoremap - <C-x>
 " Select all
 nmap <C-a> gg<S-v>G
 
+" Open file explorer
+nmap <leader>ef :Ex<CR>
+nmap <leader>ev :Vex<CR><C-w>L
+
 " Quickfix list mappings
 nnoremap <leader>qo :copen<CR>
 nnoremap <leader>qc :cclose<CR>
