@@ -1,4 +1,5 @@
 alias vim=nvim
+alias v='vim .'
 alias py=python3
 alias pip=/usr/local/bin/pip3
 alias cve='python3 -m venv --system-site-packages ./venv'
