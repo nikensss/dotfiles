@@ -14,6 +14,7 @@ Plug 'navarasu/onedark.nvim'
 Plug 'sheerun/vim-polyglot'
 Plug 'mattn/emmet-vim'
 Plug 'szw/vim-maximizer'
+Plug 'preservim/nerdtree'
 
 if has("nvim")
   Plug 'phaazon/hop.nvim'
