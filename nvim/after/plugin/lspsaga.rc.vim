@@ -9,6 +9,11 @@ saga.init_lsp_saga {
   hint_sign = '',
   infor_sign = '',
   border_style = "round",
+	max_preview_lines = 25,
+	finder_action_keys = {
+		vsplit = 'sv',
+		split = 'ss',
+	}
 }
 
 EOF
