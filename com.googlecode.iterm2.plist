@@ -56498,12 +56498,16 @@
 			<true/>
 			<key>Background Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.27054747939109802</real>
+				<real>0.19220972061157227</real>
+				<key>Color Space</key>
+				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.11274909973144531</real>
+				<real>0.090581600384571595</real>
 				<key>Red Component</key>
-				<real>0.12003477662801743</real>
+				<real>0.090581600384571595</real>
 			</dict>
 			<key>Background Image Location</key>
 			<string></string>
@@ -57612,12 +57616,16 @@
 			<true/>
 			<key>Background Color</key>
 			<dict>
+				<key>Alpha Component</key>
+				<real>1</real>
 				<key>Blue Component</key>
-				<real>0.27054747939109802</real>
+				<real>0.19215686274509805</real>
+				<key>Color Space</key>
+				<string>sRGB</string>
 				<key>Green Component</key>
-				<real>0.11274909973144531</real>
+				<real>0.090196078431372548</real>
 				<key>Red Component</key>
-				<real>0.12003477662801743</real>
+				<real>0.090196078431372548</real>
 			</dict>
 			<key>Background Image Location</key>
 			<string></string>
@@ -58635,5 +58643,9 @@
 	<string>/-+\~_.</string>
 	<key>findMode_iTerm</key>
 	<integer>0</integer>
+	<key>kCPKSelectionViewPreferredModeKey</key>
+	<integer>1</integer>
+	<key>kCPKSelectionViewShowHSBTextFieldsKey</key>
+	<false/>
 </dict>
 </plist>
