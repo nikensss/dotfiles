@@ -1,4 +1,4 @@
-" Fundamentals "{{{
+" Fundamentals 
 " ---------------------------------------------------------------------
 
 " init autocmd
@@ -84,9 +84,7 @@ autocmd InsertLeave * set nopaste
 " Add asterisks in block comments
 set formatoptions+=r
 
-"}}}
-
-" Highlights "{{{
+" Highlights 
 " ---------------------------------------------------------------------
 set cursorline
 "set cursorcolumn
@@ -107,18 +105,14 @@ if &term =~ "screen"
   autocmd VimLeave * silent!  exe '!echo -n "\ek[`hostname`:`basename $PWD`]\e\\"'
 endif
 
-"}}}
 
-" File types "{{{
-" ---------------------------------------------------------------------
+" File types 
 " JavaScript
 au BufNewFile,BufRead *.es6 setf javascript
 " TypeScript
 au BufNewFile,BufRead *.tsx setf typescriptreact
 " Markdown
 au BufNewFile,BufRead *.md set filetype=markdown
-" Flow
-au BufNewFile,BufRead *.flow set filetype=javascript
 
 set suffixesadd=.js,.es,.jsx,.json,.css,.less,.sass,.styl,.php,.py,.md
 
@@ -126,9 +120,7 @@ autocmd FileType coffee setlocal shiftwidth=2 tabstop=2
 autocmd FileType ruby setlocal shiftwidth=2 tabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-"}}}
-
-" Imports "{{{
+" Imports 
 " ---------------------------------------------------------------------
 runtime ./plug.vim
 if has("unix")
@@ -140,9 +132,8 @@ if has("unix")
 endif
 
 runtime ./maps.vim
-"}}}
 
-" Syntax theme "{{{
+" Syntax theme 
 " ---------------------------------------------------------------------
 
 " true color
@@ -158,11 +149,9 @@ if exists("&termguicolors") && exists("&winblend")
   colorscheme onedark
 endif
 
-"}}}
-
-" Extras "{{{
+" Extras 
 " ---------------------------------------------------------------------
 set exrc
-"}}}
+
 
 " vim: set foldmethod=marker foldlevel=0:
