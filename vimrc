@@ -167,13 +167,11 @@ inoremap <C-k> <esc>:m .-2<cr>==
 nnoremap <leader>j :m .+1<cr>==
 nnoremap <leader>k :m .-2<cr>==
 
-" Markdown server (livedown) remaps
-nmap gm :LivedownToggle<CR>
-
 " Git remaps
 nmap <leader>gl :diffget //3<cr>
 nmap <leader>gh :diffget //2<cr>
 nmap <leader>gs :G<cr>
+nmap <leader>gb :Git blame<cr>
 
 " Prettier remaps
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
