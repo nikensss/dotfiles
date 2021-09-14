@@ -1,0 +1,2 @@
+nmap gm :LivedownToggle<CR>
+

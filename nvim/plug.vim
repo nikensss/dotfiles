@@ -15,6 +15,7 @@ Plug 'sheerun/vim-polyglot'
 Plug 'mattn/emmet-vim'
 Plug 'szw/vim-maximizer'
 Plug 'preservim/nerdtree'
+Plug 'shime/vim-livedown'
 
 if has("nvim")
   Plug 'phaazon/hop.nvim'

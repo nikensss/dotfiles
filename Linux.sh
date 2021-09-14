@@ -34,6 +34,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install --lts
+npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier pyright livedown
 
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
