@@ -154,4 +154,4 @@ endif
 set exrc
 
 
-" vim: set foldmethod=marker foldlevel=0:
+g.markdown_fenced_languages = {"html","javascript","typescript","css","scss"}
