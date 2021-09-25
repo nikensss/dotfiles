@@ -25,6 +25,23 @@ mcd () {
   cd $1
 }
 
+tscSetup(){
+  npm i -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky
+
+  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "ecmaVersion": 2020, "sourceType": "module" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": {} }' >> .eslintrc.json
+  echo '{ "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
+  echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
+
+  npm set-script pretty "prettier --write src/**/*.ts"
+  npm set-script pretty:check "prettier --check src/**/*.ts"
+  npm set-script lint "eslint src/**/*.ts"
+  npm set-script prepare "husky install"
+  npm run prepare
+
+  npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
+  git add .husky/pre-commit
+}
+
 lpmh () {
   #babel
   npm i -D @babel/eslint-parser @babel/preset-env @babel/plugin-proposal-class-properties
