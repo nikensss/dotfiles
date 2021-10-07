@@ -25,7 +25,7 @@ set showcmd
 set cmdheight=2
 set laststatus=2
 set scrolloff=5
-set colorcolumn=80
+set colorcolumn=80,100,120
 set expandtab
 set clipboard+=unnamedplus
 "let loaded_matchparen = 1
@@ -154,4 +154,4 @@ endif
 set exrc
 
 
-g.markdown_fenced_languages = {"html","javascript","typescript","css","scss"}
+let g:markdown_fenced_languages = ["html","css","scss","javascript","js=javascript","json=javascript","typescript","ts=typescript","bash","bash=sh"]
