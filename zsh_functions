@@ -35,8 +35,8 @@ tscSetup(){
   npm set-script pretty "prettier --write src/**/*.ts"
   npm set-script pretty:check "prettier --check src/**/*.ts"
   npm set-script lint "eslint src/**/*.ts"
-  npm set-script prepareHusky "husky install"
-  npm run prepareHusky
+  npm set-script prepare "husky install"
+  npm run prepare
 
   npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
   git add .husky/pre-commit
