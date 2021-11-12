@@ -2,7 +2,7 @@ augroup NeoformatAutoFormat
     autocmd!
     autocmd FileType javascript,javascript.jsx,typescript,typescript.tsx setlocal formatprg=prettier\
                 \--stdin
-    autocmd BufWritePre,InsertLeave * Neoformat
+    autocmd BufWritePre * Neoformat
 augroup END
 
 nnoremap <leader>p :Neoformat<cr>:w<cr>

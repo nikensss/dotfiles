@@ -155,3 +155,6 @@ set exrc
 
 
 let g:markdown_fenced_languages = ["html","css","scss","javascript","js=javascript","json=javascript","typescript","ts=typescript","bash","bash=sh"]
+" Remove elements from quickfix list
+nnoremap <buffer> <silent> dd
+  \ <Cmd>call setqflist(filter(getqflist(), {idx -> idx != line('.') - 1}), 'r') <Bar><CR>
