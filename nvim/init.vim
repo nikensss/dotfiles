@@ -72,7 +72,7 @@ set ai "Auto indent
 set si "Smart indent
 set nowrap "No Wrap lines
 set formatoptions-=t "do not automatically wrap text when typing
-set backspace=start,eol,indent
+set backspace=indent,eol,start
 " Finding files - Search down into subfolders
 set path+=**
 set wildignore+=*/node_modules/*
