@@ -16,6 +16,7 @@ Plug 'mattn/emmet-vim'
 Plug 'szw/vim-maximizer'
 Plug 'preservim/nerdtree'
 Plug 'shime/vim-livedown'
+Plug 'AndrewRadev/sideways.vim'
 
 if has("nvim")
   Plug 'phaazon/hop.nvim'

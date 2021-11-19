@@ -17,7 +17,8 @@ wu(){
 
 cln(){
   git clone $1
-  code "$(basename "$1" .git)"
+  cd "$(basename "$1" .git)"
+  v
 }
 
 mcd () {
