@@ -111,3 +111,5 @@ vnoremap K :m '<-2<cr>gv=gv
 nnoremap <leader>j :m .+1<cr>==
 nnoremap <leader>k :m .-2<cr>==
 
+" Wrap variable in interpolated string notation
+nmap <leader>ip ysiw`ysi`}i$<esc>f`

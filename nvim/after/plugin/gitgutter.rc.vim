@@ -1,2 +1,2 @@
-nmap <leader>hj ]c
-nmap <leader>hk [c
+nmap <leader>hj ]czz
+nmap <leader>hk [czz
