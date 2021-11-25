@@ -18,7 +18,7 @@ saga.init_lsp_saga {
 
 EOF
 
-nnoremap <silent> <C-j> <Cmd>Lspsaga diagnostic_jump_next<CR>
+nnoremap <silent> <C-j> <Cmd>Lspsaga diagnostic_jump_next<CR>zz
 nnoremap <silent> K <Cmd>Lspsaga hover_doc<CR>
 inoremap <silent> <C-k> <Cmd>Lspsaga signature_help<CR>
 nnoremap <leader>rn <Cmd>Lspsaga rename<CR>
