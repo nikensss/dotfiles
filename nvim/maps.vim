@@ -113,3 +113,6 @@ nnoremap <leader>k :m .-2<cr>==
 
 " Wrap variable in interpolated string notation
 nmap <leader>ip ysiw`ysi`}i$<esc>f`
+
+" Select pasted text
+nnoremap gp `[v`]
