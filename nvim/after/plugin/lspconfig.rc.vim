@@ -40,9 +40,9 @@ local on_attach = function(client, bufnr)
   --buf_set_keymap('n', '<S-C-j>', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>', opts)
   buf_set_keymap('n', '<leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', opts)
 
-  vim.api.nvim_command [[autocmd CursorHold  *.{ts,tsx} lua vim.lsp.buf.document_highlight()]]
-  vim.api.nvim_command [[autocmd CursorHoldI *.{ts,tsx} lua vim.lsp.buf.document_highlight()]]
-  vim.api.nvim_command [[autocmd CursorMoved *.{ts,tsx} lua vim.lsp.buf.clear_references()]]
+  -- vim.api.nvim_command [[autocmd CursorHold  *.{ts,tsx} lua vim.lsp.buf.document_highlight()]]
+  -- vim.api.nvim_command [[autocmd CursorHoldI *.{ts,tsx} lua vim.lsp.buf.document_highlight()]]
+  -- vim.api.nvim_command [[autocmd CursorMoved *.{ts,tsx} lua vim.lsp.buf.clear_references()]]
 
   --protocol.SymbolKind = { }
   protocol.CompletionItemKind = {
