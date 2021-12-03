@@ -13,11 +13,7 @@ nnoremap + <C-a>
 nnoremap - <C-x>
 
 " Select all
-nmap <C-a> gg<S-v>G
-
-" Open file explorer
-nmap <leader>ef :Ex<CR>
-nmap <leader>ev :Vex<CR><C-w>L
+nmap <C-a> gg<S-v>Gygv
 
 " Quickfix list mappings
 nnoremap <leader>qo :copen<CR>
@@ -65,10 +61,6 @@ nmap sd svgd
 " Swap between windows
 nmap <leader><leader> <C-w>w
 " Move window
-map s<left> <C-w>h
-map s<up> <C-w>k
-map s<down> <C-w>j
-map s<right> <C-w>l
 map sh <C-w>h
 map sk <C-w>k
 map sj <C-w>j
