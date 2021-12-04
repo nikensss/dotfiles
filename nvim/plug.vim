@@ -40,6 +40,7 @@ if has("nvim")
   Plug 'nvim-telescope/telescope-fzy-native.nvim'
   Plug 'sbdchd/neoformat'
   Plug 'lukas-reineke/indent-blankline.nvim'
+  Plug 'ray-x/lsp_signature.nvim'
 endif
 
 call plug#end()

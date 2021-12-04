@@ -57,19 +57,23 @@ end
 --- jump to prev/next snippet's placeholder
 _G.tab_complete = function()
   if vim.fn.pumvisible() == 1 then
-    return t("<C-n>")
+    return vim.api.nvim_replace_termcodes("<C-n>", true, true, true)
+  elseif vim.fn["UltiSnips#CanExpandSnippet"]() == 1 or vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+    return vim.api.nvim_replace_termcodes("<C-R>=UltiSnips#ExpandSnippetOrJump()<CR>", true, true, true)
   elseif check_back_space() then
-    return t("<Tab>")
+    return vim.api.nvim_replace_termcodes("<Tab>", true, true, true)
   else
-    return vim.fn["compe#complete"]()
+    return vim.fn['compe#complete']()
   end
 end
 
 _G.s_tab_complete = function()
-  if vim.fn.pumvisible() == 1 then
-    return t("<C-p>")
+	if vim.fn.pumvisible() == 1 then
+    return vim.api.nvim_replace_termcodes("<C-p>", true, true, true)
+  elseif vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+    return vim.api.nvim_replace_termcodes("<C-R>=UltiSnips#JumpBackwards()<CR>", true, true, true)
   else
-    return t("<S-Tab>")
+    return vim.api.nvim_replace_termcodes("<S-Tab>", true, true, true)
   end
 end
 
