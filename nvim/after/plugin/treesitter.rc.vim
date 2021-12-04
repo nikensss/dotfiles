@@ -32,7 +32,8 @@ require'nvim-treesitter.configs'.setup {
     "html",
     "css",
     "scss",
-    "python"
+    "python",
+    "rust"
   },
   rainbow = {
     enable = true,
@@ -47,8 +48,8 @@ require'nvim-treesitter.configs'.setup {
         goto_definition = "gnd",
         list_definitions = "gnD",
         list_definitions_toc = "gO",
-        goto_next_usage = "<leader>un",
-        goto_previous_usage = "<leader>up",
+        goto_previous_usage = "[r",
+        goto_next_usage = "]r",
       },
     },
   }
@@ -57,3 +58,4 @@ require'nvim-treesitter.configs'.setup {
 local parser_config = require "nvim-treesitter.parsers".get_parser_configs()
 parser_config.tsx.used_by = { "javascript", "typescript.tsx" }
 EOF
+
