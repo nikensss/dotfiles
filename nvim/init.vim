@@ -19,6 +19,7 @@ set encoding=utf-8
 set title
 set autoindent
 set background=dark
+set signcolumn=yes
 set nobackup
 set nowritebackup
 set showcmd
@@ -138,7 +139,6 @@ runtime ./maps.vim
 
 " true color
 if exists("&termguicolors") && exists("&winblend")
-  syntax enable
   set termguicolors
   set winblend=0
   set wildoptions=pum

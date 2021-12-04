@@ -20,6 +20,7 @@ Plug 'shime/vim-livedown'
 Plug 'AndrewRadev/sideways.vim'
 
 if has("nvim")
+  Plug 'simrat39/rust-tools.nvim'
   Plug 'phaazon/hop.nvim'
   Plug 'hoob3rt/lualine.nvim'
   Plug 'kristijanhusak/defx-git'
@@ -30,6 +31,8 @@ if has("nvim")
   Plug 'folke/lsp-colors.nvim'
   Plug 'hrsh7th/nvim-compe'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+  Plug 'nvim-treesitter/nvim-treesitter-refactor'
+  Plug 'p00f/nvim-ts-rainbow'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'nvim-lua/popup.nvim'
   Plug 'nvim-lua/plenary.nvim'
