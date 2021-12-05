@@ -323,7 +323,8 @@ require'nvim-treesitter.configs'.setup {
     "jsonc",
     "html",
     "css",
-    "scss"
+    "scss",
+    "rust"
   },
 }
 
