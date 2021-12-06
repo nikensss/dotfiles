@@ -174,6 +174,4 @@ local rust_opts = {
 }
 
 require('rust-tools').setup(rust_opts)
-
-
 EOF

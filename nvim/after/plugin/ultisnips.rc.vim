@@ -1,5 +1,5 @@
 let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+let g:UltiSnipsJumpForwardTrigger="<C-m>"
+let g:UltiSnipsJumpBackwardTrigger="<C-b>"
 
 let g:UltiSnipsEditSplit="vertical"
