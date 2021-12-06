@@ -1,7 +1,13 @@
 snippet caf "const arrow function" b
-const ${1} = (${2})  => {
-	${3}
+const ${1:name} = (${2:input}): ${3:output} => {
+	${4}
 }
+endsnippet
+
+snippet :a "literal object arrow function" b
+	${1:method_name}: (${2:input}): ${3:return_type} => {
+		${0:${VISUAL}}
+	},
 endsnippet
 
 snippet co "console.log({ something })" b
@@ -15,7 +21,13 @@ for await (const ${1} of ${2}) {
 endsnippet
 
 snippet cmet "class method" b
-${1}():${2} {
+${1}(): ${2} {
 	${3}
+}
+endsnippet
+
+snippet acmet "async class method" b
+async ${1:method_name}(${2:input}): Promise<${3:return_type}> {
+	${4}
 }
 endsnippet
