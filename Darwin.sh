@@ -47,24 +47,26 @@ python3 -m pip install --user --upgrade pynvim
 
 echo "${GREEN}installing rust${RESET}"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+echo "${BLUE}adding rustfmt component${RESET}"
 rustup component add rustfmt
 cd ~
 mkdir repos
 cd repos
 mkdir rust
 cd rust
+echo "${BLUE}cloning rust-analyzer${RESET}"
 git clone https://github.com/rust-analyzer/rust-analyzer.git
 cd rust-analyzer
+echo "${BLUE}installing rust language server${RESET}"
 cargo xtask install --server
 
-echo "${BLUE}installing vim-plug${RESET}"
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-
-echo "${BLUE}installing oh-my-zsh${RESET}"
+echo "${GREEN}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
 
-echo "${BLUE}installing plugins${RESET}"
+echo "${GREEN}installing vim-plug${RESET}"
+sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+
+echo "${GREEN}installing plugins${RESET}"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
