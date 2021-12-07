@@ -89,9 +89,24 @@ nvim_lsp.rust_analyzer.setup {
   }
 }
 
+local function organize_imports()
+  local params = {
+    command = "_typescript.organizeImports",
+    arguments = {vim.api.nvim_buf_get_name(0)},
+    title = ""
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 nvim_lsp.tsserver.setup {
   on_attach = on_attach,
-  filetypes = { "typescript", "typescriptreact", "typescript.tsx" }
+  filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+  commands = {
+    OrganizeImports = {
+      organize_imports,
+      description = "Organize Imports"
+    }
+  }
 }
 
 nvim_lsp.diagnosticls.setup {
@@ -175,3 +190,5 @@ local rust_opts = {
 
 require('rust-tools').setup(rust_opts)
 EOF
+
+nnoremap <leader>oi :OrganizeImports<CR>

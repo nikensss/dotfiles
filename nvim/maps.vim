@@ -97,12 +97,6 @@ nnoremap J mzJ`z:delm!<cr>
 nnoremap <expr> k (v:count > 5 ? "m'" . v:count : "") . 'k'
 nnoremap <expr> j (v:count > 5 ? "m'" . v:count : "") . 'j'
 
-" Moving text
-vnoremap J :m '>+1<cr>gv=gv
-vnoremap K :m '<-2<cr>gv=gv
-nnoremap <leader>j :m .+1<cr>==
-nnoremap <leader>k :m .-2<cr>==
-
 " Wrap variable in interpolated string notation
 nmap <leader>ip ysiw`ysi`}i$<esc>f`
 vmap <leader>ip S`ysi`}i$<esc>f`
