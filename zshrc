@@ -136,9 +136,6 @@ if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-clou
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-source ~/.zsh_aliases
-source ~/.zsh_functions
-
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
@@ -164,3 +161,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+. /usr/local/opt/asdf/libexec/asdf.sh
+. ~/.asdf/plugins/java/set-java-home.zsh
+
+source ~/.zsh_aliases
+source ~/.zsh_functions

@@ -36,7 +36,7 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf
 brew upgrade
 
 echo "${GREEN}installing python"
