@@ -23,6 +23,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 
 if has("nvim")
+  Plug 'mfussenegger/nvim-jdtls'
   Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'SirVer/ultisnips'
   Plug 'folke/lsp-colors.nvim'
