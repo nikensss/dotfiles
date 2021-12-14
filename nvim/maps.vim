@@ -103,3 +103,7 @@ vmap <leader>ip S`ysi`}i$<esc>f`
 
 " Select pasted text
 nnoremap gp `[v`]
+
+" Remove elements from quickfix list
+nnoremap <buffer> <silent> dd
+  \ <Cmd>call setqflist(filter(getqflist(), {idx -> idx != line('.') - 1}), 'r') <Bar><CR>
