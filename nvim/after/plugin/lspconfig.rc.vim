@@ -10,7 +10,7 @@ lua << EOF
 local nvim_lsp = require 'lspconfig'
 local protocol = require 'vim.lsp.protocol'
 
--- Use an on_attach function to only map the following keys 
+-- Use an on_attach function to only map the following keys
 -- after the language server attaches to the current buffer
 local on_attach = function(client, bufnr)
   require 'lsp_signature'.on_attach()

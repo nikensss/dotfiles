@@ -60,6 +60,11 @@ cd rust-analyzer
 echo "${BLUE}installing rust language server${RESET}"
 cargo xtask install --server
 
+echo "${GREEN}installing java language server${RESET}"
+cd ~/repos
+mkdir java
+cd java
+
 echo "${GREEN}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
 

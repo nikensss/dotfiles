@@ -45,3 +45,4 @@ alias gcb='git for-each-ref --format "%(refname:short)" refs/heads | grep -v "ma
 alias ffcg='firebase functions:config:get | json_pp'
 alias ffcs='firebase functions:config:set'
 alias fpl='firebase projects:list'
+alias cd_vpl='cd /Users/ricard/.local/share/nvim/plugged'

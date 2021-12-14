@@ -30,6 +30,7 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
+export JDTLS_HOME="~/repos/java/jdt-language-server-1.5.0"
 export NODE_ENV=mbp
 export VISUAL=vim
 export EDITOR="$VISUAL"

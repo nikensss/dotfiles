@@ -54,23 +54,23 @@ vnoremap <silent> # :<C-U>
 " Windows
 
 " Split window
-nmap ss :split<Return><C-w>w
-nmap sv :vsplit<Return><C-w>w
+nmap <leader>ss :split<Return><C-w>w
+nmap <leader>sv :vsplit<Return><C-w>w
 " Go to definition in side window
-nmap sd svgd
+nmap <leader>sd svgd
 " Swap between windows
 nmap <leader><leader> <C-w>w
 " Move window
-map sh <C-w>h
-map sk <C-w>k
-map sj <C-w>j
-map sl <C-w>l
+map <leader>sh <C-w>h
+map <leader>sk <C-w>k
+map <leader>sj <C-w>j
+map <leader>sl <C-w>l
 " Close last used window
-map sp <C-w>p<C-w>q
+map <leader>sp <C-w>p<C-w>q
 " Close window
-map sq <C-w>q
+map <leader>sq <C-w>q
 " Close other windows
-map so <C-w>o
+map <leader>so <C-w>o
 
 " Resize window
 nmap <C-w><left> <C-w><
