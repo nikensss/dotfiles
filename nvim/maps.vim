@@ -57,7 +57,7 @@ vnoremap <silent> # :<C-U>
 nmap <leader>ss :split<Return><C-w>w
 nmap <leader>sv :vsplit<Return><C-w>w
 " Go to definition in side window
-nmap <leader>sd svgd
+nmap <leader>sd <leader>svgd
 " Swap between windows
 nmap <leader><leader> <C-w>w
 " Move window
