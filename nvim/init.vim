@@ -1,4 +1,4 @@
-" Fundamentals 
+" Fundamentals
 " ---------------------------------------------------------------------
 
 " init autocmd
@@ -85,7 +85,7 @@ autocmd InsertLeave * set nopaste
 " Add asterisks in block comments
 set formatoptions+=r
 
-" Highlights 
+" Highlights
 " ---------------------------------------------------------------------
 set cursorline
 "set cursorcolumn
@@ -107,7 +107,7 @@ if &term =~ "screen"
 endif
 
 
-" File types 
+" File types
 " JavaScript
 au BufNewFile,BufRead *.es6 setf javascript
 " TypeScript
@@ -121,7 +121,7 @@ autocmd FileType coffee setlocal shiftwidth=2 tabstop=2
 autocmd FileType ruby setlocal shiftwidth=2 tabstop=2
 autocmd FileType yaml setlocal shiftwidth=2 tabstop=2
 
-" Imports 
+" Imports
 " ---------------------------------------------------------------------
 runtime ./plug.vim
 if has("unix")
@@ -134,7 +134,7 @@ endif
 
 runtime ./maps.vim
 
-" Syntax theme 
+" Syntax theme
 " ---------------------------------------------------------------------
 
 " true color
@@ -149,12 +149,9 @@ if exists("&termguicolors") && exists("&winblend")
   colorscheme onedark
 endif
 
-" Extras 
+" Extras
 " ---------------------------------------------------------------------
 set exrc
 
 
 let g:markdown_fenced_languages = ["html","css","scss","javascript","js=javascript","json=javascript","typescript","ts=typescript","bash","bash=sh"]
-" Remove elements from quickfix list
-nnoremap <buffer> <silent> dd
-  \ <Cmd>call setqflist(filter(getqflist(), {idx -> idx != line('.') - 1}), 'r') <Bar><CR>
