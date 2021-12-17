@@ -41,6 +41,7 @@ set noerrorbells
 set hidden
 
 set matchpairs+=<:>
+set updatetime=300
 
 " Helps force plug-ins to load correctly when it is turned back on below.
 filetype off
