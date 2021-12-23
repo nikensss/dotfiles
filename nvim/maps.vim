@@ -66,7 +66,7 @@ map <leader>sk <C-w>k
 map <leader>sj <C-w>j
 map <leader>sl <C-w>l
 " Close last used window
-map <leader>sp <C-w>p<C-w>q
+map <leader>sp <C-w>w<C-w>q
 " Close window
 map <leader>sq <C-w>q
 " Close other windows
