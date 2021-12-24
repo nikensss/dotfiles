@@ -25,19 +25,19 @@ setup_colors
 echo "${GREEN}installing delevoper tools...${RESET}"
 xcode-select --install
 
-echo "${BLUE}installing nvm${RESET}"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm install --lts
-npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier prettier-plugin-java pyright livedown
-
 echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf http jq
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq
 brew upgrade
+
+echo "${GREEN}installing nvm${RESET}"
+http get https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq .version | xargs -tI {} curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v{}/install.sh" | bash
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+nvm install --lts
+npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier prettier-plugin-java pyright livedown
 
 echo "${GREEN}installing python"
 pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
