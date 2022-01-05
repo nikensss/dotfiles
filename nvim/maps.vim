@@ -71,6 +71,9 @@ map <leader>sp <C-w>w<C-w>q
 map <leader>sq <C-w>q
 " Close other windows
 map <leader>so <C-w>o
+" Leave only diff window open (to be used when only the :Git status window is
+" open and the cursor is on the diff window already)
+map <leader>od <leader>gs<leader>sq<leader>sl
 
 " Resize window
 nmap <C-w><left> <C-w><
