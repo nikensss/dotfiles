@@ -139,14 +139,18 @@ runtime ./maps.vim
 " ---------------------------------------------------------------------
 
 " true color
+lua << EOF
+require('onedark').setup {
+  style = 'darker'
+}
+EOF
+
 if exists("&termguicolors") && exists("&winblend")
   set termguicolors
   set winblend=0
   set wildoptions=pum
   set pumblend=5
   set background=dark
-  " Use onedark
-  let g:onedark_style = 'darker'
   colorscheme onedark
 endif
 
