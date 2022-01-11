@@ -22,7 +22,7 @@ nnoremap <silent> ]a <Cmd>Lspsaga diagnostic_jump_next<CR>zz
 nnoremap <silent> [a <Cmd>Lspsaga diagnostic_jump_prev<CR>zz
 nnoremap <silent> K <Cmd>Lspsaga hover_doc<CR>
 inoremap <silent> <C-k> <Cmd>Lspsaga signature_help<CR>
-nnoremap <leader>rn <Cmd>Lspsaga rename<CR>
+nnoremap <silent> <leader>rn <Cmd>Lspsaga rename<CR>
 nnoremap <silent> ga <Cmd>Lspsaga code_action<CR>
 nnoremap <silent> gh <Cmd>Lspsaga lsp_finder<CR>
 nnoremap <silent> <C-f> <cmd>lua require('lspsaga.action').smart_scroll_with_saga(1)<CR>
