@@ -19,9 +19,9 @@ nmap <C-a> gg<S-v>Gygv
 nnoremap <leader>qo :copen<CR>
 nnoremap <leader>qc :cclose<CR>
 nnoremap <leader>qj :cnext<CR>zz
-nnoremap <leader>qJ :cfirst<CR>zz
+nnoremap <leader>qJ :clast<CR>zz
 nnoremap <leader>qk :cprevious<CR>zz
-nnoremap <leader>qK :clast<CR>zz
+nnoremap <leader>qK :cfirst<CR>zz
 
 " Location list mappings
 nnoremap <leader>lo :lopen<CR>
