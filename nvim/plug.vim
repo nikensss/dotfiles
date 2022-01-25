@@ -23,7 +23,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-unimpaired'
 
 if has("nvim")
-  Plug 'mfussenegger/nvim-jdtls'
+  Plug 'APZelos/blamer.nvim'
   Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'SirVer/ultisnips'
   Plug 'folke/lsp-colors.nvim'
@@ -38,6 +38,7 @@ if has("nvim")
   Plug 'kristijanhusak/defx-icons'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lukas-reineke/indent-blankline.nvim'
+  Plug 'mfussenegger/nvim-jdtls'
   Plug 'neovim/nvim-lspconfig'
   Plug 'nvim-lua/plenary.nvim'
   Plug 'nvim-lua/popup.nvim'
