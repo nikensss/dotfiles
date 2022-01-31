@@ -50,6 +50,7 @@ if has("nvim")
   Plug 'phaazon/hop.nvim'
   Plug 'quangnguyen30192/cmp-nvim-ultisnips'
   Plug 'ray-x/lsp_signature.nvim'
+  Plug 'rhysd/git-messenger.vim'
   Plug 'sbdchd/neoformat'
   Plug 'simrat39/rust-tools.nvim'
   Plug 'tami5/lspsaga.nvim'
