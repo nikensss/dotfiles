@@ -38,8 +38,6 @@ cmp.setup({
 		["<Tab>"] = cmp.mapping(function(fallback)
 					if cmp.visible() then
             cmp.select_next_item()
-          elseif vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
-            vim.fn["UltiSnips#JumpForwards"]()
           elseif has_any_words_before() then
             press("<Tab>")
           else
@@ -54,8 +52,6 @@ cmp.setup({
 		["<S-Tab>"] = cmp.mapping(function(fallback)
           if cmp.visible() then
             cmp.select_prev_item()
-					elseif vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
-            vim.fn["UltiSnips#JumpBackwards"]()
           else
             fallback()
           end
