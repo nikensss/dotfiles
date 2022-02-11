@@ -58,6 +58,9 @@ tscSetup(){
   npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
   git add .husky/pre-commit
 
+  npx --yes husky add .husky/commit-msg "npx --no -- commitlint --edit $1"
+  git add .husky/commit-msg
+
   npm run pretty
   npm run start
 }
