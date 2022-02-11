@@ -41,7 +41,7 @@ tscSetup(){
   npm i -D typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": {"@typescript-eslint/no-floating-promises": ["error"]} }' >> .eslintrc.json
-  echo '{ "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
+  echo '{ "printWidth": 100, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
   tsc --init
   mkdir src
