@@ -3,7 +3,7 @@
 # Please adapt and uncomment the following lines:
 	user = Ricard Mallafre
 	email = rikitzzz@gmail.com
-	pager = diff-so-fancy | less --tabs=1,5 -R
+	pager = diff-so-fancy | less --tabs=1,5 -RTX
 	editor = nvim
 [user]
 	name = Ricard Mallafre
