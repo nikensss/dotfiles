@@ -109,8 +109,6 @@ cmp.setup({
         end, {
           "i",
           "s",
-          -- add this line when using cmp-cmdline:
-          -- "c",
 		}),
 		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-1), {'i', 'c'}),
 		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(1), {'i', 'c'}),
@@ -130,7 +128,7 @@ cmp.setup({
 		{ name = 'nvim_lsp' },
 		{ name = 'ultisnips' },
 	}, {
-		{ name = 'buffer' },
+		{ name = 'buffer', keyword_length = 5 },
 	})
 })
 
