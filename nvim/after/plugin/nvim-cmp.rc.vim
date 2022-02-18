@@ -36,7 +36,11 @@ cmp.setup({
 	},
 	mapping = {
 		["<Tab>"] = cmp.mapping(function(fallback)
-					if cmp.visible() then
+          if cmp.get_selected_entry() == nil and vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
+            vim.fn["UltiSnips#ExpandSnippet"]()
+          elseif vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+            vim.fn["UltiSnips#JumpForwards"]()
+          elseif cmp.visible() then
             cmp.select_next_item()
           elseif has_any_words_before() then
             press("<Tab>")
@@ -46,11 +50,11 @@ cmp.setup({
         end, {
           "i",
           "s",
-          -- add this line when using cmp-cmdline:
-          -- "c",
 		}),
 		["<S-Tab>"] = cmp.mapping(function(fallback)
-          if cmp.visible() then
+          if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
+            vim.fn["UltiSnips#JumpBackwards"]()
+          elseif cmp.visible() then
             cmp.select_prev_item()
           else
             fallback()
@@ -58,8 +62,6 @@ cmp.setup({
         end, {
           "i",
           "s",
-          -- add this line when using cmp-cmdline:
-          -- "c",
 		}),
 		['<Down>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
 		['<Up>'] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
@@ -110,8 +112,8 @@ cmp.setup({
           "i",
           "s",
 		}),
-		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-1), {'i', 'c'}),
-		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(1), {'i', 'c'}),
+		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), {'i', 'c'}),
+		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), {'i', 'c'}),
 		['<C-e>'] = cmp.mapping({ i = cmp.mapping.close(), c = cmp.mapping.close() }),
 		['<CR>'] = cmp.mapping({
 				i = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
