@@ -158,5 +158,11 @@ endif
 " ---------------------------------------------------------------------
 set exrc
 
+" I put blamer.nvim stuff here because it doesn't seem to work when it is in
+" nvim/after/plugin
+let g:blamer_enabled = 1
+let g:blamer_delay = 700
+let g:blamer_show_in_insert_modes = 0
+let g:blamer_show_in_visual_modes = 0
 
 let g:markdown_fenced_languages = ["html","css","scss","javascript","js=javascript","json=javascript","typescript","ts=typescript","bash","bash=sh"]
