@@ -91,6 +91,9 @@ nnoremap <leader>rp :vertical resize 120<cr>
 " Yank to the end of the line
 nnoremap Y y$
 
+" Select to the end of the line
+nnoremap <leader>v v$
+
 " Keep the cursor centered when joining lines or moving around
 nnoremap n nzzzv
 nnoremap N Nzzzv
