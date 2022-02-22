@@ -37,7 +37,7 @@ http get https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq .
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm install --lts
-npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier prettier-plugin-java pyright livedown
+npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier prettier-plugin-java pyright livedown live-server
 
 echo "${GREEN}installing python"
 pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
