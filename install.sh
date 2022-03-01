@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 umask g-w,o-w
 
@@ -33,8 +33,8 @@ echo "${BLUE}Checking platform${RESET}"
 platform=$(uname)
 if [ "$platform" = "Linux" ]; then
   echo "${GREEN}Detected Linux${RESET}"
-  bash ./Linux.sh
+  ./Linux.sh
 elif [ "$platform" = "Darwin" ]; then
   echo "${GREEN}Detected macOS${RESET}"
-  bash ./Darwin.sh
+  ./Darwin.sh
 fi
