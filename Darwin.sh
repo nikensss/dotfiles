@@ -64,6 +64,9 @@ echo "${GREEN}installing java language server${RESET}"
 cd ~/repos
 mkdir java
 cd java
+asdf plugin-add java
+asdf install java openjdk-17.0.2
+asdf global java openjdk-17.0.2
 
 echo "${GREEN}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended

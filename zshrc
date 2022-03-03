@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -8,6 +10,10 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # For c and c++ stuff
 export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
+
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -140,16 +146,6 @@ if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-clou
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
-export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/Users/ricard/.pyenv/versions/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -165,8 +161,23 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-. /usr/local/opt/asdf/libexec/asdf.sh
-. ~/.asdf/plugins/java/set-java-home.zsh
+# Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+export PATH="$PATH:$HOME/.rvm/bin"
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+if [[ -f "/usr/local/opt/asdf/libexec/asdf.sh" ]]; then
+  . /usr/local/opt/asdf/libexec/asdf.sh
+fi
+
+if [[ -f "~/.asdf/plugins/java/set-java-home.zsh" ]]; then
+  . ~/.asdf/plugins/java/set-java-home.zsh
+fi
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
