@@ -171,8 +171,13 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
-. /usr/local/opt/asdf/libexec/asdf.sh
-. ~/.asdf/plugins/java/set-java-home.zsh
+if [[ -f "/usr/local/opt/asdf/libexec/asdf.sh" ]]; then
+  . /usr/local/opt/asdf/libexec/asdf.sh
+fi
+
+if [[ -f "~/.asdf/plugins/java/set-java-home.zsh" ]]; then
+  . ~/.asdf/plugins/java/set-java-home.zsh
+fi
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
