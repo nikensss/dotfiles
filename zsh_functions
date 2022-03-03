@@ -46,21 +46,22 @@ tscSetup(){
   tsc --init
   mkdir src
   touch src/index.ts
-  echo "console.log('hello, world!')" > src/index.ts
+  echo "const main = async () => {console.log('hello, world!');};\n\nmain().then(()=>console.log('Done!')).catch(console.error);" > src/index.ts
 
   npm set-script start "ts-node src/index.ts"
-  npm set-script pretty "prettier --write src/**/*.ts"
-  npm set-script pretty:check "prettier --check src/**/*.ts"
-  npm set-script lint "eslint src/**/*.ts"
+  npm set-script pretty "prettier --write 'src/**/*.ts'"
+  npm set-script pretty:check "prettier --check 'src/**/*.ts'"
+  npm set-script lint "eslint 'src/**/*.ts'"
   npm set-script prepare "husky install"
+
   npm run prepare
 
   npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
   npx --yes husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'
 
+  prettier --write './**/*{json,ts}'
   git add --all
 
-  npm run pretty
   npm run start
 }
 
