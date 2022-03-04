@@ -11,7 +11,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # For c and c++ stuff
 export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
 
-if [[ -f "/opt/homebrew/bin/brew" ]]; then
+if [ -f "/opt/homebrew/bin/brew" ]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
@@ -171,11 +171,11 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
-if [[ -f "/usr/local/opt/asdf/libexec/asdf.sh" ]]; then
+if [ -f "/usr/local/opt/asdf/libexec/asdf.sh" ]; then
   . /usr/local/opt/asdf/libexec/asdf.sh
 fi
 
-if [[ -f "~/.asdf/plugins/java/set-java-home.zsh" ]]; then
+if [ -f "~/.asdf/plugins/java/set-java-home.zsh" ]; then
   . ~/.asdf/plugins/java/set-java-home.zsh
 fi
 
