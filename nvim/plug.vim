@@ -26,7 +26,9 @@ if has("nvim")
   Plug 'APZelos/blamer.nvim'
   Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
   Plug 'SirVer/ultisnips'
+  Plug 'cakebaker/scss-syntax.vim'
   Plug 'folke/lsp-colors.nvim'
+  Plug 'hail2u/vim-css3-syntax'
   Plug 'honza/vim-snippets'
   Plug 'hoob3rt/lualine.nvim'
   Plug 'hrsh7th/cmp-buffer'
