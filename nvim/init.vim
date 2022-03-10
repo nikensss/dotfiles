@@ -66,8 +66,6 @@ set lazyredraw
 set ignorecase
 " Be smart when using tabs ;)
 set smarttab
-" indents
-filetype plugin indent on
 set shiftwidth=2
 set tabstop=2
 set ai "Auto indent
@@ -166,3 +164,9 @@ let g:blamer_show_in_insert_modes = 0
 let g:blamer_show_in_visual_modes = 0
 
 let g:markdown_fenced_languages = ["html","css","scss","javascript","js=javascript","json=javascript","typescript","ts=typescript","bash","bash=sh"]
+
+" CSS stuff (I should find a better place for it)
+filetype plugin on
+set omnifunc=syntaxcomplete#Complete
+
+autocmd FileType css,scss set omnifunc=csscomplete#CompleteCSS
