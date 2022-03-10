@@ -29,7 +29,7 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server
 brew upgrade
 
 echo "${GREEN}installing nvm${RESET}"
@@ -59,6 +59,7 @@ git clone https://github.com/rust-analyzer/rust-analyzer.git
 cd rust-analyzer
 echo "${BLUE}installing rust language server${RESET}"
 cargo xtask install --server
+cargo install stylua
 
 echo "${GREEN}installing java language server${RESET}"
 cd ~/repos
