@@ -1,4 +1,4 @@
-Run
+# Instructions
 
 If you run this with `sudo`, all installed packages and programs will be owned
 by the root user. I have to investigate if, by making myself a `sudoer`, that
