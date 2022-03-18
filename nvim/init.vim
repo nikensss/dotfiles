@@ -89,11 +89,6 @@ set formatoptions+=r
 set cursorline
 "set cursorcolumn
 
-" Set cursor line color on visual mode
-highlight Visual cterm=NONE ctermbg=236 ctermfg=NONE guibg=Grey40
-
-highlight LineNr cterm=none ctermfg=240 guifg=#2b506e guibg=#000000
-
 augroup BgHighlight
   autocmd!
   autocmd WinEnter * set cul
@@ -170,3 +165,6 @@ filetype plugin on
 set omnifunc=syntaxcomplete#Complete
 
 autocmd FileType css,scss set omnifunc=csscomplete#CompleteCSS
+
+" Set cursor line color on visual mode
+highlight Visual guibg=#00396c
