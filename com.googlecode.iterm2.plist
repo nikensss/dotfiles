@@ -56321,6 +56321,8 @@
 	<true/>
 	<key>DimOnlyText</key>
 	<true/>
+	<key>EnableAPIServer</key>
+	<true/>
 	<key>EnableDivisionView</key>
 	<true/>
 	<key>FlashTabBarInFullscreen</key>
