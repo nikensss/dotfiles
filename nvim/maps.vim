@@ -65,8 +65,8 @@ map <leader>sh <C-w>h
 map <leader>sk <C-w>k
 map <leader>sj <C-w>j
 map <leader>sl <C-w>l
-" Close last used window
-map <leader>sp <C-w>w<C-w>q
+" Move to floating window
+map <leader>sp <C-w>p
 " Close window
 map <leader>sq <C-w>q
 " Close other windows
