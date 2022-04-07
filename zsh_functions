@@ -43,6 +43,8 @@ ctp(){
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": {"@typescript-eslint/no-floating-promises": ["error"]} }' > .eslintrc.json
   echo '{ "printWidth": 100, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
+  echo 'save-exact=true' > .npmrc
+
   tsc --init
   mkdir src
   touch src/index.ts
