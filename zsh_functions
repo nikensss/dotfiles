@@ -26,7 +26,7 @@ mcd () {
   cd $1
 }
 
-tscSetup(){
+ctp(){
   if [ -z "$1" ]
     then
       echo "Project name not provided"
@@ -57,188 +57,27 @@ tscSetup(){
   npm run prepare
 
   npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
-  npx --yes husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'
+  npx --yes husky add .husky/commit-msg 'npx --no -- commitlint --edit $1'
+  npx --yes husky add .husky/pre-push ""
+  echo "STATUS=\$(git status --porcelain | wc -l | xargs)" >> .husky/pre-push
+  echo "" >> .husky/pre-push
+  echo "RED='\\\033[0;31m'" >> .husky/pre-push
+  echo "GREEN='\\\033[0;32m'" >> .husky/pre-push
+  echo "NO_COLOR='\\\033[0m'" >> .husky/pre-push
+  echo "" >> .husky/pre-push
+  echo "if [ \$STATUS -ne 0 ]; then" >> .husky/pre-push
+  echo "  echo \$RED'✖ Make sure all changes are staged and committed before pushing'\$NO_COLOR" >> .husky/pre-push
+  echo "  echo \$RED'\\\tDetected changes in '\$STATUS' files'\$NO_COLOR" >> .husky/pre-push
+  echo "  exit 1" >> .husky/pre-push
+  echo "fi" >> .husky/pre-push
+  echo "" >> .husky/pre-push
+  echo "echo \$GREEN'✓ No changes left to commit'\$NO_COLOR" >> .husky/pre-push
+  echo "" >> .husky/pre-push
 
   prettier --write './**/*{json,ts}'
   git add --all
 
   npm run start
-}
-
-lpmh () {
-  #babel
-  npm i -D @babel/eslint-parser @babel/preset-env @babel/plugin-proposal-class-properties
-  #eslint
-  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-node eslint-plugin-prettier@latest eslint-plugin-promise
-  #prettier
-  npm i -D --save-exact prettier
-  #commitlint
-  npm i -D @commitlint/cli @commitlint/config-conventional
-  #mocha and chai
-  npm i -D mocha chai
-
-  npm set-script pretty "prettier --write src/**/*.ts"
-  npm set-script pretty:check "prettier --check src/**/*.ts"
-  npm set-script lint "eslint src/**/*.ts"
-  npm set-script prepare "husky install"
-  npm run prepare
-
-  npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
-  git add .husky/pre-commit
-
-  echo '{
-  "env": {
-      "es2021": true,
-      "node": true,
-      "mocha": true
-    },
-    "extends": ["standard", "plugin:prettier/recommended","prettier"],
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "rules": {}
-  }' > .eslintrc.json
-
-  echo '{
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "none",
-    "arrowParens": "avoid"
-  }' > .prettierrc.json
-
-  echo '{
-    "extends": ["@commitlint/config-conventional"]
-  }' > .commitlintrc.json
-
-  echo '{
-    "presets": ["@babel/preset-env"],
-    "plugins": ["@babel/plugin-proposal-class-properties"]
-  }' > .babelrc.json
-
-  echo '{
-    "diff": true,
-    "extension": ["js"],
-    "package": "./package.json",
-    "recursive": true,
-    "spec": ["test/**/*.spec.js"]
-  }' > .mocharc.json
-}
-
-basu(){
-  npm i -D typescript ts-node @types/node
-  #eslint
-  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-react eslint-plugin-prettier@latest @typescript-eslint/parser @typescript-eslint/eslint-plugin
-  #prettier
-  npm i -D --save-exact prettier
-  #commitlint
-  npm i -D @commitlint/cli @commitlint/config-conventional
-
-  echo '{
-    "extends": [
-      "eslint:recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "prettier"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaVersion": 2021,
-      "sourceType": "module",
-    },
-    "plugins": ["@typescript-eslint"],
-    "rules": {
-      "semi":["error","always"],
-      "quotes":["error","single"]
-    }
-  }' > .eslintrc.json
-
-  echo '{
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "none",
-    "arrowParens": "avoid"
-  }' > .prettierrc.json
-
-  echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
-
-  npm i -D husky
-
-  npm set-script pretty "prettier --write src/**/*.ts"
-  npm set-script pretty:check "prettier --check src/**/*.ts"
-  npm set-script lint "eslint src/**/*.ts"
-  npm set-script prepare "cd .. && husky install functions/.husky"
-  npm run prepare
-
-  npx --yes husky add .husky/pre-commit "cd functions && npm run pretty:check && npm run lint"
-  git add --all
-}
-
-fesu(){
-  #eslint
-  npm i -D eslint eslint-config-prettier eslint-config-standard eslint-plugin-import eslint-plugin-react eslint-plugin-prettier@latest @typescript-eslint/parser @typescript-eslint/eslint-plugin
-  #prettier
-  npm i -D --save-exact prettier
-  #commitlint
-  npm i -D @commitlint/cli @commitlint/config-conventional
-
-  echo '{
-    "env": {
-      "es2021": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:react/recommended",
-      "plugin:@typescript-eslint/recommended",
-      "plugin:prettier/recommended",
-      "prettier"
-    ],
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-      "ecmaFeature": {
-        "jsx": true
-      },
-      "project": ["./tsconfig.json"]
-    },
-    "plugins": ["@typescript-eslint"],
-    "rules": {
-      "@typescript-eslint/no-floating-promises": 2
-    },
-    "settings": {
-      "react": {
-        "version": "^17"
-      }
-    }
-  }' > .eslintrc.json
-
-  echo '{
-    "tabWidth": 2,
-    "useTabs": false,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "none",
-    "arrowParens": "avoid"
-  }' > .prettierrc.json
-
-  echo '{
-    "extends": ["@commitlint/config-conventional"]
-  }' > .commitlintrc.json
-
-  npm i -D husky
-
-  npm set-script pretty "prettier --write src/**/*.tsx"
-  npm set-script pretty:check "prettier --check src/**/*.tsx"
-  npm set-script lint "eslint src/**/*.tsx"
-  npm set-script prepare "cd .. && husky install hosting/.husky"
-  npm run prepare
-
-  npx --yes husky add .husky/pre-commit "cd hosting && npm run pretty:check && npm run lint"
-  git add --all
 }
 
 md2pdf(){
