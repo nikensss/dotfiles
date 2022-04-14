@@ -62,6 +62,7 @@ ctp(){
   npx --yes husky add .husky/commit-msg 'npx --no -- commitlint --edit $1'
   npx --yes husky add .husky/pre-push ""
   echo "STATUS=\$(git status --porcelain | wc -l | xargs)" >> .husky/pre-push
+  echo "FILES=\$(git status --porcelain | sed -n \"s;^.. \\\(.*\\\)\$;\\\\\\\\\\\t\\\\\\\\\\\t\\\1\\\\\\\\\\\n;p\")" >> .husky/pre-push
   echo "" >> .husky/pre-push
   echo "RED='\\\033[0;31m'" >> .husky/pre-push
   echo "GREEN='\\\033[0;32m'" >> .husky/pre-push
@@ -69,7 +70,8 @@ ctp(){
   echo "" >> .husky/pre-push
   echo "if [ \$STATUS -ne 0 ]; then" >> .husky/pre-push
   echo "  echo \$RED'✖ Make sure all changes are staged and committed before pushing'\$NO_COLOR" >> .husky/pre-push
-  echo "  echo \$RED'\\\tDetected changes in '\$STATUS' files'\$NO_COLOR" >> .husky/pre-push
+  echo "  echo \$RED'\\\tDetected changes in:'\$NO_COLOR" >> .husky/pre-push
+  echo "  echo \$RED\$FILES\$NO_COLOR" >> .husky/pre-push
   echo "  exit 1" >> .husky/pre-push
   echo "fi" >> .husky/pre-push
   echo "" >> .husky/pre-push
