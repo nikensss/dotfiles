@@ -88,9 +88,9 @@ nnoremap <leader>- :vertical resize -5<cr>
 nnoremap <leader>= <c-w>=
 nnoremap <leader>rp :vertical resize 120<cr>
 nnoremap <leader><up> <C-w>+
-nnoremap <leader><leader><up> <C-w>25+
+nnoremap <leader><leader><up> <C-w>15+
 nnoremap <leader><down> <C-w>-
-nnoremap <leader><leader><down> <C-w>25-
+nnoremap <leader><leader><down> <C-w>15-
 
 " Yank to the end of the line
 nnoremap Y y$
