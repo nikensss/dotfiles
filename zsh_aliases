@@ -1,14 +1,34 @@
 alias restart_shell='exec $SHELL'
 alias vim=nvim
 alias v='vim .'
+
+# Python
 alias py=python
 alias cve='python -m venv --system-site-packages ./venv'
 alias uve='source venv/bin/activate'
+
+# NPM
 alias b='npm run build'
 alias t='npm test'
 alias tw='npm run test:watch'
 alias s='npm start'
+alias rmnm='rm -rf node_modules'
+
+# Development
+alias qka='cd ~/repos/javascript/quokkasandbox'
+alias sassw='sass --watch --no-source-map scss/style.scss css/style.css'
+alias postcssw='postcss css/style.css -o css/output.css --no-map -u autoprefixer -w'
+alias vsc='code .'
+
+# System
 alias please='sudo'
+alias slogin='/usr/local/bin/zsh --login'
+alias caff='caffeinate -i'
+alias st='networkQuality -v'
+alias la='exa --long --all --git --icons'
+alias cal='gcal --starting-day=1'
+
+# cd
 alias repos='cd ~/repos'
 alias dotf='repos && cd dotfiles'
 alias weirwood='repos && cd weirwood'
@@ -19,15 +39,15 @@ alias wd='webdev'
 alias js='repos && cd javascript'
 alias ts='repos && cd typescript'
 alias bf='repos && cd basic-fit'
+alias cd_vpl='cd /Users/ricard/.local/share/nvim/plugged'
+
+# Editing dotfiles
 alias vzsh='vim ~/.zshrc'
 alias szsh='source ~/.zshrc'
 alias vvrc='vim ~/.vimrc'
 alias vnvi='vim ~/.config/nvim/init.vim'
-alias qka='cd ~/repos/javascript/quokkasandbox'
-alias sass-watch='sass --watch --no-source-map scss/style.scss css/style.css'
-alias postcss-watch='postcss css/style.css -o css/output.css --no-map -u autoprefixer -w'
-alias rmnm='rm -rf node_modules'
-alias slogin='/usr/local/bin/zsh --login'
+
+# Updating packages
 alias brup='echo "updating and upgrading homebrew" && brew update && brew upgrade'
 alias urust='echo "updating rust" && rustup update && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cd -'
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
@@ -40,18 +60,19 @@ alias plug_update='echo "updating vim plugins" && vim +PlugUpdate! +qa'
 alias plug_upgrade='echo "upgrading vim Plug" && vim +PlugUpgrade +qa'
 alias uvpl='plug_clean && plug_update && plug_upgrade'
 alias uall='brup && urust && unvm && ugnp && uomz && upl10k && uvpl && tldr --update && restart_shell'
-alias vsc='code .'
+
+# git
 alias gfp='git fetch origin --prune'
 alias gft='git tag -d $(git tag) && git fetch --tags --all'
 alias gcb='git for-each-ref --format "%(refname:short)" refs/heads | grep -v "master\|main\|dev\|develop" | xargs git branch -D'
 alias gbn='git branch --show-current'
+alias gpsu='git push --set-upstream origin $(git branch --show-current)'
+
+# firebase
 alias ffcg='firebase functions:config:get | json_pp'
 alias ffcs='firebase functions:config:set'
 alias fpl='firebase projects:list'
-alias cd_vpl='cd /Users/ricard/.local/share/nvim/plugged'
-alias la='exa --long --all --git --icons'
-alias cal='gcal --starting-day=1'
+
+# Weirwood
 alias fintenlog='ssh meegan@rpi "tail -20 ~/finten/logs/.log"'
 alias summary='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq'
-alias caff='caffeinate -i'
-alias st='networkQuality -v'
