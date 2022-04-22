@@ -38,6 +38,7 @@ ctp(){
 
   echo "node_modules\n.DS_Store" > .gitignore
 
+  npm init --yes
   npm i -D typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": {"@typescript-eslint/no-floating-promises": ["error"]} }' > .eslintrc.json
