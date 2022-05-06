@@ -13,6 +13,8 @@ alias t='npm test'
 alias tw='npm run test:watch'
 alias s='npm start'
 alias rmnm='rm -rf node_modules'
+alias ribt='rmnm && npm ci && b && t'
+alias ribs='rmnm && npm ci && b && s'
 
 # Development
 alias qka='cd ~/repos/javascript/quokkasandbox'
