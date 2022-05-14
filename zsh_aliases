@@ -2,12 +2,12 @@ alias restart_shell='exec $SHELL'
 alias vim=nvim
 alias v='vim .'
 
-# Python
+# python
 alias py=python
 alias cve='python -m venv --system-site-packages ./venv'
 alias uve='source venv/bin/activate'
 
-# NPM
+# npm
 alias b='npm run build'
 alias t='npm test'
 alias tw='npm run test:watch'
@@ -17,13 +17,13 @@ alias rmnm='rm -rf node_modules'
 alias ribt='rmnm && npm ci && b && t'
 alias ribs='rmnm && npm ci && b && s'
 
-# Development
+# development
 alias qka='cd ~/repos/javascript/quokkasandbox'
 alias sassw='sass --watch --no-source-map scss/style.scss css/style.css'
 alias postcssw='postcss css/style.css -o css/output.css --no-map -u autoprefixer -w'
 alias vsc='code .'
 
-# System
+# system
 alias please='sudo'
 alias slogin='/usr/local/bin/zsh --login'
 alias caff='caffeinate -i'
@@ -44,13 +44,13 @@ alias ts='repos && cd typescript'
 alias bf='repos && cd basic-fit'
 alias cd_vpl='cd /Users/ricard/.local/share/nvim/plugged'
 
-# Editing dotfiles
+# editing dotfiles
 alias vzsh='vim ~/.zshrc'
 alias szsh='source ~/.zshrc'
 alias vvrc='vim ~/.vimrc'
 alias vnvi='vim ~/.config/nvim/init.vim'
 
-# Updating packages
+# updating packages
 alias brup='echo "updating and upgrading homebrew" && brew update && brew upgrade'
 alias urust='echo "updating rust" && rustup update && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cd -'
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
@@ -76,6 +76,6 @@ alias ffcg='firebase functions:config:get | json_pp'
 alias ffcs='firebase functions:config:set'
 alias fpl='firebase projects:list'
 
-# Weirwood
+# weirwood
 alias fintenlog='ssh meegan@rpi "tail -20 ~/finten/logs/.log"'
 alias summary='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq'
