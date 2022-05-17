@@ -123,3 +123,7 @@ nnoremap <leader>qa :qa<CR>
 
 " Take notes
 nmap <leader>n<CR> :tab drop notes.md<CR>
+
+" Switch to light themes (it's impossible to work in the office with a dark theme...)
+nnoremap <leader><leader>cp :colorscheme PaperColor <BAR> set background=light<CR>
+nnoremap <leader><leader>ct :colorscheme tokyonight <BAR> set background=light<CR>

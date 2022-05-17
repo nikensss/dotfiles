@@ -5,6 +5,8 @@ endif
 call plug#begin()
 
 Plug 'AndrewRadev/sideways.vim'
+Plug 'NLKNguyen/papercolor-theme'
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-sort-motion'
 Plug 'cohama/lexima.vim'
