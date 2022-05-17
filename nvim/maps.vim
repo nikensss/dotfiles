@@ -59,7 +59,7 @@ nmap <leader>sv :vsplit<Return><C-w>w
 " Go to definition in side window
 nmap <leader>sd <leader>svgd
 " Swap between windows
-nmap <leader><leader> <C-w>w
+nmap <leader>sw <C-w>w
 " Move window
 map <leader>sh <C-w>h
 map <leader>sk <C-w>k
