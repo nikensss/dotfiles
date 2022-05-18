@@ -36,14 +36,8 @@ cmp.setup({
 	},
 	mapping = {
 		["<Tab>"] = cmp.mapping(function(fallback)
-          if cmp.get_selected_entry() == nil and vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
-            vim.fn["UltiSnips#ExpandSnippet"]()
-          elseif vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
+          if vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
             vim.fn["UltiSnips#JumpForwards"]()
-          elseif cmp.visible() then
-            cmp.select_next_item()
-          elseif has_any_words_before() then
-            press("<Tab>")
           else
             fallback()
           end
@@ -54,8 +48,6 @@ cmp.setup({
 		["<S-Tab>"] = cmp.mapping(function(fallback)
           if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
             vim.fn["UltiSnips#JumpBackwards"]()
-          elseif cmp.visible() then
-            cmp.select_prev_item()
           else
             fallback()
           end
@@ -98,11 +90,8 @@ cmp.setup({
 				end
 		}),
 		['<C-Space>'] = cmp.mapping(function(fallback)
-          if cmp.visible() then
-            if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
-              vim.fn["UltiSnips#ExpandSnippet"]()
-            end
-            cmp.select_next_item()
+          if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
+            vim.fn["UltiSnips#ExpandSnippet"]()
           elseif has_any_words_before() then
             press("<Space>")
           else

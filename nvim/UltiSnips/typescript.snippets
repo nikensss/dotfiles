@@ -6,7 +6,7 @@ endsnippet
 
 snippet :a "literal object arrow function" b
 	${1:method_name}: (${2:input}): ${3:return_type} => {
-		${0:${VISUAL}}
+		${4}
 	},
 endsnippet
 
@@ -30,4 +30,8 @@ snippet acmet "async class method" b
 async ${1:method_name}(${2:input}): Promise<${3:return_type}> {
 	${4}
 }
+endsnippet
+
+snippet coj "log JSON stringify" b
+console.log(JSON.stringify(${1}, null, 2));
 endsnippet
