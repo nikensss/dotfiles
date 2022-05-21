@@ -7,15 +7,20 @@ alias py=python
 alias cve='python -m venv --system-site-packages ./venv'
 alias uve='source venv/bin/activate'
 
-# npm
+# node.js
 alias b='npm run build'
-alias t='npm test'
-alias tw='npm run test:watch'
+alias bs='npm run build && npm start'
+alias bt='npm run build && npm test'
+alias i='npm ci'
+alias ribd='rmnm && npm ci && b && sd'
+alias ribs='rmnm && npm ci && b && s'
+alias ribt='rmnm && npm ci && b && t'
+alias rmnm='rm -rf node_modules'
 alias s='npm start'
 alias sd='npm run start:dev'
-alias rmnm='rm -rf node_modules'
-alias ribt='rmnm && npm ci && b && t'
-alias ribs='rmnm && npm ci && b && s'
+alias t='npm test'
+alias tw='npm run test:watch'
+alias unv='OLD=$(node --version) && nvm install --lts --reinstall-packages-from=$OLD && nvm alias default $(node --version) && nvm uninstall $OLD'
 
 # development
 alias qka='cd ~/repos/javascript/quokkasandbox'
