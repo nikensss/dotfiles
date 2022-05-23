@@ -1,0 +1,38 @@
+snippet drcp
+	const ${1:component_name}Page = () => {
+		return (
+			<main>
+				${2}
+			</main>
+		)
+	}
+
+	export default ${1}Page;
+
+snippet drcom
+	interface ${1}Props {
+	  ${2}
+	}
+
+	const ${1:component_name} = ({${3}}: ${1}Props) => {
+		return (
+			<main>
+				${4}
+			</main>
+		)
+	}
+
+	export default ${1}Page;
+
+snippet rcom
+	interface ${1}Props {
+	  ${2}
+	}
+
+	export const ${1:component_name} = ({${3}}: ${1}Props) => {
+		return (
+			<main>
+				${4}
+			</main>
+		)
+	}

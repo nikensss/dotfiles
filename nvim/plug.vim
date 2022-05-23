@@ -27,8 +27,9 @@ Plug 'tpope/vim-unimpaired'
 if has("nvim")
   Plug 'APZelos/blamer.nvim'
   Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
-  Plug 'SirVer/ultisnips'
   Plug 'cakebaker/scss-syntax.vim'
+  Plug 'dcampos/cmp-snippy'
+  Plug 'dcampos/nvim-snippy'
   Plug 'folke/lsp-colors.nvim'
   Plug 'hail2u/vim-css3-syntax'
   Plug 'honza/vim-snippets'
@@ -53,7 +54,6 @@ if has("nvim")
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'p00f/nvim-ts-rainbow'
   Plug 'phaazon/hop.nvim'
-  Plug 'quangnguyen30192/cmp-nvim-ultisnips'
   Plug 'ray-x/lsp_signature.nvim'
   Plug 'rhysd/git-messenger.vim'
   Plug 'sbdchd/neoformat'

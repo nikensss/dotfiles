@@ -29,32 +29,7 @@ end
 
 local cmp = require'cmp'
 cmp.setup({
-	snippet = {
-		expand = function(args)
-			vim.fn["UltiSnips#Anon"](args.body)
-		end,
-	},
 	mapping = {
-		["<Tab>"] = cmp.mapping(function(fallback)
-          if vim.fn["UltiSnips#CanJumpForwards"]() == 1 then
-            vim.fn["UltiSnips#JumpForwards"]()
-          else
-            fallback()
-          end
-        end, {
-          "i",
-          "s",
-		}),
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-          if vim.fn["UltiSnips#CanJumpBackwards"]() == 1 then
-            vim.fn["UltiSnips#JumpBackwards"]()
-          else
-            fallback()
-          end
-        end, {
-          "i",
-          "s",
-		}),
 		['<Down>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
 		['<Up>'] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
 		['<C-n>'] = cmp.mapping({
@@ -89,18 +64,6 @@ cmp.setup({
 						end
 				end
 		}),
-		['<C-Space>'] = cmp.mapping(function(fallback)
-          if vim.fn["UltiSnips#CanExpandSnippet"]() == 1 then
-            vim.fn["UltiSnips#ExpandSnippet"]()
-          elseif has_any_words_before() then
-            press("<Space>")
-          else
-            fallback()
-          end
-        end, {
-          "i",
-          "s",
-		}),
 		['<C-b>'] = cmp.mapping(cmp.mapping.scroll_docs(-4), {'i', 'c'}),
 		['<C-f>'] = cmp.mapping(cmp.mapping.scroll_docs(4), {'i', 'c'}),
 		['<C-e>'] = cmp.mapping({ i = cmp.mapping.close(), c = cmp.mapping.close() }),
@@ -117,7 +80,6 @@ cmp.setup({
 	},
 	sources = cmp.config.sources({
 		{ name = 'nvim_lsp' },
-		{ name = 'ultisnips' },
 	}, {
 		{ name = 'buffer', keyword_length = 5 },
 	})

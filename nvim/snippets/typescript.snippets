@@ -1,0 +1,31 @@
+snippet caf
+	const ${1:name} = (${2:input}): ${3:output} => {
+		${4}
+	}
+
+snippet :a
+	${1:method_name}: (${2:input}): ${3:return_type} => {
+		${4}
+	},
+
+snippet co
+	console.log({${1}})
+
+snippet forao
+	for await (const ${1} of ${2}) {
+		${3}
+	}
+
+snippet cmet
+	${1}(): ${2} {
+		${3}
+	}
+
+snippet acmet
+	async ${1:method_name}(${2:input}): Promise<${3:return_type}> {
+		${4}
+	}
+
+snippet coj
+	console.log(JSON.stringify(${1}, null, 2));
+
