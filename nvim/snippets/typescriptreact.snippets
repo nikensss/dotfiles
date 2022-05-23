@@ -10,29 +10,25 @@ snippet drcp
 	export default ${1}Page;
 
 snippet drcom
-	interface ${1}Props {
+	interface ${1:component_name}Props {
 	  ${2}
 	}
 
-	const ${1:component_name} = ({${3}}: ${1}Props) => {
+	const ${1} = ({${3}}: ${1}Props) => {
 		return (
-			<main>
 				${4}
-			</main>
 		)
 	}
 
 	export default ${1}Page;
 
 snippet rcom
-	interface ${1}Props {
+	interface ${1:component_name}Props {
 	  ${2}
 	}
 
-	export const ${1:component_name} = ({${3}}: ${1}Props) => {
+	export const ${1} = ({${3}}: ${1}Props) => {
 		return (
-			<main>
 				${4}
-			</main>
 		)
 	}

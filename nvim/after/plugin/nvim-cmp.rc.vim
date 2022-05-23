@@ -29,11 +29,6 @@ end
 
 local cmp = require'cmp'
 cmp.setup({
-	snippet = {
-		expand = function(args)
-			require('snippy').expand_snippet(args.body)
-		end,
-	},
 	mapping = {
 		['<Down>'] = cmp.mapping(cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
 		['<Up>'] = cmp.mapping(cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }), {'i'}),
