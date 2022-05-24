@@ -1,10 +1,15 @@
 snippet caf
-	const ${1:name} = (${2:input}): ${3:output} => {
+	const ${1} = (${2}): ${3} => {
 		${4}
 	}
 
+snippet ecaf
+	export const ${1} = (${2}): ${3} => {
+	  ${4}
+	}
+
 snippet :a
-	${1:method_name}: (${2:input}): ${3:return_type} => {
+	${1}: (${2}): ${3} => {
 		${4}
 	},
 
@@ -22,7 +27,7 @@ snippet cmet
 	}
 
 snippet acmet
-	async ${1:method_name}(${2:input}): Promise<${3:return_type}> {
+	async ${1}(${2}): Promise<${3}> {
 		${4}
 	}
 
