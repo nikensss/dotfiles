@@ -47,7 +47,7 @@ alias wd='webdev'
 alias js='repos && cd javascript'
 alias ts='repos && cd typescript'
 alias bf='repos && cd basic-fit'
-alias cd_vpl='cd /Users/ricard/.local/share/nvim/plugged'
+alias vpl='cd ~/.local/share/nvim/plugged'
 
 # editing dotfiles
 alias vzsh='vim ~/.zshrc'
