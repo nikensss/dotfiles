@@ -13,7 +13,7 @@ nnoremap + <C-a>
 nnoremap - <C-x>
 
 " Select all
-nmap <C-a> gg<S-v>Gygv
+nnoremap <C-a> gg<S-v>Gygv
 
 " Quickfix list mappings
 nnoremap <leader>qo :copen<CR>
