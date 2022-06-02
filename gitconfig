@@ -26,5 +26,3 @@
 	defaultBranch = main
 [pull]
 	ff = only
-[merge]
-	ff = no
