@@ -100,6 +100,7 @@ end
 
 nvim_lsp.tsserver.setup {
   on_attach = on_attach,
+  capabilities = capabilities,
   commands = {
     OrganizeImports = {
       organize_imports,
