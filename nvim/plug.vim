@@ -59,6 +59,7 @@ if has("nvim")
   Plug 'sbdchd/neoformat'
   Plug 'simrat39/rust-tools.nvim'
   Plug 'tami5/lspsaga.nvim'
+  Plug 'tree-sitter/tree-sitter-python'
 endif
 
 call plug#end()

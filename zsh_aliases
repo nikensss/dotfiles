@@ -83,4 +83,5 @@ alias fpl='firebase projects:list'
 
 # weirwood
 alias fintenlog='ssh meegan@rpi "tail -20 ~/finten/logs/.log"'
-alias summary='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq'
+alias summary='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.ratio"'
+alias ratios='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.ratio" | sed "s/[\"%]//g" | nl -s", "'
