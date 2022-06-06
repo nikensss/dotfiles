@@ -83,5 +83,9 @@ alias fpl='firebase projects:list'
 
 # weirwood
 alias fintenlog='ssh meegan@rpi "tail -f ~/finten/logs/.log"'
-alias summary='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.ratio"'
 alias ratios='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.ratio" | sed "s/[\"%]//g" | nl -s", "'
+alias ratio='ratios | tail -n 1 | sed "s;^.*, \(.*\)$;\1;"'
+alias fpm='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.filingsPerMinute" | tail -n 1'
+alias filings='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.filingsCount" | tail -n 1'
+alias visited='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.visitedLinksCount" | tail -n 1'
+alias stats='echo "filings = $(filings)\nvisited links = $(visited)\nratio = $(ratio)%\nfilings per minute = $(fpm)"'
