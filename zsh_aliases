@@ -58,6 +58,7 @@ alias vnvi='vim ~/.config/nvim/init.vim'
 # updating packages
 alias brup='echo "updating and upgrading homebrew" && brew update && brew upgrade'
 alias urust='echo "updating rust" && rustup update && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cd -'
+alias ura='echo "updating rust-analyzer" && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cargo xtask install --server && cd -'
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
 alias unvm='echo "updating nvm" && http get https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq .version | xargs -tI {} curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v{}/install.sh" | bash'
 alias ugnp='echo "updating global npm packages" && npm update -g'
