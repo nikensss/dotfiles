@@ -50,7 +50,9 @@ if has("nvim")
   Plug 'nvim-lua/popup.nvim'
   Plug 'nvim-telescope/telescope-fzy-native.nvim'
   Plug 'nvim-telescope/telescope.nvim'
+  Plug 'nvim-treesitter/nvim-treesitter'
   Plug 'nvim-treesitter/nvim-treesitter', { 'do': ':TSUpdate' }
+  Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'p00f/nvim-ts-rainbow'
   Plug 'phaazon/hop.nvim'
