@@ -55,6 +55,7 @@ if has("nvim")
   Plug 'nvim-treesitter/nvim-treesitter-context'
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'p00f/nvim-ts-rainbow'
+  Plug 'pantharshit00/vim-prisma'
   Plug 'phaazon/hop.nvim'
   Plug 'ray-x/lsp_signature.nvim'
   Plug 'rhysd/git-messenger.vim'
