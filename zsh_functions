@@ -50,7 +50,7 @@ ctp(){
   tsc --init
   mkdir src
   touch src/index.ts
-  echo "const main = async () => 'done';\nmain().then(console.log).catch(console.error);" > src/index.ts
+  echo "const main = async (): Promise<string> => 'done';\nmain().then(console.log).catch(console.error);" > src/index.ts
 
   npm set-script start "ts-node src/index.ts"
   npm set-script pretty "prettier --write 'src/**/*.ts'"
