@@ -41,6 +41,7 @@ if has("nvim")
   Plug 'hrsh7th/cmp-nvim-lua'
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/nvim-cmp'
+  Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
   Plug 'kristijanhusak/defx-git'
   Plug 'kristijanhusak/defx-icons'
   Plug 'kyazdani42/nvim-web-devicons'
