@@ -84,6 +84,8 @@ ctp(){
   git add --all
 
   npm run start
+
+  git commit -am "chore: initial commit"
 }
 
 md2pdf(){
