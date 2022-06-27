@@ -50,8 +50,9 @@ ctp(){
   tsc --init
   mkdir src
   touch src/index.ts
-  echo "const main = async (): Promise<void> => {console.log('Hello, World!');}\nmain().then(()=>console.log('Done!')).catch(console.error);" > src/index.ts
+  echo "const main = async (): Promise<void> => {console.log('Hello, World!');}\nmain().then( () => console.log('Done!') ).catch(console.error);" > src/index.ts
 
+  npm pkg set version="0.1.0"
   npm pkg set scripts.start="ts-node src/index.ts"
   npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
   npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
@@ -81,11 +82,11 @@ ctp(){
   echo "" >> .husky/pre-push
 
   prettier --write './**/*{json,ts}'
+
   git add --all
+  git commit -am "chore: initial commit"
 
   npm run start
-
-  git commit -am "chore: initial commit"
 }
 
 md2pdf(){
