@@ -97,3 +97,14 @@ dsf(){
 nvmi(){
   nvm install $1 --reinstall-packages-from=$(node --version)
 }
+
+fni(){
+  NODE_VERSION=$1
+  echo "Getting global packages"
+  GLOBAL_PACKAGES=$(npm ls -g --json | jq '.dependencies | keys | .[]' | xargs)
+
+  fnm install $NODE_VERSION
+  fnm use $NODE_VERSION
+  echo "Reinstalling global packages"
+  echo $GLOBAL_PACKAGES | xargs npm i -g
+}
