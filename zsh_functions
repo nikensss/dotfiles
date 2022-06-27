@@ -50,13 +50,13 @@ ctp(){
   tsc --init
   mkdir src
   touch src/index.ts
-  echo "const main = async (): Promise<string> => 'done';\nmain().then(console.log).catch(console.error);" > src/index.ts
+  echo "const main = async (): Promise<void> => {console.log('Hello, World!');}\nmain().then(()=>console.log('Done!')).catch(console.error);" > src/index.ts
 
-  npm set-script start "ts-node src/index.ts"
-  npm set-script pretty "prettier --write 'src/**/*.ts'"
-  npm set-script pretty:check "prettier --check 'src/**/*.ts'"
-  npm set-script lint "eslint 'src/**/*.ts'"
-  npm set-script prepare "husky install"
+  npm pkg set scripts.start="ts-node src/index.ts"
+  npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
+  npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
+  npm pkg set scripts.lint="eslint 'src/**/*.ts'"
+  npm pkg set scripts.prepare="husky install"
 
   npm run prepare
 
