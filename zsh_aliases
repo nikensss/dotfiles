@@ -20,7 +20,6 @@ alias s='npm start'
 alias sd='npm run start:dev'
 alias t='npm test'
 alias tw='npm run test:watch'
-alias unv='OLD=$(node --version) && nvm install --lts --reinstall-packages-from=$OLD && nvm alias default $(node --version) && nvm uninstall $OLD'
 
 # development
 alias qka='cd ~/repos/javascript/quokkasandbox'
@@ -60,7 +59,6 @@ alias brup='echo "updating and upgrading homebrew" && brew update && brew upgrad
 alias urust='echo "updating rust" && rustup update && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cd -'
 alias ura='echo "updating rust-analyzer" && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cargo xtask install --server && cd -'
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
-alias unvm='echo "updating nvm" && http get https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq .version | xargs -tI {} curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v{}/install.sh" | bash'
 alias ugnp='echo "updating global npm packages" && npm update -g'
 alias uomz='echo "updating Oh My zsh" && sh ~/.oh-my-zsh/tools/upgrade.sh'
 alias upl10k='echo "updating powerlevel10k" && git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull'
@@ -68,7 +66,7 @@ alias plug_clean='echo "cleaning vim plugins" && vim +PlugClean! +qa'
 alias plug_update='echo "updating vim plugins" && vim +PlugUpdate! +qa'
 alias plug_upgrade='echo "upgrading vim Plug" && vim +PlugUpgrade +qa'
 alias uvpl='plug_clean && plug_update && plug_upgrade'
-alias uall='brup && urust && unvm && ugnp && uomz && upl10k && uvpl && tldr --update && restart_shell'
+alias uall='brup && urust && ugnp && uomz && upl10k && uvpl && tldr --update && restart_shell'
 
 # git
 alias gfp='git fetch origin --prune'
