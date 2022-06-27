@@ -29,15 +29,12 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm
 brew upgrade
 
-echo "${GREEN}installing nvm${RESET}"
-http get https://raw.githubusercontent.com/nvm-sh/nvm/master/package.json | jq .version | xargs -tI {} curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v{}/install.sh" | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm install --lts
-npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier prettier-plugin-java pyright livedown live-server prettier-plugin-prisma
+fnm install --lts
+fnm use --lts
+npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn
 
 echo "${GREEN}installing python"
 pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
