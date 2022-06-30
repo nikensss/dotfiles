@@ -65,6 +65,13 @@ if has("nvim")
   Plug 'simrat39/rust-tools.nvim'
   Plug 'tami5/lspsaga.nvim'
   Plug 'tree-sitter/tree-sitter-python'
+
+  " debugging
+  Plug 'mfussenegger/nvim-dap'
+  Plug 'rcarriga/nvim-dap-ui'
+  Plug 'theHamsta/nvim-dap-virtual-text'
+  Plug 'nvim-telescope/telescope-dap.nvim'
+  Plug 'David-Kunz/jester'
 endif
 
 call plug#end()

@@ -59,6 +59,15 @@ echo "${BLUE}installing rust language server${RESET}"
 cargo xtask install --server
 cargo install stylua
 
+echo "${GREEN}installing node-debug2${RESET}"
+cd ~/repos
+mkdir javascript
+cd javascript
+git clone https://github.com/microsoft/vscode-node-debug2.git
+cd vscode-node-debug2
+npm ci
+NODE_OPTIONS=--no-experimental-fetch npm run build
+
 echo "${GREEN}installing java language server${RESET}"
 cd ~/repos
 mkdir java
