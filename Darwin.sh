@@ -46,6 +46,7 @@ echo "${GREEN}installing rust${RESET}"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 echo "${BLUE}adding rustfmt component${RESET}"
 rustup component add rustfmt
+rustup component add clippy
 cd ~
 mkdir repos
 cd repos
