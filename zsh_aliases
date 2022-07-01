@@ -88,3 +88,8 @@ alias fpm='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].stati
 alias filings='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.filingsCount" | tail -n 1'
 alias visited='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.visitedLinksCount" | tail -n 1'
 alias stats='echo "filings = $(filings)\nvisited links = $(visited)\nratio = $(ratio)%\nfilings per minute = $(fpm)"'
+
+# rust
+alias rav='rust-analyzer --version'
+alias c='cargo run'
+alias cr='cargo run --release'

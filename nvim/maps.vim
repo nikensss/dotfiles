@@ -49,37 +49,14 @@ vnoremap <silent> # :<C-U>
   \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
   \gV:call setreg('"', old_reg, old_regtype)<CR>
 
-
-"------------------------------
-" Windows
-
-" Split window
-nmap <leader>ss :split<Return><C-w>w
-nmap <leader>sv :vsplit<Return><C-w>w
 " Go to definition in side window
 nmap <leader>sd <leader>svgd
-" Swap between windows
-nmap <leader>sw <C-w>w
-" Move window
-map <leader>sh <C-w>h
-map <leader>sk <C-w>k
-map <leader>sj <C-w>j
-map <leader>sl <C-w>l
-" Move to floating window
-map <leader>sp <C-w>p
-" Close window
-map <leader>sq <C-w>q
-" Close other windows
-map <leader>so <C-w>o
-" Leave only diff window open (to be used when only the :Git status window is
-" open and the cursor is on the diff window already)
-map <leader>od <leader>gs<leader>sq<leader>sl
 
 " Resize window
-nmap <C-w><left> <C-w><
-nmap <C-w><right> <C-w>>
-nmap <C-w><up> <C-w>+
-nmap <C-w><down> <C-w>-
+nmap <C-w><C-,> 10<C-w><
+nmap <C-w><C-.> 10<C-w>>
+nmap <C-w><up> 10<C-w>+
+nmap <C-w><down> 10<C-w>-
 
 nnoremap <leader><cr> :so ~/.config/nvim/init.vim<cr>
 nnoremap <leader>pv <c-w>v:Ex<cr>
