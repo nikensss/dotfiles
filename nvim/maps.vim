@@ -55,8 +55,8 @@ nmap <leader>sd <leader>svgd
 " Resize window
 nmap <C-w><C-,> 10<C-w><
 nmap <C-w><C-.> 10<C-w>>
-nmap <C-w><up> 10<C-w>+
-nmap <C-w><down> 10<C-w>-
+nmap <C-w><C-u> 5<C-w>+
+nmap <C-w><C-d> 5<C-w>-
 
 nnoremap <leader><cr> :so ~/.config/nvim/init.vim<cr>
 nnoremap <leader>pv <c-w>v:Ex<cr>

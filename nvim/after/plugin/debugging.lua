@@ -5,11 +5,26 @@ dap.adapters.node2 = {
 	args = { os.getenv("HOME") .. "/repos/javascript/vscode-node-debug2/out/src/nodeDebug.js" },
 }
 
+dap.configurations.typescript = {
+	{
+		type = "node2",
+		request = "launch",
+		name = "Launch Program (Node2 with ts-node)",
+		cwd = vim.fn.getcwd(),
+		runtimeArgs = { "-r", "ts-node/register" },
+		runtimeExecutable = "node",
+		args = { "--inspect", "${file}" },
+		sourceMaps = true,
+		skipFiles = { "<node_internals>/**", "node_modules/**" },
+	},
+}
+
 require("dap").set_log_level("INFO")
 dap.defaults.fallback.terminal_win_cmd = "20split new"
-vim.fn.sign_define("DapBreakpoint", { text = "⏹", texthl = "", linehl = "", numhl = "" })
-vim.fn.sign_define("DapBreakpointRejected", { text = "↩️", texthl = "", linehl = "", numhl = "" })
 vim.fn.sign_define("DapStopped", { text = "▶️", texthl = "", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpoint", { text = "⏹", texthl = "", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpointCondition", { text = "⏸", texthl = "", linehl = "", numhl = "" })
+vim.fn.sign_define("DapBreakpointRejected", { text = "↩️", texthl = "", linehl = "", numhl = "" })
 
 vim.keymap.set("n", "<leader>db", function()
 	require("dap").toggle_breakpoint()
@@ -62,10 +77,41 @@ vim.keymap.set("n", "<leader>dB", ":Telescope dap list_breakpoints<CR>")
 require("nvim-dap-virtual-text").setup()
 vim.g.dap_virtual_text = true
 
-require("dapui").setup()
+local dapui = require("dapui")
+dapui.setup({
+	layouts = {
+		{
+			elements = {
+				"watches",
+				"breakpoints",
+				"stacks",
+				"scopes",
+			},
+			size = 80, -- 80 columns
+			position = "left",
+		},
+		{
+			elements = {
+				"console",
+				"repl",
+			},
+			size = 0.25, -- 25% of total lines
+			position = "bottom",
+		},
+	},
+})
 vim.keymap.set("n", "<leader>dp", function()
-	require("dapui").toggle()
+	dapui.toggle()
 end)
+dap.listeners.after.event_initialized["dapui_config"] = function()
+	dapui.open()
+end
+dap.listeners.before.event_terminated["dapui_config"] = function()
+	dapui.close()
+end
+dap.listeners.before.event_exited["dapui_config"] = function()
+	dapui.close()
+end
 
 -- David-Kunz/jester
 -- require'jester'.setup({ path_to_jest = "/usr/local/bin/jest" })
