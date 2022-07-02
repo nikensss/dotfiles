@@ -62,6 +62,11 @@ vim.keymap.set("n", "<leader>dB", ":Telescope dap list_breakpoints<CR>")
 require("nvim-dap-virtual-text").setup()
 vim.g.dap_virtual_text = true
 
+require("dapui").setup()
+vim.keymap.set("n", "<leader>dp", function()
+	require("dapui").toggle()
+end)
+
 -- David-Kunz/jester
 -- require'jester'.setup({ path_to_jest = "/usr/local/bin/jest" })
 vim.keymap.set("n", "<leader>tt", function()
