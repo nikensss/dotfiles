@@ -199,9 +199,9 @@ function toggle_terminal()
     vim.cmd(':startinsert')
   end
 end
+
 vim.keymap.set('n', '<C-t>', toggle_terminal)
-vim.keymap.set('i', '<C-t>', '<ESC>:lua toggle_terminal()<CR>')
-vim.keymap.set('t', '<C-t>', '<c-\\><c-n>:lua toggle_terminal()<CR>')
+vim.keymap.set('n', '<leader>tr', ':lua toggle_terminal()<CR><c-\\><c-n><C-w>Ti')
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
 
 _G.send_line_to_terminal = function()
