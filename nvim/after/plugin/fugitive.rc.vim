@@ -14,7 +14,8 @@ endif
 cnoreabbrev g Git
 cnoreabbrev gopen GBrowse
 
-nmap <leader>gj :diffget //3<cr>
-nmap <leader>gf :diffget //2<cr>
-nmap <leader>gs :G<cr>
-nmap <leader>gb :Git blame<cr>
+nmap <leader>gj :diffget //3<CR>
+nmap <leader>gf :diffget //2<CR>
+nmap <leader>gs :G<CR>
+nmap <leader>gb :Git blame<CR>
+nnoremap <leader>gd :GitGutterDiffOrig<CR>

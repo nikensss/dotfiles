@@ -58,6 +58,7 @@ if has("nvim")
   Plug 'phaazon/hop.nvim'
   Plug 'rhysd/git-messenger.vim'
   Plug 'sbdchd/neoformat'
+  Plug 'rust-lang/rust.vim'
   Plug 'simrat39/rust-tools.nvim'
   Plug 'tami5/lspsaga.nvim'
   Plug 'tree-sitter/tree-sitter-python'
