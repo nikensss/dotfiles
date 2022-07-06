@@ -29,7 +29,7 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm
+brew install git iterm2 neovim ngrok ripgrep tree-sitter luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm tmux
 brew upgrade
 
 fnm install --lts
@@ -41,6 +41,9 @@ pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[
 pyenv global $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
 python3 -m pip install --user --upgrade pynvim
 
+
+echo "${GREEN}cloning tmux themes${RESET}"
+git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 
 echo "${GREEN}installing rust${RESET}"
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -92,7 +95,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 dir=$HOME/dotfiles
 olddir=$HOME/dotfiles_old
 oldconfig=$HOME/oldconfig
-files="vimrc zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
+files="vimrc tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
 config="nvim"
 
 mkdir -p $olddir
@@ -101,7 +104,7 @@ cd $HOME
 echo "${BLUE}updating dotfiles${RESET}"
 for file in $files; do
   echo "${LBLUE}backing $file up ($olddir)${RESET}"
-  mv ~/.$file $olddir
+  mv ~/.$file $olddir/.$file.bak
   echo "${CYAN}creating symlink to $file${RESET}"
   ln -s $dir/$file .$file
 done
