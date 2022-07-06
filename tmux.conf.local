@@ -5,7 +5,6 @@
 #         Copyright 2012— Gregory Pakosz (@gpakosz).
 
 
-source-file "${HOME}/.tmux-themepack/powerline/default/purple.tmuxtheme"
 # -- navigation ----------------------------------------------------------------
 
 # if you're running tmux within iTerm2
@@ -353,6 +352,7 @@ bind C-Space send-prefix
 # move status line to top
 #set -g status-position top
 
+source-file "${HOME}/.tmux-themepack/powerline/default/purple.tmuxtheme"
 
 # -- tpm -----------------------------------------------------------------------
 
