@@ -5,6 +5,7 @@
 #         Copyright 2012— Gregory Pakosz (@gpakosz).
 
 
+source-file "${HOME}/.tmux-themepack/powerline/default/purple.tmuxtheme"
 # -- navigation ----------------------------------------------------------------
 
 # if you're running tmux within iTerm2
@@ -342,12 +343,12 @@ tmux_conf_copy_to_os_clipboard=false
 #set -g status-keys vi
 #set -g mode-keys vi
 
-# replace C-b by C-a instead of using both prefixes
+# replace C-b by C-Space instead of using both prefixes
 set -gu prefix2
-unbind C-a
+unbind C-Space
 unbind C-b
-set -g prefix C-q
-bind C-q send-prefix
+set -g prefix C-Space
+bind C-Space send-prefix
 
 # move status line to top
 #set -g status-position top
@@ -390,9 +391,9 @@ tmux_conf_uninstall_plugins_on_reload=true
 # visit https://github.com/tmux-plugins for available plugins
 #set -g @plugin 'tmux-plugins/tmux-copycat'
 #set -g @plugin 'tmux-plugins/tmux-cpu'
-#set -g @plugin 'tmux-plugins/tmux-resurrect'
-#set -g @plugin 'tmux-plugins/tmux-continuum'
-#set -g @continuum-restore 'on'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+set -g @continuum-restore 'on'
 
 
 # -- custom variables ----------------------------------------------------------

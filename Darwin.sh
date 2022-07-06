@@ -42,7 +42,8 @@ pyenv global $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0
 python3 -m pip install --user --upgrade pynvim
 
 
-echo "${GREEN}cloning tmux themes${RESET}"
+echo "${GREEN}tmux plugin manager and themes${RESET}"
+git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 
 echo "${GREEN}installing rust${RESET}"
