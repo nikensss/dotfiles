@@ -353,6 +353,7 @@ bind C-Space send-prefix
 #set -g status-position top
 
 source-file "${HOME}/.tmux-themepack/powerline/default/purple.tmuxtheme"
+set -g default-terminal "screen-256color"
 
 # -- tpm -----------------------------------------------------------------------
 
