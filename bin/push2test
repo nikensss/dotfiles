@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+ribt
+RIBT_EXIT_CODE=$?
+SUCCESS=0
+
+if [ $RIBT_EXIT_CODE -ne $SUCCESS ]; then
+  echo "ribt failed"
+  exit $RIBT_EXIT_CODE
+fi
+
+CURRENT_BRANCH=$(git branch --show-current)
+echo "force-pushing $CURRENT_BRANCH to test branch..."
+git push origin $CURRENT_BRANCH:test --force

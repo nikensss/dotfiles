@@ -25,7 +25,7 @@ local function attach()
 		sourceMaps = true,
 		protocol = "inspector",
 		skipFiles = { "<node_internals>/**" },
-		port = 9229,
+		port = 9230,
 	})
 end
 

@@ -93,7 +93,7 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.
 echo "${CYAN}installing power10k theme${RESET}"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
-dir=$HOME/dotfiles
+dir=$(pwd)
 olddir=$HOME/dotfiles_old
 oldconfig=$HOME/oldconfig
 files="vimrc tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
@@ -101,6 +101,9 @@ config="nvim"
 
 mkdir -p $olddir
 cd $HOME
+
+echo "${BLUE}symlink for ~/bin${RESET}"
+ln -s $dir/bin bin
 
 echo "${BLUE}updating dotfiles${RESET}"
 for file in $files; do
