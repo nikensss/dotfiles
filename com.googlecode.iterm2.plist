@@ -58647,6 +58647,8 @@
 	<false/>
 	<key>Window Arrangements</key>
 	<dict/>
+	<key>WindowNumber</key>
+	<true/>
 	<key>WordCharacters</key>
 	<string>/-+\~_.</string>
 	<key>findMode_iTerm</key>
