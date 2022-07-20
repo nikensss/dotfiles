@@ -2,7 +2,7 @@
 
 echo "removing node_modules, reinstalling, building and testing..."
 
-rm -rdf node_modules
-npm ci
-npm run build
-npm run test
+rm -rdf node_modules && \
+  npm ci && \
+  npm run build && \
+  npm run test
