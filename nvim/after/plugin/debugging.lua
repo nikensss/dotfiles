@@ -87,7 +87,7 @@ dapui.setup({
 				"stacks",
 				"scopes",
 			},
-			size = 80, -- 80 columns
+			size = 55, -- # of columns
 			position = "left",
 		},
 		{
