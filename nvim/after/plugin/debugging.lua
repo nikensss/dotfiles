@@ -45,7 +45,7 @@ end)
 vim.keymap.set("n", "<leader>dn", function()
 	require("dap").run_to_cursor()
 end)
-vim.keymap.set("n", "<leader>dt", function()
+vim.keymap.set("n", "<leader>dT", function()
 	require("dap").terminate()
 end)
 vim.keymap.set("n", "<leader>dR", function()
@@ -71,7 +71,7 @@ vim.keymap.set("n", "<leader>dr", ':lua require"dap".repl.toggle({}, "vsplit")<C
 -- nvim-telescope/telescope-dap.nvim
 require("telescope").load_extension("dap")
 vim.keymap.set("n", "<leader>ds", ":Telescope dap frames<CR>")
--- vim.keymap.set('n', '<leader>dc', ':Telescope dap commands<CR>')
+vim.keymap.set("n", "<leader>dt", ":Telescope dap commands<CR>")
 vim.keymap.set("n", "<leader>dB", ":Telescope dap list_breakpoints<CR>")
 
 require("nvim-dap-virtual-text").setup()
