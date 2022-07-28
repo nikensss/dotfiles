@@ -11,6 +11,6 @@ bash -c "$(curl -fsSL https://raw.github.com/nikensss/dotfiles/main/install.sh)"
 ## Ignore `git` revisions
 
 ```bash
-git config blame.ignoreRevsFiles .git-blame-ignore-revs
-echo $COMMIT_HASH_TO_BE_IGNORED >> .git-blame-ignore-revs
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+echo $FULL_COMMIT_HASH_TO_BE_IGNORED >> .git-blame-ignore-revs
 ```
