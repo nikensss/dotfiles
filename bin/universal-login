@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+if [[ ! -f ~/bin/.env ]]; then
+  echo "Missing '~/bin/.env' file"
+  exit 1
+fi
+
+source ~/bin/.env
+
+echo "Logging in with: $UNIVERSAL_LOGIN_EMAIL"
+
+TOKEN=$(curl -s -X "POST" \
+  "https://staging-auth-service.herokuapp.com/login" \
+  -H 'accept: application/json' \
+  -H "client-id: $UNIVERSAL_LOGIN_CLIENT_ID" \
+  -H "redirect-uri: $UNIVERSAL_LOGIN_REDIRECT_URI" \
+  -H "Content-Type: application/json" \
+  -d "{ \"email\": \"$UNIVERSAL_LOGIN_EMAIL\", \"password\": \"$UNIVERSAL_LOGIN_PASSWORD\", \"keepLoggedIn\": true }" \
+  | jq '.accessToken' | xargs)
+
+echo $TOKEN | pbcopy
+
+echo "The token is (already in clipboard): $TOKEN"
