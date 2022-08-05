@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+const fromBase64 = (base64) => JSON.parse(Buffer.from(base64, 'base64').toString('utf8'));
+
+const token = process.argv[2];
+const [header, payload] = token.split('.').slice(0, 2).map(fromBase64);
+
+if (!header) throw new Error('Missing header');
+if (!payload) throw new Error('Missing payload');
+
+console.log(JSON.stringify({ header, payload }, null, 2));
