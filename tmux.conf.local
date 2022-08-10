@@ -354,6 +354,7 @@ bind C-Space send-prefix
 
 source-file "${HOME}/.tmux-themepack/powerline/default/purple.tmuxtheme"
 set -g default-terminal "screen-256color"
+set-option repeat-time 0
 
 # -- tpm -----------------------------------------------------------------------
 
