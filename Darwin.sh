@@ -34,7 +34,7 @@ brew upgrade
 
 fnm install --lts
 fnm use --lts
-npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn
+npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn tree-sitter-yaml tree-sitter
 
 echo "${GREEN}installing python"
 pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)

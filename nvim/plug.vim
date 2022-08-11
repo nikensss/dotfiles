@@ -28,6 +28,7 @@ Plug 'tpope/vim-unimpaired'
 
 if has("nvim")
   Plug 'APZelos/blamer.nvim'
+  Plug 'cuducos/yaml.nvim'
   Plug 'dcampos/cmp-snippy'
   Plug 'dcampos/nvim-snippy'
   Plug 'folke/lsp-colors.nvim'

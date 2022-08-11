@@ -33,8 +33,10 @@ require'nvim-treesitter.configs'.setup {
     "python",
     "rust",
     "scss",
+    "toml",
     "tsx",
     "typescript",
+    "yaml"
   },
   rainbow = {
     enable = true,
