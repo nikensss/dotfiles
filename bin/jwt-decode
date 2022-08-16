@@ -2,7 +2,7 @@
 
 TOKEN=$1
 
-if [ -z $TOKEN ]; then
+if [ -z "$TOKEN" ]; then
   TOKEN=$(pbpaste)
 fi
 
