@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Restore Backup
+#
+# Given a file name, this script will reset that file if there is a .bak
+# available
+
+FILE=$1
+
+if [[ ! -f "$FILE.bak" ]]; then
+  echo "File $FILE.bak does not exist, cannot be restored"
+  exit 1
+fi
+
+cp $FILE.bak $FILE
