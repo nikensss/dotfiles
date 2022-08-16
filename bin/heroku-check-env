@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [[ ! -f ~/bin/.env ]]; then
+  echo "No .env file available!"
+  exit 1
+fi
+
+source .env
+
+PROD=$(heroku config --app $APP_NAME --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
+LOCALHOST=$(cat $BASICFIT_BACKEND_REPO/.env | sed 's/=.*$//g;/^#.*$/d' | uniq | sort)
+
+echo "- Complete diff:"
+diff -u  <(echo "$PROD") <(echo "$LOCALHOST") | diff-so-fancy
+
+echo ""
+echo "- Additions:"
+comm -13 <(echo "$PROD") <(echo "$LOCALHOST")
