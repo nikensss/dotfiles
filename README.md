@@ -14,3 +14,11 @@ bash -c "$(curl -fsSL https://raw.github.com/nikensss/dotfiles/main/install.sh)"
 git config blame.ignoreRevsFile .git-blame-ignore-revs
 echo $FULL_COMMIT_HASH_TO_BE_IGNORED >> .git-blame-ignore-revs
 ```
+
+## Debugging bash scripts
+
+Use this `#!`:
+
+```bash
+#!/usr/bin/env -S bash -x
+```

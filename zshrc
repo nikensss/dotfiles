@@ -40,6 +40,7 @@ eval "$(fnm env --use-on-cd)"
 # add-zsh-hook chpwd load-nvmrc
 # load-nvmrc
 
+export PS4='$LINENO > '
 export JDTLS_HOME="~/repos/java/jdtls-160"
 export NODE_ENV=development
 export VISUAL=vim
