@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Move first column to last
+#
+# Given a CSV file, this script will move the first column to the end of the
+# file
+
+FILE_PATH=$1
+SEPARATOR=$2
+
+if [[ -z $2 ]]; then SEPARATOR=','; fi
+
+RESULT=''
+
+while IFS="$SEPARATOR" read -r FIRST REST; do
+  LINE="$(echo $REST | tr -d '\r')$SEPARATOR$FIRST\n"
+  RESULT="$RESULT$LINE"
+done < <(cat $FILE_PATH)
+
+# use 'sed' to remove the last line if empty
+echo -e $RESULT | sed '${/^$/d;}' > $FILE_PATH
