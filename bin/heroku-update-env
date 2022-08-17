@@ -14,7 +14,7 @@ if [ -z "$APP_NAME" ]; then
 fi
 
 if [[ ! -f "$FILE_NAME" ]]; then
-  echo "Missing '~/bin/.env' file"
+  echo "File '$FILE_NAME' does not exist"
   exit 1
 fi
 
