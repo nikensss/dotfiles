@@ -1,9 +1,5 @@
 #!/usr/bin/env bash
 
-TOKEN=$1
-
-if [ -z "$TOKEN" ]; then
-  TOKEN=$(pbpaste)
-fi
+TOKEN=${1:-$(pbpaste)}
 
 jwt-decode-node $TOKEN | jq .
