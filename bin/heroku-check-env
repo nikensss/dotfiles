@@ -3,7 +3,7 @@
 usage (){
   cat << _EOF_
 usage:
- $ ${0##*/} [(-n | --app-name) <APP_NAME>] [(-l | --location) <ENV_LOCATION>]
+ $ ${0##*/} [(-n | --app-name) <APP_NAME>] [(-e | --env) <ENV_LOCATION>]
 
 The '~/bin/.env' file is sourced and the 'APP_NAME' and 'ENV_LOCATION'
 variables will be used in case the corresponding arguments are not passed.
@@ -23,7 +23,7 @@ while [[ -n "$1" ]]; do
       shift
       APP_NAME="$1"
       ;;
-    -l | --location)
+    -e | --env)
       shift
       ENV_LOCATION="$1"
       ;;
