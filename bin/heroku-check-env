@@ -7,6 +7,22 @@ fi
 
 source .env
 
+while [[ -n "$1" ]]; do
+  case "$1" in
+    -n | --app-name)
+      shift
+      APP_NAME="$1"
+      ;;
+    -l | --location)
+      shift
+      BASICFIT_BACKEND_REPO="$1"
+      ;;
+  esac
+  shift
+done
+
+echo "Comparing ENV at '$APP_NAME' with ENV at '$BASICFIT_BACKEND_REPO'"
+
 PROD=$(heroku config --app $APP_NAME --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
 LOCALHOST=$(cat $BASICFIT_BACKEND_REPO/.env | sed 's/=.*$//g;/^#.*$/d' | uniq | sort)
 
