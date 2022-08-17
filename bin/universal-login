@@ -20,4 +20,5 @@ TOKEN=$(curl -s -X "POST" \
 
 echo $TOKEN | pbcopy
 
-echo "The token is (already in clipboard): $TOKEN"
+echo "Token: $TOKEN"
+echo "Available in the clipboard"
