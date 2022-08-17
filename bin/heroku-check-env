@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
-if [[ ! -f ~/bin/.env ]]; then
-  echo "No .env file available!"
-  exit 1
-fi
+usage (){
+  cat << _EOF_
+usage:
+ $ ${0##*/} [(-n | --app-name) <APP_NAME>] [(-l | --location) <ENV_LOCATION>]
 
-source .env
+The '~/bin/.env' file is sourced and the 'APP_NAME' and 'ENV_LOCATION'
+variables will be used in case the corresponding arguments are not passed.
+
+APP_NAME = "$APP_NAME"
+ENV_LOCATION = "$ENV_LOCATION"
+_EOF_
+}
+
+if [[ -f ~/bin/.env ]]; then
+  source .env
+fi
 
 while [[ -n "$1" ]]; do
   case "$1" in
@@ -15,20 +25,24 @@ while [[ -n "$1" ]]; do
       ;;
     -l | --location)
       shift
-      BASICFIT_BACKEND_REPO="$1"
+      ENV_LOCATION="$1"
       ;;
   esac
   shift
 done
 
-echo "Comparing ENV at '$APP_NAME' with ENV at '$BASICFIT_BACKEND_REPO'"
+if [[ -z "$APP_NAME" || -z "$ENV_LOCATION" ]]; then
+  usage
+  exit 1
+fi
+
+echo "Comparing ENV at '$APP_NAME' with ENV at '$ENV_LOCATION'"
 
 PROD=$(heroku config --app $APP_NAME --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
-LOCALHOST=$(cat $BASICFIT_BACKEND_REPO/.env | sed 's/=.*$//g;/^#.*$/d' | uniq | sort)
+LOCALHOST=$(cat $ENV_LOCATION | sed 's/=.*$//g;/^#.*$/d' | uniq | sort)
 
 echo "- Complete diff:"
 diff -u  <(echo "$PROD") <(echo "$LOCALHOST") | diff-so-fancy
 
-echo ""
-echo "- Additions:"
+echo -e "\n-------------------------------------------------------------------------------\n\n- Additions:"
 comm -13 <(echo "$PROD") <(echo "$LOCALHOST")
