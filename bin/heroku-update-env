@@ -1,36 +1,55 @@
 #!/usr/bin/env bash
 
+usage (){
+  cat << _EOF_
+usage:
+ $ ${0##*/} [(-n | --app-name) <APP_NAME>] [(-e | --env) <ENV_LOCATION>]
+
+The '~/bin/.env' file is sourced and the 'APP_NAME' and 'ENV_LOCATION'
+variables will be used in case the corresponding arguments are not passed.
+
+APP_NAME = "$APP_NAME"
+ENV_LOCATION = "$ENV_LOCATION"
+_EOF_
+}
+
+if [[ -f ~/bin/.env ]]; then
+  source .env
+fi
+
 while [[ -n "$1" ]]; do
   case "$1" in
     -n | --app-name)
       shift
       APP_NAME="$1"
       ;;
-    -f | --file)
+    -e | --env)
       shift
-      FILE_NAME="$1"
+      ENV_LOCATION="$1"
       ;;
   esac
   shift
 done
 
-echo "Updating ENV at '$APP_NAME' with ENV at '$FILE_NAME'"
-
-if [ -z "$FILE_NAME" ]; then
-  echo "Missing file name"
+if [[ -z "$APP_NAME" ]]; then
+  usage
+  echo "Missing app name"
   exit 1
 fi
 
-if [ -z "$APP_NAME" ]; then
-  echo "Missing app name!"
+if [[ -z "$ENV_LOCATION" ]]; then
+  usage
+  echo "Missing env location"
   exit 1
 fi
 
-if [[ ! -f "$FILE_NAME" ]]; then
-  echo "File '$FILE_NAME' does not exist"
+if [[ ! -f "$ENV_LOCATION" ]]; then
+  usage
+  echo "File '$ENV_LOCATION' does not exist"
   exit 1
 fi
 
+echo "Updating ENV at '$APP_NAME' with ENV at '$ENV_LOCATION'"
 
-cat $FILE_NAME | xargs -p heroku config:set --app $APP_NAME
+cat $ENV_LOCATION | xargs -p heroku config:set --app $APP_NAME
 
