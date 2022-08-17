@@ -6,9 +6,7 @@
 # file
 
 FILE_PATH=$1
-SEPARATOR=$2
-
-if [[ -z "$2" ]]; then SEPARATOR=','; fi
+SEPARATOR=${2:-","}
 
 RESULT=''
 
