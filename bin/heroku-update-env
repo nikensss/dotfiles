@@ -1,7 +1,20 @@
 #!/usr/bin/env bash
 
-FILE_NAME=$1
-APP_NAME=$2
+while [[ -n "$1" ]]; do
+  case "$1" in
+    -n | --app-name)
+      shift
+      APP_NAME="$1"
+      ;;
+    -f | --file)
+      shift
+      FILE_NAME="$1"
+      ;;
+  esac
+  shift
+done
+
+echo "Updating ENV at '$APP_NAME' with ENV at '$FILE_NAME'"
 
 if [ -z "$FILE_NAME" ]; then
   echo "Missing file name"
