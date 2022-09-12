@@ -1,11 +1,13 @@
 " Description: Keymaps
 
 let mapleader = " "
-nnoremap <leader>w :w<cr>
+nnoremap <leader>w :w<CR>
 
-nnoremap <S-C-p> "0p
+" Paste without yank
+xnoremap <leader><leader>p "_dP
 " Delete without yank
-nnoremap <leader>d "_d
+nnoremap <leader><leader>d "_d
+vnoremap <leader><leader>d "_d
 nnoremap x "_x
 
 " Increment/decrement
