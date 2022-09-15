@@ -191,24 +191,14 @@ nvim_lsp.sumneko_lua.setup {
   },
 }
 
+local rt = require("rust-tools")
 local rust_opts = {
-    tools = { -- rust-tools options
-        autoSetHints = true,
-        -- hover_with_actions = true,
-        inlay_hints = {
-            show_parameter_hints = false,
-            parameter_hints_prefix = "",
-            other_hints_prefix = "",
-        },
-    },
-
-    -- all the opts to send to nvim-lspconfig
-    -- these override the defaults set by rust-tools.nvim
-    -- see https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#rust_analyzer
     server = {
-        -- on_attach is a callback called when the language server attachs to the buffer
         on_attach = function(_, bufnr)
-          vim.keymap.set('n', 'ga', require("rust-tools").hover_actions, {buffer=bufnr})
+          -- Hover actions
+          vim.keymap.set('n', '<Leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
+          -- Code action groups
+          vim.keymap.set('n', 'ga', rt.code_action_group.code_action_group, { buffer = bufnr })
         end,
         settings = {
             -- to enable rust-analyzer settings visit:
@@ -223,7 +213,7 @@ local rust_opts = {
     },
 }
 
-require('rust-tools').setup(rust_opts)
+rt.setup(rust_opts)
 
 EOF
 
