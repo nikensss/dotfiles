@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [[ $1 = "--start" ]]; then
+  ./psql-scripts/start
+elif [[ $1 = "--stop" ]]; then
+  ./psql-scripts/stop
+fi
+
+DB_NAME=${1:-"postgres"}
+
+docker exec -it my-postgres psql -U postgres $DB_NAME
