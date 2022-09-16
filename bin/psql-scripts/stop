@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 echo 'stopping docker container'
-docker compose rm tutorial-db -s -f -v
+docker compose -f ~/bin/psql-scripts/docker-compose.yml rm tutorial-db -s -f -v
