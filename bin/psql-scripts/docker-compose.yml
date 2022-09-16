@@ -1,0 +1,13 @@
+version: '3'
+services:
+  tutorial-db:
+    image: 'postgres:14'
+    container_name: 'my-postgres'
+    environment:
+      POSTGRES_PASSWORD: 'my-password'
+    ports:
+      - '54320:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:
