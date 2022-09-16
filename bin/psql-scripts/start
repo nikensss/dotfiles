@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
+echo 'starting docker container'
 docker compose up tutorial-db -d

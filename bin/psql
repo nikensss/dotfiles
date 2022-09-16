@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-if [[ $1 = "--start" ]]; then
+case $1 in
+  '--start')
   ./psql-scripts/start
-elif [[ $1 = "--stop" ]]; then
+    exit 0
+    ;;
+  '--stop')
   ./psql-scripts/stop
-fi
+    exit 0
+    ;;
+esac
 
 DB_NAME=${1:-"postgres"}
 
