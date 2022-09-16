@@ -6,14 +6,15 @@ call plug#begin()
 
 Plug 'AndrewRadev/sideways.vim'
 Plug 'NLKNguyen/papercolor-theme'
-Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-sort-motion'
 Plug 'cohama/lexima.vim'
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'junegunn/gv.vim'
 Plug 'kana/vim-textobj-indent'
 Plug 'kana/vim-textobj-user'
 Plug 'mattn/emmet-vim'
+Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'navarasu/onedark.nvim'
 Plug 'preservim/nerdtree'
 Plug 'sheerun/vim-polyglot'
