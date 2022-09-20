@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+function color(){
+  local NO_COLOR='\033[0m'
+  echo -e "$@$NO_COLOR"
+}
+
+function red(){
+  local RED='\033[0;31m'
+  color "$RED$@"
+}
+
+function green() {
+  local GREEN='\033[0;32m'
+  color "$GREEN$@"
+}
+
+function blue(){
+  local BLUE='\034[1;34m'
+  color "$BLUE$@"
+}
+
+function section(){
+  local TITLE=$1
+  local CMD=$2
+
+
+  green ":::::::::::::::::::::::::::::::"
+  green "$TITLE"
+  green ":::::::::::::::::::::::::::::::"
+
+  eval "$CMD"
+
+  if [[ "$?" != 0 ]]; then
+    red "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    red "\'$TITLE\' returned $? instead of 0"
+    red "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+  else 
+    blue "==============================="
+    blue "Successfully completed"
+    blue "==============================="
+  fi
+
+}
+
+section "Updating and upgrading homebrew" "brew update && brew upgrade"
+section "Updating rust" "rustup update"
+section "Updating rust-analyzer" "cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cargo xtask install --server && cd -"
+section "Updating global npm packages" "npm update -g"
+section "Updating Oh My zsh" "sh ~/.oh-my-zsh/tools/upgrade.sh"
+section "Updating powerlevel10k" "git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull"
+section "Updating nvim plugins" "nvim +PlugClean! +qa && nvim +PlugUpdate! +qa && nvim +PlugUpgrade! +qa"

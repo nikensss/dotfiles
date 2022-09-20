@@ -58,18 +58,7 @@ alias vvrc='vim ~/.vimrc'
 alias vnvi='vim ~/.config/nvim/init.vim'
 
 # updating packages
-alias brup='echo "updating and upgrading homebrew" && brew update && brew upgrade'
-alias urust='echo "updating rust" && rustup update && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cd -'
-alias ura='echo "updating rust-analyzer" && cd ~/repos/rust/rust-analyzer && git reset --hard HEAD && git pull && cargo xtask install --server && cd -'
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
-alias ugnp='echo "updating global npm packages" && npm update -g'
-alias uomz='echo "updating Oh My zsh" && sh ~/.oh-my-zsh/tools/upgrade.sh'
-alias upl10k='echo "updating powerlevel10k" && git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull'
-alias plug_clean='echo "cleaning vim plugins" && vim +PlugClean! +qa'
-alias plug_update='echo "updating vim plugins" && vim +PlugUpdate! +qa'
-alias plug_upgrade='echo "upgrading vim Plug" && vim +PlugUpgrade +qa'
-alias uvpl='plug_clean && plug_update && plug_upgrade'
-alias uall='brup && urust && ugnp && uomz && upl10k && uvpl && tldr --update && restart_shell'
 
 # git
 alias gfp='git fetch origin --prune'
