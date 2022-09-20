@@ -1,11 +1,11 @@
 alias restart_shell='exec $SHELL'
-alias vim=nvim
+alias vim='nvim'
 alias v='vim .'
 
 # python
-alias py=python
+alias py='python'
 alias cve='python -m venv --system-site-packages ./venv'
-alias uve='source venv/bin/activate'
+alias ave='source venv/bin/activate'
 
 # node.js
 alias rmnm='rm -rf node_modules'
@@ -13,16 +13,16 @@ alias i='npm ci'
 alias b='npm run build'
 alias s='npm start'
 alias t='npm test'
-alias bs='b && s'
-alias bt='b && t'
+alias bs='npm run build && npm run start'
+alias bt='npm run build && npm run test'
 alias sd='npm run start:dev'
-alias bv='b && sd'
+alias bd='npm run build && npm run start:dev'
 alias sb='npm run start:debug'
-alias bb='b && sd'
+alias bb='npm run build && npm run start:debug'
 alias tw='npm run test:watch'
-alias ribs='rmnm && npm ci && bs'
-alias ribd='rmnm && npm ci && bv'
-alias ribb='rmnm && npm ci && bb'
+alias ribs='rm -rf node_modules && npm ci && npm run build && npm run start'
+alias ribd='rm -rf node_modules && npm ci && npm run build && npm run start:dev'
+alias ribb='rm -rf node_modules && npm ci && npm run build && npm run start:debug'
 
 # development
 alias qka='cd ~/repos/javascript/quokkasandbox'
@@ -52,10 +52,10 @@ alias bf='repos && cd basic-fit'
 alias vpl='cd ~/.local/share/nvim/plugged'
 
 # editing dotfiles
-alias vzsh='vim ~/.zshrc'
+alias vzsh='nvim ~/.zshrc'
 alias szsh='source ~/.zshrc'
-alias vvrc='vim ~/.vimrc'
-alias vnvi='vim ~/.config/nvim/init.vim'
+alias vvrc='nvim ~/.vimrc'
+alias vnvi='nvim ~/.config/nvim/init.vim'
 
 # updating packages
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
