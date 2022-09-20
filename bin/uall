@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+trap ctrl_c INT
+
+STOP=0
+
+function ctrl_c(){
+  red "user request stop, stopping as soon as possible"
+  STOP=1
+}
+
 function color(){
   local NO_COLOR='\033[0m'
   echo -e "$@$NO_COLOR"
@@ -44,6 +53,10 @@ function section(){
     blue "==============================="
   fi
 
+  if [[ "$STOP" == 1 ]]; then
+    red "Stopping on user request"
+    exit 0
+  fi
 }
 
 section "Updating and upgrading homebrew" "brew update && brew upgrade"
