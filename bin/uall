@@ -16,7 +16,7 @@ function green() {
 }
 
 function blue(){
-  local BLUE='\034[1;34m'
+  local BLUE='\033[0;34m'
   color "$BLUE$@"
 }
 
@@ -29,12 +29,15 @@ function section(){
   green "$TITLE"
   green ":::::::::::::::::::::::::::::::"
 
+  echo ""
   eval "$CMD"
+  echo ""
 
   if [[ "$?" != 0 ]]; then
     red "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     red "\'$TITLE\' returned $? instead of 0"
     red "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+    sleep 3000
   else 
     blue "==============================="
     blue "Successfully completed"
