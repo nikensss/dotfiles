@@ -11,7 +11,12 @@ case $1 in
     ;;
   '--file')
     shift
-    ~/bin/psql-scripts/run-file-in-container $1 $2
+    ~/bin/psql-scripts/run-file-in-container "$1" "$2"
+    exit 0
+    ;;
+  '--export')
+    shift
+    ~/bin/psql-scripts/to-csv "$1" "$2"
     exit 0
     ;;
 esac

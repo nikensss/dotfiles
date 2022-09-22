@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+QUERY=$1
+SEPARATOR=${2:-','}
+
+docker exec -u postgres my-postgres psql -d test -c "COPY ($QUERY) TO STDOUT CSV HEADER DELIMITER '$SEPARATOR'"
