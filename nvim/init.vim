@@ -26,6 +26,7 @@ set showcmd
 set cmdheight=2
 set laststatus=2
 set scrolloff=5
+set cursorline
 set colorcolumn=80,100,120
 set expandtab
 set clipboard+=unnamedplus
