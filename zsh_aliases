@@ -1,4 +1,4 @@
-alias restart_shell='exec $SHELL'
+alias rsh='exec $SHELL'
 alias vim='nvim'
 alias v='vim .'
 

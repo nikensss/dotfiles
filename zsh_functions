@@ -114,5 +114,23 @@ fni(){
 }
 
 bmpsql(){
-  source ~/bin/.env && psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
+  local ENV=$1
+
+  if [[ -z "$ENV" ]]; then
+    echo "no environment provided: use 'stage' or 'prod'"
+    exit 1
+  fi
+
+  case "$ENV" in
+    "prod")
+      source ~/bin/.env.bm.prod 
+      psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
+      ;;
+    "stage")
+      heroku pg:psql postgresql-curly-69955 --app staging-body-metrics
+      ;;
+    *)
+      echo "unknown environment '$ENV': use 'stage' or 'prod'"
+      ;;
+  esac
 }
