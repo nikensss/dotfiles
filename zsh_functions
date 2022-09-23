@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 up(){
   local AMOUNT=$1
   for i in {1..$AMOUNT}
@@ -109,4 +111,8 @@ fni(){
   fnm use $NODE_VERSION
   echo "Reinstalling global packages"
   echo $GLOBAL_PACKAGES | xargs npm i -g
+}
+
+bmpsql(){
+  source ~/bin/.env && psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
 }
