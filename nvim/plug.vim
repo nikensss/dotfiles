@@ -63,7 +63,7 @@ if has("nvim")
   Plug 'sbdchd/neoformat'
   Plug 'rust-lang/rust.vim'
   Plug 'simrat39/rust-tools.nvim'
-  Plug 'tami5/lspsaga.nvim'
+  Plug 'glepnir/lspsaga.nvim', { 'branch': 'main' }
   Plug 'tree-sitter/tree-sitter-python'
 
   " debugging
