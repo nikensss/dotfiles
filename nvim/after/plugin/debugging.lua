@@ -74,7 +74,7 @@ vim.keymap.set("n", "<leader>ds", ":Telescope dap frames<CR>")
 vim.keymap.set("n", "<leader>dt", ":Telescope dap commands<CR>")
 vim.keymap.set("n", "<leader>dB", ":Telescope dap list_breakpoints<CR>")
 
-require("nvim-dap-virtual-text").setup()
+require("nvim-dap-virtual-text").setup({})
 vim.g.dap_virtual_text = true
 
 local dapui = require("dapui")
@@ -101,16 +101,16 @@ dapui.setup({
 	},
 })
 vim.keymap.set("n", "<leader>dp", function()
-	dapui.toggle()
+	dapui.toggle({})
 end)
 dap.listeners.after.event_initialized["dapui_config"] = function()
-	dapui.open()
+	dapui.open({})
 end
 dap.listeners.before.event_terminated["dapui_config"] = function()
-	dapui.close()
+	dapui.close({})
 end
 dap.listeners.before.event_exited["dapui_config"] = function()
-	dapui.close()
+	dapui.close({})
 end
 
 -- David-Kunz/jester
