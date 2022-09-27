@@ -62,3 +62,9 @@ To apply a stash by name:
 ```
 git stash apply stash^{/my_stash_name}
 ```
+
+## Show timestamp in zsh history
+
+```bash
+history -i
+```
