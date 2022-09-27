@@ -16,7 +16,8 @@ local function debugJest(testName, filename)
 end
 
 local function attach()
-	print("attaching")
+	local port = vim.fn.input("Attach to port: ", "9230")
+
 	dap.run({
 		type = "node2",
 		request = "attach",
@@ -25,7 +26,7 @@ local function attach()
 		sourceMaps = true,
 		protocol = "inspector",
 		skipFiles = { "<node_internals>/**" },
-		port = 9230,
+		port = port,
 	})
 end
 
