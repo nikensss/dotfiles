@@ -134,9 +134,10 @@ runtime ./maps.vim
 
 " true color
 lua << EOF
-require('onedark').setup {
-  style = 'darker'
-}
+  require('onedark').setup {
+    style = 'darker'
+  }
+  require('catppuccin').setup()
 EOF
 
 if exists("&termguicolors") && exists("&winblend")
@@ -144,9 +145,11 @@ if exists("&termguicolors") && exists("&winblend")
   set winblend=0
   set wildoptions=pum
   set pumblend=5
-  set background=dark
-  colorscheme onedark
 endif
+
+set background=dark
+let g:catppuccin_flavour='mocha'
+colorscheme tokyonight-night
 
 " Extras
 " ---------------------------------------------------------------------
@@ -174,6 +177,7 @@ lua << EOF
 _G.term_buf_of_tab = _G.term_buf_of_tab or {}
 _G.term_buf_max_nmb = _G.term_buf_max_nmb or 0
 
+-- Terminal in neovim
 function spawn_terminal()
   local cur_tab = vim.api.nvim_get_current_tabpage()
   vim.cmd('vs | terminal')

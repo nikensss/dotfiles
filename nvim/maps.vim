@@ -103,6 +103,18 @@ nnoremap <leader>qa :qa<CR>
 " Take notes
 nmap <leader>n<CR> :tab drop notes.md<CR>
 
-" Switch to light themes (it's impossible to work in the office with a dark theme...)
-nnoremap <leader><leader>cp :colorscheme PaperColor <BAR> set background=light<CR>
-nnoremap <leader><leader>ct :colorscheme tokyonight <BAR> set background=light<CR>
+
+" Catppuccin
+nnoremap <leader><leader>ca  :let g:catppuccin_flavour='macchiato'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>cf  :let g:catppuccin_flavour='frappe'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>cl  :let g:catppuccin_flavour='latte'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>co  :let g:catppuccin_flavour='mocha'<BAR> colorscheme catppuccin<CR>
+
+"One dark
+nnoremap <leader><leader>od  :colorscheme onedark<CR>
+
+" Tokyonight
+nnoremap <leader><leader>tn  :colorscheme tokyonight-night<CR>
+nnoremap <leader><leader>ts  :colorscheme tokyonight-storm<CR>
+nnoremap <leader><leader>td  :colorscheme tokyonight-day<CR>
+nnoremap <leader><leader>tm  :colorscheme tokyonight-moon<CR>

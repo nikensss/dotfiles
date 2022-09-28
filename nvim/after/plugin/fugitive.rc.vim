@@ -11,7 +11,7 @@ if !exists('*fugitive#statusline')
   set statusline+=%{GitStatus()}
 endif
 
-cnoreabbrev g Git
+cnoreabbrev git Git
 cnoreabbrev gopen GBrowse
 
 nmap <leader>gj :diffget //3<CR>

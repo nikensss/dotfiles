@@ -5,7 +5,6 @@ endif
 call plug#begin()
 
 Plug 'AndrewRadev/sideways.vim'
-Plug 'NLKNguyen/papercolor-theme'
 Plug 'airblade/vim-gitgutter'
 Plug 'christoomey/vim-sort-motion'
 Plug 'cohama/lexima.vim'
@@ -16,6 +15,7 @@ Plug 'kana/vim-textobj-user'
 Plug 'mattn/emmet-vim'
 Plug 'mg979/vim-visual-multi', {'branch': 'master'}
 Plug 'navarasu/onedark.nvim'
+Plug 'catppuccin/nvim', {'as': 'catppuccin'}
 Plug 'preservim/nerdtree'
 Plug 'sheerun/vim-polyglot'
 Plug 'shime/vim-livedown'
@@ -34,7 +34,7 @@ if has("nvim")
   Plug 'dcampos/nvim-snippy'
   Plug 'folke/lsp-colors.nvim'
   Plug 'honza/vim-snippets'
-  Plug 'hoob3rt/lualine.nvim'
+  Plug 'nvim-lualine/lualine.nvim'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
