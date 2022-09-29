@@ -59,6 +59,7 @@ if has("nvim")
   Plug 'p00f/nvim-ts-rainbow'
   Plug 'pantharshit00/vim-prisma'
   Plug 'phaazon/hop.nvim'
+  Plug 'ggandor/leap.nvim'
   Plug 'rhysd/git-messenger.vim'
   Plug 'sbdchd/neoformat'
   Plug 'rust-lang/rust.vim'
