@@ -54,7 +54,6 @@ alias vpl='cd ~/.local/share/nvim/plugged'
 # editing dotfiles
 alias vzsh='nvim ~/.zshrc'
 alias szsh='source ~/.zshrc'
-alias vvrc='nvim ~/.vimrc'
 alias vnvi='nvim ~/.config/nvim/init.vim'
 
 # updating packages

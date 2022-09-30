@@ -96,7 +96,7 @@ git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$
 dir=$(pwd)
 olddir=$HOME/dotfiles_old
 oldconfig=$HOME/oldconfig
-files="vimrc tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
+files="tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
 config="nvim"
 
 mkdir -p $olddir
