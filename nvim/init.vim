@@ -44,6 +44,8 @@ set hidden
 set matchpairs+=<:>
 set updatetime=300
 
+set mouse=
+
 " Helps force plug-ins to load correctly when it is turned back on below.
 filetype off
 " For plug-ins to load correctly.
