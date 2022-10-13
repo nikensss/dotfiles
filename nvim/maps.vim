@@ -106,15 +106,15 @@ nmap <leader>n<CR> :tab drop notes.md<CR>
 
 " Catppuccin
 nnoremap <leader><leader>ca  :let g:catppuccin_flavour='macchiato'<BAR> colorscheme catppuccin<CR>
-nnoremap <leader><leader>cf  :let g:catppuccin_flavour='frappe'<BAR> colorscheme catppuccin<CR>
-nnoremap <leader><leader>cl  :let g:catppuccin_flavour='latte'<BAR> colorscheme catppuccin<CR>
-nnoremap <leader><leader>co  :let g:catppuccin_flavour='mocha'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>cb  :let g:catppuccin_flavour='frappe'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>cc  :let g:catppuccin_flavour='latte'<BAR> colorscheme catppuccin<CR>
+nnoremap <leader><leader>cd  :let g:catppuccin_flavour='mocha'<BAR> colorscheme catppuccin<CR>
 
 "One dark
 nnoremap <leader><leader>od  :colorscheme onedark<CR>
 
 " Tokyonight
-nnoremap <leader><leader>tn  :colorscheme tokyonight-night<CR>
-nnoremap <leader><leader>ts  :colorscheme tokyonight-storm<CR>
-nnoremap <leader><leader>td  :colorscheme tokyonight-day<CR>
-nnoremap <leader><leader>tm  :colorscheme tokyonight-moon<CR>
+nnoremap <leader><leader>ta  :colorscheme tokyonight-night<CR>
+nnoremap <leader><leader>tb  :colorscheme tokyonight-storm<CR>
+nnoremap <leader><leader>tc  :colorscheme tokyonight-day<CR>
+nnoremap <leader><leader>td  :colorscheme tokyonight-moon<CR>
