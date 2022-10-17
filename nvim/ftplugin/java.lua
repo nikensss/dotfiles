@@ -1,5 +1,5 @@
 local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").update_capabilities(capabilities)
+capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
