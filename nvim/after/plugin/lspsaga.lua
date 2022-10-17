@@ -5,6 +5,7 @@ saga.init_lsp_saga({
 	diagnostic_header = { " ", " ", " ", " " },
 	border_style = "rounded",
 	max_preview_lines = 25,
+	finder_request_timeout = 15000,
 	finder_action_keys = {
 		vsplit = "<C-v>",
 		split = "<C-s>",
