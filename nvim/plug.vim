@@ -30,18 +30,20 @@ Plug 'tpope/vim-unimpaired'
 if has("nvim")
   Plug 'APZelos/blamer.nvim'
   Plug 'cuducos/yaml.nvim'
-  Plug 'dcampos/cmp-snippy'
-  Plug 'dcampos/nvim-snippy'
   Plug 'folke/lsp-colors.nvim'
   Plug 'honza/vim-snippets'
   Plug 'nvim-lualine/lualine.nvim'
+
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
   Plug 'hrsh7th/cmp-nvim-lua'
   Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/cmp-vsnip'
   Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/vim-vsnip'
+
   Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lukas-reineke/indent-blankline.nvim'
@@ -68,11 +70,13 @@ if has("nvim")
   Plug 'tree-sitter/tree-sitter-python'
 
   " debugging
+  Plug 'David-Kunz/jester'
   Plug 'mfussenegger/nvim-dap'
+  Plug 'nvim-telescope/telescope-dap.nvim'
   Plug 'rcarriga/nvim-dap-ui'
   Plug 'theHamsta/nvim-dap-virtual-text'
-  Plug 'nvim-telescope/telescope-dap.nvim'
-  Plug 'David-Kunz/jester'
+  Plug 'williamboman/mason-lspconfig.nvim'
+  Plug 'williamboman/mason.nvim'
 endif
 
 call plug#end()

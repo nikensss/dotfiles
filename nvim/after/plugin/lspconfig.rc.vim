@@ -12,6 +12,10 @@ nnoremap <silent> <leader>q <cmd>lua vim.lsp.diagnostic.set_loclist()<CR>
 
 lua << EOF
 --vim.lsp.set_log_level("debug")
+
+require("mason").setup()
+require("mason-lspconfig").setup()
+
 local nvim_lsp = require 'lspconfig'
 local protocol = require 'vim.lsp.protocol'
 protocol.CompletionItemKind = {
@@ -201,7 +205,7 @@ local rust_opts = {
   server = {
       on_attach = function(_, bufnr)
         -- Hover actions
-        vim.keymap.set('n', 'ga', rt.hover_actions.hover_actions, { buffer = bufnr })
+        vim.keymap.set('n', '<Leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
         -- Code action groups
         vim.keymap.set('n', '<Leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
       end,

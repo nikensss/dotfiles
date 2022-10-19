@@ -18,8 +18,8 @@ set fileencodings=utf-8,sjis,euc-jp,latin
 set encoding=utf-8
 set title
 set autoindent
-set background=dark
 set signcolumn=yes
+set background=dark
 set nobackup
 set nowritebackup
 set showcmd
