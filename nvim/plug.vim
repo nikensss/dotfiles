@@ -31,6 +31,7 @@ if has("nvim")
   Plug 'APZelos/blamer.nvim'
   Plug 'cuducos/yaml.nvim'
   Plug 'folke/lsp-colors.nvim'
+  Plug 'folke/trouble.nvim'
   Plug 'honza/vim-snippets'
   Plug 'nvim-lualine/lualine.nvim'
 
