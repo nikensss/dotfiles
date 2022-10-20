@@ -15,6 +15,10 @@ vim.opt.completeopt = {'menuone', 'noselect', 'noinsert'}
 vim.opt.shortmess = vim.opt.shortmess + { c = true}
 vim.api.nvim_set_option('updatetime', 300)
 
+local t = function(str)
+	return vim.api.nvim_replace_termcodes(str, true, true, true)
+end
+
 -- Completion Plugin Setup
 local cmp = require'cmp'
 cmp.setup({
@@ -25,16 +29,52 @@ cmp.setup({
     end,
   },
   mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
+		['<C-n>'] = cmp.mapping({
+				c = function()
+						if cmp.visible() then
+								cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+						else
+								vim.api.nvim_feedkeys(t('<Down>'), 'n', true)
+						end
+				end,
+				i = function(fallback)
+						if cmp.visible() then
+								cmp.select_next_item({ behavior = cmp.SelectBehavior.Select })
+						else
+								fallback()
+						end
+				end
+		}),
+		['<C-p>'] = cmp.mapping({
+				c = function()
+						if cmp.visible() then
+								cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+						else
+								vim.api.nvim_feedkeys(t('<Up>'), 'n', true)
+						end
+				end,
+				i = function(fallback)
+						if cmp.visible() then
+								cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select })
+						else
+								fallback()
+						end
+				end
+		}),
     ['<C-b>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
     ['<C-Space>'] = cmp.mapping.complete(),
     ['<C-e>'] = cmp.mapping.close(),
-    ['<CR>'] = cmp.mapping.confirm({
-      behavior = cmp.ConfirmBehavior.Insert,
-      select = true,
-    })
+		['<CR>'] = cmp.mapping({
+				i = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false }),
+				c = function(fallback)
+						if cmp.visible() then
+								cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+						else
+								fallback()
+						end
+				end
+		}),
   },
   -- Installed sources:
   sources = {
