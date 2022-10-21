@@ -125,13 +125,15 @@ bmpsql(){
   case "$ENV" in
     "prod")
       source ~/bin/.env.bm.prod 
-      psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
       ;;
     "stage")
-      heroku pg:psql postgresql-curly-69955 --app staging-body-metrics
+      source ~/bin/.env.bm.stage
       ;;
     *)
       echo "unknown environment '$ENV': use 'stage' or 'prod'"
+      exit 1
       ;;
   esac
+
+  psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
 }
