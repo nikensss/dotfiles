@@ -118,3 +118,5 @@ require("nvim-treesitter.configs").setup({
 
 local ft_to_parser = require("nvim-treesitter.parsers").filetype_to_parsername
 ft_to_parser.tsx = { "javascript", "typescript.tsx" }
+
+vim.keymap.set("n", "<Leader>ih", ":TSLspToggleInlayHints<CR>")

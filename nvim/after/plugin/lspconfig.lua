@@ -81,7 +81,7 @@ local on_attach = function(client, bufnr)
 		filter_out_diagnostics_by_code = {},
 
 		-- inlay hints
-		auto_inlay_hints = true,
+		auto_inlay_hints = false,
 		inlay_hints_highlight = "Comment",
 		inlay_hints_priority = 200, -- priority of the hint extmarks
 		inlay_hints_throttle = 150, -- throttle the inlay hint request
@@ -222,7 +222,7 @@ local rust_opts = {
 			-- Hover actions
 			vim.keymap.set("n", "<Leader>ca", rt.hover_actions.hover_actions, { buffer = bufnr })
 			-- Code action groups
-			vim.keymap.set("n", "<Leader>a", rt.code_action_group.code_action_group, { buffer = bufnr })
+			vim.keymap.set("n", "<Leader>ga", rt.code_action_group.code_action_group, { buffer = bufnr })
 		end,
 		settings = {
 			-- to enable rust-analyzer settings visit:
