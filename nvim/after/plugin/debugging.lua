@@ -42,7 +42,7 @@ end)
 vim.keymap.set("n", "<leader>dc", function()
 	require("dap").continue()
 end)
-vim.keymap.set("n", "<leader>dn", function()
+vim.keymap.set("n", "<leader>dh", function()
 	require("dap").run_to_cursor()
 end)
 vim.keymap.set("n", "<leader>dT", function()
@@ -114,25 +114,33 @@ dap.listeners.before.event_exited["dapui_config"] = function()
 end
 
 -- David-Kunz/jester
--- require'jester'.setup({ path_to_jest = "/usr/local/bin/jest" })
+
+require("jester").setup({ path_to_jest_run = "npx jest" })
+
 vim.keymap.set("n", "<leader>tt", function()
 	require("jester").run()
 end)
-vim.keymap.set("n", "<leader>t_", function()
+
+vim.keymap.set("n", "<leader>tl", function()
 	require("jester").run_last()
 end)
+
 vim.keymap.set("n", "<leader>tf", function()
 	require("jester").run_file()
 end)
-vim.keymap.set("n", "<leader>d_", function()
+
+vim.keymap.set("n", "<leader>dd", function()
+	require("jester").debug()
+end)
+
+vim.keymap.set("n", "<leader>dl", function()
 	require("jester").debug_last()
 end)
+
 vim.keymap.set("n", "<leader>df", function()
 	require("jester").debug_file()
 end)
+
 vim.keymap.set("n", "<leader>dq", function()
 	require("jester").terminate()
-end)
-vim.keymap.set("n", "<leader>dd", function()
-	require("jester").debug()
 end)
