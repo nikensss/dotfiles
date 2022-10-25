@@ -38,11 +38,11 @@ fi
 
 echo "Comparing ENV at '$APP_NAME' with ENV at '$ENV_LOCATION'"
 
-PROD=$(heroku config --app $APP_NAME --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
+HEROKU=$(heroku config --app $APP_NAME --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
 LOCALHOST=$(cat $ENV_LOCATION | sed 's/=.*$//g;/^#.*$/d' | uniq | sort)
 
 echo "- Complete diff:"
-diff -u  <(echo "$PROD") <(echo "$LOCALHOST") | diff-so-fancy
+diff -u  <(echo "$HEROKU") <(echo "$LOCALHOST") | diff-so-fancy
 
 echo -e "\n-------------------------------------------------------------------------------\n\n- Additions:"
-comm -13 <(echo "$PROD") <(echo "$LOCALHOST")
+comm -13 <(echo "$HEROKU") <(echo "$LOCALHOST")
