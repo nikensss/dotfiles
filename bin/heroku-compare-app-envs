@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+usage (){
+  cat << _EOF_
+usage:
+ $ ${0##*/} [-a <APP_A>] [-b <APP_B>]
+
+Compares the environment variables of the two given apps.
+_EOF_
+}
+
+
+while [[ -n "$1" ]]; do
+  case "$1" in
+    -a)
+      shift
+      APP_A="$1"
+      ;;
+    -b)
+      shift
+      APP_B="$1"
+      ;;
+  esac
+  shift
+done
+
+if [[ -z "$APP_A" || -z "$APP_B" ]]; then
+  usage
+  exit 1
+fi
+
+echo "Comparing ENV at '$APP_A' with ENV at '$APP_B'"
+
+HEROKU_A=$(heroku config --app $APP_A --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
+HEROKU_B=$(heroku config --app $APP_B --json | jq '. | keys' | sed 's|[\", ]||g;/^\[$/d;/^\]$/d;/^$/d')
+
+echo "- Complete diff:"
+diff -u  <(echo "$HEROKU_A") <(echo "$HEROKU_B") | diff-so-fancy
+
+echo -e "\n-------------------------------------------------------------------------------\n\n- Additions:"
+comm -13 <(echo "$HEROKU_A") <(echo "$HEROKU_B")

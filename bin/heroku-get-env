@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+usage (){
+  cat << _EOF_
+usage:
+ $ ${0##*/} [(-a | --app) <APP_NAME>] [(-d | --destination) <ENV_DESTINATION>]
+
+Gets the environments variables from 'APP_NAME' and stores them in
+'ENV_DESTINATION'.
+
+APP_NAME = "$APP_NAME"
+ENV_DESTINATION = "$ENV_DESTINATION"
+_EOF_
+}
+
+if [[ -f ~/bin/.env ]]; then
+  source .env
+fi
+
+while [[ -n "$1" ]]; do
+  case "$1" in
+    -a | --app)
+      shift
+      APP_NAME="$1"
+      ;;
+    -d | --destination)
+      shift
+      ENV_DESTINATION="$1"
+      ;;
+  esac
+  shift
+done
+
+if [[ -z "$APP_NAME" || -z "$ENV_DESTINATION" ]]; then
+  usage
+  exit 1
+fi
+
+echo "Saving ENV at '$APP_NAME' in '$ENV_DESTINATION'"
+
+heroku config --app $APP_NAME --shell > $ENV_DESTINATION
