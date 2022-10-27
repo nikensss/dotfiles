@@ -115,7 +115,7 @@ fni(){
   echo $GLOBAL_PACKAGES | xargs npm i -g
 }
 
-bmpsql(){
+bfpsql(){
   local ENV=$1
 
   if [[ -z "$ENV" ]]; then
@@ -124,15 +124,22 @@ bmpsql(){
   fi
 
   case "$ENV" in
-    "prod")
+    "production-body-metrics")
       source ~/bin/.env.bm.prod 
       ;;
-    "stage")
+    "staging-body-metrics")
       source ~/bin/.env.bm.stage
       ;;
+    "identification-service-pro")
+      source ~/bin/.env.identification-service.pro
+      ;;
     *)
-      echo "unknown environment '$ENV': use 'stage' or 'prod'"
-      exit 1
+      echo "unknown postregresql environment '$ENV'"
+      echo "use one of:"
+      echo "\tproduction-body-metrics"
+      echo "\tstaging-body-metrics"
+      echo "\tidentification-service-pro"
+      return
       ;;
   esac
 
