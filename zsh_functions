@@ -38,7 +38,8 @@ ctp(){
   mcd $1
   git init
 
-  echo "node_modules\n.DS_Store\n.env\ndist" > .gitignore
+  echo "node_modules\n.DS_Store\n.env*\ndist" > .gitignore
+  touch .env
 
   npm init --yes
   echo 'save-exact=true' > .npmrc
