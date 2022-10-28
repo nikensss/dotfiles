@@ -9,6 +9,7 @@ source ~/bin/.env
 
 echo "Logging in with: $UNIVERSAL_LOGIN_EMAIL"
 
+  # "https://auth.basic-fit.com/login" \
 TOKEN=$(curl -s -X "POST" \
   "https://staging-auth-service.herokuapp.com/login" \
   -H 'accept: application/json' \
