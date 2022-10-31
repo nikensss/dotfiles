@@ -13,7 +13,7 @@ dap.configurations.typescript = {
 		cwd = vim.fn.getcwd(),
 		runtimeArgs = { "-r", "ts-node/register", "-r", "dotenv/config" },
 		runtimeExecutable = "node",
-		args = { "--inspect", "${file}" },
+		args = { "--inspect", vim.fn.getcwd() .. "/src/index.ts" },
 		sourceMaps = true,
 		skipFiles = { "<node_internals>/**", "node_modules/**" },
 	},
