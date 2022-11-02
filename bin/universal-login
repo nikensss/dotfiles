@@ -9,9 +9,21 @@ source ~/bin/.env
 
 echo "Logging in with: $UNIVERSAL_LOGIN_EMAIL"
 
-  # "https://auth.basic-fit.com/login" \
+case "$1" in
+  'prod')
+    source ~/bin/.env.ul.prod
+    ;;
+  'stage')
+    source ~/bin/.env.ul.stage
+    ;;
+  *)
+    echo "Unknown env $1, use 'prod' or 'stage'"
+    exit 1
+    ;;
+esac
+
 TOKEN=$(curl -s -X "POST" \
-  "https://staging-auth-service.herokuapp.com/login" \
+  "$UNIVERSAL_LOGIN_URL" \
   -H 'accept: application/json' \
   -H "client-id: $UNIVERSAL_LOGIN_CLIENT_ID" \
   -H "redirect-uri: $UNIVERSAL_LOGIN_REDIRECT_URI" \
