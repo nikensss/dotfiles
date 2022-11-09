@@ -15,31 +15,15 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+# fnm
+if [[ -d "$HOME/.fnm" ]]; then
+  export PATH=/home/meegan/.fnm:$PATH
+  eval "`fnm env`"
+fi
+
 if [[ -x "$(command -v fnm)" ]];then
   eval "$(fnm env --use-on-cd)"
 fi
-
-# autoload -U add-zsh-hook
-# load-nvmrc() {
-#   local node_version="$(fnm version)"
-#   local nvmrc_path="$(nvm_find_nvmrc)"
-
-#   if [ -n "$nvmrc_path" ]; then
-#     local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
-
-#     if [ "$nvmrc_node_version" = "N/A" ]; then
-#       fnm install
-#     elif [ "$nvmrc_node_version" != "$node_version" ]; then
-#       fnm use
-#     fi
-#   elif [ "$node_version" != "$(nvm version default)" ]; then
-#     echo "Reverting to nvm default version"
-#     fnm use default
-#   fi
-# }
-
-# add-zsh-hook chpwd load-nvmrc
-# load-nvmrc
 
 export PS4='$LINENO > '
 export JDTLS_HOME="~/repos/java/jdtls-160"
