@@ -11,11 +11,13 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # For c and c++ stuff
 export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
 
-if [ -f "/opt/homebrew/bin/brew" ]; then
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-eval "$(fnm env --use-on-cd)"
+if [[ -x "$(command -v fnm)" ]];then
+  eval "$(fnm env --use-on-cd)"
+fi
 
 # autoload -U add-zsh-hook
 # load-nvmrc() {
@@ -139,10 +141,10 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+if [[ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+if [[ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
@@ -150,10 +152,10 @@ if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-clou
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/Users/ricard/.pyenv/versions/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
+if [[ $? -eq 0 ]]; then
     eval "$__conda_setup"
 else
-    if [ -f "/Users/ricard/.pyenv/versions/miniforge3/etc/profile.d/conda.sh" ]; then
+    if [[ -f "/Users/ricard/.pyenv/versions/miniforge3/etc/profile.d/conda.sh" ]]; then
         . "/Users/ricard/.pyenv/versions/miniforge3/etc/profile.d/conda.sh"
     else
         export PATH="/Users/ricard/.pyenv/versions/miniforge3/bin:$PATH"
@@ -172,9 +174,16 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
-. $(brew --prefix asdf)/libexec/asdf.sh
+if [[ -x "$(command -v brew)" ]];then
+  if [[ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]]; then
+    . $(brew --prefix asdf)/libexec/asdf.sh
+  fi
 
-. ~/.asdf/plugins/java/set-java-home.zsh
+  if [[ -f "${HOME}/.asdf/plugins/java/set-java-home.zsh" ]]; then
+    . ~/.asdf/plugins/java/set-java-home.zsh
+  fi
+fi
+
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
