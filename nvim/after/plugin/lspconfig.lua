@@ -210,6 +210,12 @@ nvim_lsp.sumneko_lua.setup({
 	},
 })
 
+local codelldb_path = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/adapter/codelldb"
+local liblldb_path = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/lldb/lib/liblldb.so"
+if vim.fn.has("mac") == 1 then
+	liblldb_path = vim.fn.stdpath("data") .. "/mason/packages/codelldb/extension/lldb/lib/liblldb.dylib"
+end
+
 local rt = require("rust-tools")
 local rust_opts = {
 	tools = {
@@ -234,6 +240,9 @@ local rust_opts = {
 				},
 			},
 		},
+	},
+	dap = {
+		adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
 	},
 }
 
