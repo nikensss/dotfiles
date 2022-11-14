@@ -9,6 +9,7 @@ nnoremap <leader>fp <cmd>Telescope git_files<CR>
 nnoremap <leader>gc <cmd>Telescope git_branches<CR>
 nnoremap <leader>km <cmd>Telescope keymaps<CR>
 nnoremap <leader>fs <cmd>Telescope lsp_document_symbols<CR>
+nnoremap <leader>fd <cmd>Telescope lsp_dynamic_workspace_symbols<CR>
 nnoremap <leader>fr <cmd>Telescope lsp_references<CR>
 
 lua << EOF
