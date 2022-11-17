@@ -2,4 +2,4 @@
 
 TOKEN=${1:-$(pbpaste)}
 
-jwt-decode-node $TOKEN | jq .
+jwt-decode-node $TOKEN | jq

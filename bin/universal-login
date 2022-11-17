@@ -31,7 +31,7 @@ TOKEN=$(curl -s -X "POST" \
   -d "{ \"email\": \"$UNIVERSAL_LOGIN_EMAIL\", \"password\": \"$UNIVERSAL_LOGIN_PASSWORD\", \"keepLoggedIn\": true }" \
   | jq '.accessToken' | xargs)
 
-echo $TOKEN | pbcopy
+echo $TOKEN | tr -d '\n' | pbcopy
 
 echo "Token: $TOKEN"
 echo "Available in the clipboard"
