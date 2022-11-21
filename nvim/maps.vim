@@ -4,7 +4,7 @@ let mapleader = " "
 nnoremap <leader>w :w<CR>
 
 " Paste without yank
-xnoremap <leader><leader>p "_dP
+vnoremap <leader><leader>p "_dP
 " Delete without yank
 nnoremap <leader><leader>d "_d
 vnoremap <leader><leader>d "_d
