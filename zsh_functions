@@ -134,6 +134,9 @@ bfpsql(){
     "identification-service-pro")
       source ~/bin/.env.identification-service.pro
       ;;
+    "playtomic-bot-api-test")
+      source ~/bin/.env.playtomic-bot-api.test
+      ;;
     *)
       echo "unknown postregresql environment '$ENV'"
       echo "use one of:"
