@@ -134,6 +134,9 @@ bfpsql(){
     "identification-service-pro")
       source ~/bin/.env.identification-service.pro
       ;;
+    "playtomic-bot-api-dev")
+      source ~/bin/.env.playtomic-bot-api.dev
+      ;;
     "playtomic-bot-api-test")
       source ~/bin/.env.playtomic-bot-api.test
       ;;
