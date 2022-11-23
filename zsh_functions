@@ -116,7 +116,7 @@ fni(){
   echo $GLOBAL_PACKAGES | xargs npm i -g
 }
 
-bfpsql(){
+wsql(){
   local ENV=$1
 
   if [[ -z "$ENV" ]]; then
@@ -134,6 +134,9 @@ bfpsql(){
     "identification-service-pro")
       source ~/bin/.env.identification-service.pro
       ;;
+    "playtomic-bot-api-prod")
+      source ~/bin/.env.playtomic-bot-api.prod
+      ;;
     "playtomic-bot-api-dev")
       source ~/bin/.env.playtomic-bot-api.dev
       ;;
@@ -150,5 +153,5 @@ bfpsql(){
       ;;
   esac
 
-  psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
+  PGPASSWORD="$PGPASSWORD" psql -h $PGHOST -p $PGPORT -U $PGUSER $PGDATABASE
 }
