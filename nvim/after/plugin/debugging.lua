@@ -17,6 +17,17 @@ dap.configurations.typescript = {
 		sourceMaps = true,
 		skipFiles = { "<node_internals>/**", "node_modules/**" },
 	},
+	{
+		type = "node2",
+		request = "launch",
+		name = "Launch NestJS app",
+		cwd = vim.fn.getcwd(),
+		runtimeArgs = { "-r", "ts-node/register", "-r", "dotenv/config" },
+		runtimeExecutable = "node",
+		args = { "--inspect", vim.fn.getcwd() .. "/dist/main.js" },
+		sourceMaps = true,
+		skipFiles = { "<node_internals>/**", "node_modules/**" },
+	},
 }
 
 require("dap").set_log_level("INFO")

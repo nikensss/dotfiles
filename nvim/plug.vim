@@ -46,7 +46,7 @@ if has("nvim")
   Plug 'hrsh7th/vim-vsnip'
 
   Plug 'jose-elias-alvarez/nvim-lsp-ts-utils'
-  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'nvim-tree/nvim-web-devicons'
   Plug 'lukas-reineke/indent-blankline.nvim'
   Plug 'mfussenegger/nvim-jdtls'
   Plug 'neovim/nvim-lspconfig'
