@@ -11,6 +11,7 @@ nnoremap <leader>km <cmd>Telescope keymaps<CR>
 nnoremap <leader>fs <cmd>Telescope lsp_document_symbols<CR>
 nnoremap <leader>fd <cmd>Telescope lsp_dynamic_workspace_symbols<CR>
 nnoremap <leader>fr <cmd>Telescope lsp_references<CR>
+nnoremap <leader>se <cmd>Telescope diagnostics<CR>
 
 lua << EOF
 local actions = require('telescope.actions')
