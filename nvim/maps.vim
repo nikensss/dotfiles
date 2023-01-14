@@ -55,9 +55,6 @@ vnoremap <silent> # :<C-U>
   \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
   \gV:call setreg('"', old_reg, old_regtype)<CR>
 
-" Go to definition in side window
-nmap <leader>sd <leader>svgd
-
 " Resize window
 nmap <C-w><C-,> 10<C-w><
 nmap <C-w><C-.> 10<C-w>>

@@ -1,12 +1,12 @@
 local keymap = vim.keymap.set
 local saga = require("lspsaga")
 
-saga.init_lsp_saga({
-	diagnostic_header = { " ", " ", " ", " " },
-	border_style = "rounded",
-	max_preview_lines = 25,
-	finder_request_timeout = 15000,
-	finder_action_keys = {
+saga.setup({
+	ui = {
+		border = "rounded",
+	},
+	request_timeout = 15000,
+	finder = {
 		vsplit = "<C-v>",
 		split = "<C-s>",
 	},
@@ -14,8 +14,8 @@ saga.init_lsp_saga({
 
 keymap("n", "]a", "<cmd>Lspsaga diagnostic_jump_next<CR>zz", { silent = true })
 keymap("n", "[a", "<cmd>Lspsaga diagnostic_jump_prev<CR>zz", { silent = true })
+keymap("n", "<leader>ld", "<cmd>Lspsaga show_line_diagnostics<CR>zz", { silent = true })
 keymap("n", "K", "<cmd>Lspsaga hover_doc<CR>", { silent = true })
-keymap("n", "<C-k>", "<cmd>Lspsaga signature_help<CR>", { silent = true })
 keymap("n", "<leader>rn", "<cmd>Lspsaga rename<CR>", { silent = true })
 keymap("n", "ga", "<cmd>Lspsaga code_action<CR>", { silent = true })
 keymap("n", "gh", "<cmd>Lspsaga lsp_finder<CR>", { silent = true })
