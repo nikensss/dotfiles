@@ -29,12 +29,12 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm tmux helix postgresql@14 luarocks gnu-sed
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm tmux helix postgresql@14 luarocks gnu-sed pnpm
 brew upgrade
 
 fnm install --lts
 fnm use --lts
-npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn tree-sitter-yaml tree-sitter
+npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn tree-sitter-yaml tree-sitter @astrojs/language-server
 
 echo "${GREEN}installing python"
 pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
