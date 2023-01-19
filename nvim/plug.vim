@@ -38,7 +38,7 @@ if has("nvim")
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/cmp-nvim-lsp-signature-help'
+  Plug 'ray-x/lsp_signature.nvim'
   Plug 'hrsh7th/cmp-nvim-lua'
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/cmp-vsnip'
