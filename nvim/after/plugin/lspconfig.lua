@@ -117,6 +117,8 @@ end
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+nvim_lsp.astro.setup({})
+
 nvim_lsp.tsserver.setup({
 	init_options = require("nvim-lsp-ts-utils").init_options,
 	on_attach = on_attach,
