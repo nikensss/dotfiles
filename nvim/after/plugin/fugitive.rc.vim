@@ -19,3 +19,4 @@ nmap <leader>gf :diffget //2<CR>
 nmap <leader>gs :G<CR>
 nmap <leader>gb :Git blame<CR>
 nnoremap <leader>gd :GitGutterDiffOrig<CR>
+nnoremap <leader>gp :G push<CR>
