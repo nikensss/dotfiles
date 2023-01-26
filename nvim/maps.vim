@@ -36,6 +36,8 @@ nnoremap <leader>lK :llast<CR>zz
 " Page motion maps
 nnoremap <C-u> <C-u>zz
 nnoremap <C-d> <C-d>zz
+nnoremap <C-o> <C-o>zz
+nnoremap <C-i> <C-i>zz
 
 " Autoclose tags
 inoremap <buffer> <C-t> <esc>yiwi<lt><esc>ea></><esc>hpF>i
