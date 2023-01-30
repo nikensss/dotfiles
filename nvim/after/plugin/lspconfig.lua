@@ -5,8 +5,6 @@ vim.keymap.set("n", "gd", "<cmd>lua vim.lsp.buf.definition()<CR>zz")
 vim.keymap.set("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<CR>zz")
 vim.keymap.set("n", "gy", "<cmd>lua vim.lsp.buf.type_definition()<CR>")
 vim.keymap.set("n", "gr", "<cmd>lua vim.lsp.buf.references()<CR>")
-vim.keymap.set("n", "<leader>e", "<cmd>lua vim.lsp.diagnostics.show_line_diagnostics()<CR>")
-vim.keymap.set("n", "<leader>q", "<cmd>lua vim.lsp.diagnostics.set_loclist()<CR>")
 
 require("mason").setup()
 require("mason-lspconfig").setup()
@@ -249,5 +247,3 @@ local rust_opts = {
 }
 
 rt.setup(rust_opts)
-
-nvim_lsp.bash.setup({})
