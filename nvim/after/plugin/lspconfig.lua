@@ -249,3 +249,5 @@ local rust_opts = {
 }
 
 rt.setup(rust_opts)
+
+nvim_lsp.bash.setup({})
