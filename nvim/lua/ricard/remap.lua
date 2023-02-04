@@ -38,7 +38,7 @@ vim.keymap.set("n","<leader><leader>-","<C-w>15-")
 _G.term_buf_of_tab = _G.term_buf_of_tab or {}
 _G.term_buf_max_nmb = _G.term_buf_max_nmb or 0
 
-local function spawn_terminal()
+function Spawn_terminal()
   local cur_tab = vim.api.nvim_get_current_tabpage()
   vim.cmd('vs | terminal')
   local cur_buf = vim.api.nvim_get_current_buf()
@@ -48,7 +48,7 @@ local function spawn_terminal()
   vim.cmd(':startinsert')
 end
 
-local function toggle_terminal()
+function Toggle_terminal()
   local cur_tab = vim.api.nvim_get_current_tabpage()
   local term_buf = term_buf_of_tab[cur_tab]
   if term_buf ~= nil then
@@ -60,11 +60,11 @@ local function toggle_terminal()
      vim.cmd(':startinsert')
    end
   else
-    spawn_terminal()
+    Spawn_terminal()
     vim.cmd(':startinsert')
   end
 end
 
-vim.keymap.set('n', '<C-t>', toggle_terminal)
-vim.keymap.set('n', '<leader>tr', ':lua toggle_terminal()<CR><c-\\><c-n><C-w>Ti')
+vim.keymap.set('n', '<C-t>', Toggle_terminal)
+vim.keymap.set('n', '<leader>tr', [[:lua Toggle_terminal()<CR><C-\><C-n><C-w>Ti]])
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')

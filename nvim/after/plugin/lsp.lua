@@ -4,7 +4,8 @@ local nvim_lsp = require('lspconfig')
 lsp.preset('recommended')
 
 lsp.ensure_installed({
-  'prisma-language-server',
+  'eslint',
+  'prismals',
   'rust_analyzer',
   'sumneko_lua',
   'tsserver',
@@ -15,19 +16,58 @@ lsp.ensure_installed({
 lsp.configure('sumneko_lua', {
   settings = {
     Lua = {
-      runtime = { version = "LuaJIT" },
+      runtime = { version = 'LuaJIT' },
       diagnostics = { globals = { 'vim' } },
-      workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+      workspace = { library = vim.api.nvim_get_runtime_file('', true), checkThirdParty = false },
       telemetry = { enable = false }
     }
   }
 })
 
 lsp.configure('tsserver', {
-  root_dir = nvim_lsp.util.root_pattern("package.json"),
+  root_dir = nvim_lsp.util.root_pattern('package.json'),
   single_file_support = false,
 })
 
+lsp.configure('diagnosticls', {
+  filetypes = {
+    'javascript',
+    'javascriptreact',
+    'json',
+    'typescript',
+    'typescriptreact',
+  },
+  init_options = {
+    linters = {
+      eslint = {
+        command = 'eslint_d',
+        rootPatterns = { '.eslintrc.json' },
+        debounce = 100,
+        args = { '--stdin', '--stdin-filename', '%filepath', '--format', 'json' },
+        sourceName = 'eslint_d',
+        parseJson = {
+          errorsRoot = '[0].messages',
+          line = 'line',
+          column = 'column',
+          endLine = 'endLine',
+          endColumn = 'endColumn',
+          message = '[eslint] ${message} [${ruleId}]',
+          security = 'severity',
+        },
+        securities = {
+          [2] = 'error',
+          [1] = 'warning',
+        },
+      },
+    },
+    filetypes = {
+      javascript = 'eslint',
+      javascriptreact = 'eslint',
+      typescript = 'eslint',
+      typescriptreact = 'eslint',
+    },
+  },
+})
 
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
@@ -48,57 +88,17 @@ lsp.setup_nvim_cmp({
 lsp.on_attach(function(client, bufnr)
   local opts = { buffer = bufnr, remap = false }
 
-  vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
-  vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "<leader>vws", function() vim.lsp.buf.workspace_symbol() end, opts)
-  vim.keymap.set("n", "<leader>vd", function() vim.diagnostic.open_float() end, opts)
-  vim.keymap.set("n", "[a", function() vim.diagnostic.goto_next() end, opts)
-  vim.keymap.set("n", "]a", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
+  vim.keymap.set('n', 'gd', function() vim.lsp.buf.definition() end, opts)
+  vim.keymap.set('n', 'K', function() vim.lsp.buf.hover() end, opts)
+  vim.keymap.set('n', '<leader>vws', function() vim.lsp.buf.workspace_symbol() end, opts)
+  vim.keymap.set('n', '<leader>vd', function() vim.diagnostic.open_float() end, opts)
+  vim.keymap.set('n', '[a', function() vim.diagnostic.goto_next() end, opts)
+  vim.keymap.set('n', ']a', function() vim.diagnostic.goto_prev() end, opts)
+  vim.keymap.set('i', '<C-h>', function() vim.lsp.buf.signature_help() end, opts)
 end)
 
 lsp.setup()
 
 vim.diagnostic.config({
   virtual_text = true
-})
-
-nvim_lsp.diagnosticls.setup({
-	filetypes = {
-		"javascript",
-		"javascriptreact",
-		"json",
-		"typescript",
-		"typescriptreact",
-	},
-	init_options = {
-		linters = {
-			eslint = {
-				command = "eslint_d",
-				rootPatterns = { ".eslintrc.json" },
-				debounce = 100,
-				args = { "--stdin", "--stdin-filename", "%filepath", "--format", "json" },
-				sourceName = "eslint_d",
-				parseJson = {
-					errorsRoot = "[0].messages",
-					line = "line",
-					column = "column",
-					endLine = "endLine",
-					endColumn = "endColumn",
-					message = "[eslint] ${message} [${ruleId}]",
-					security = "severity",
-				},
-				securities = {
-					[2] = "error",
-					[1] = "warning",
-				},
-			},
-		},
-		filetypes = {
-			javascript = "eslint",
-			javascriptreact = "eslint",
-			typescript = "eslint",
-			typescriptreact = "eslint",
-		},
-	},
 })
