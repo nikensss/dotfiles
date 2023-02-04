@@ -91,6 +91,7 @@ require('lazy').setup({
   'mg979/vim-visual-multi',
   'nvim-lualine/lualine.nvim',
   'phaazon/hop.nvim',
+  'preservim/nerdtree',
   'rhysd/git-messenger.vim',
   'tpope/vim-abolish',
   'tpope/vim-commentary',
@@ -101,5 +102,6 @@ require('lazy').setup({
   'mfussenegger/nvim-dap',
   'nvim-telescope/telescope-dap.nvim',
   'rcarriga/nvim-dap-ui',
-  'theHamsta/nvim-dap-virtual-text'
+  'theHamsta/nvim-dap-virtual-text',
+  'jiangmiao/auto-pairs'
 })

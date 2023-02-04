@@ -1,2 +1,2 @@
-require("ricard")
+require('ricard')
 
