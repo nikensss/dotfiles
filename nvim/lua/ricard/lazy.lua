@@ -97,5 +97,10 @@ require('lazy').setup({
   'tpope/vim-commentary',
   'tpope/vim-repeat',
   'tpope/vim-surround',
-  'tpope/vim-unimpaired'
+  'tpope/vim-unimpaired',
+  'David-Kunz/jester',
+  'mfussenegger/nvim-dap',
+  'nvim-telescope/telescope-dap.nvim',
+  'rcarriga/nvim-dap-ui',
+  'theHamsta/nvim-dap-virtual-text'
 })
