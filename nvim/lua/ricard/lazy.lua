@@ -86,7 +86,6 @@ require('lazy').setup({
   'APZelos/blamer.nvim',
   'airblade/vim-gitgutter',
   'christoomey/vim-sort-motion',
-  'glepnir/lspsaga.nvim',
   'junegunn/gv.vim',
   'lukas-reineke/indent-blankline.nvim',
   'mg979/vim-visual-multi',

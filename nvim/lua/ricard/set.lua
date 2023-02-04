@@ -17,6 +17,7 @@ vim.opt.backup = false
 
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
+vim.o.ignorecase = true
 
 vim.opt.termguicolors = true
 
@@ -26,4 +27,6 @@ vim.opt.signcolumn = "yes"
 vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80,100,120"
+
+vim.o.completeopt = 'menuone,noselect'
 
