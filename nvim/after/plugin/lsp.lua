@@ -85,6 +85,10 @@ lsp.setup_nvim_cmp({
   mapping = cmp_mappings
 })
 
+lsp.set_preferences({
+  suggest_lsp_servers = false
+})
+
 lsp.on_attach(function(client, bufnr)
   local nmap = function(keys, func, desc)
     if desc then
