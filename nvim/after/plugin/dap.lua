@@ -1,4 +1,5 @@
 local dap = require("dap")
+
 dap.adapters.node2 = {
 	type = "executable",
 	command = "node",
@@ -66,7 +67,7 @@ vim.keymap.set("n", "<leader>de", function()
 	require("dap").set_exception_breakpoints({ "all" })
 end)
 vim.keymap.set("n", "<leader>da", function()
-	require("debugHelper").attach()
+	require("utils").attachDebugger()
 end)
 vim.keymap.set("n", "<leader>dw", function()
 	require("dap.ui.widgets").hover()
@@ -155,3 +156,4 @@ end)
 vim.keymap.set("n", "<leader>dq", function()
 	require("jester").terminate()
 end)
+
