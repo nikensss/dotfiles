@@ -1,2 +1,3 @@
-require("ricard.lazy")
-require("ricard.remap")
+require('ricard.lazy')
+require('ricard.set')
+require('ricard.remap')
