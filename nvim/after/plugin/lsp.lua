@@ -7,6 +7,7 @@ lsp.ensure_installed({
   'eslint',
   'jsonls',
   'prismals',
+  -- 'prettierd',
   'rust_analyzer',
   'sumneko_lua',
   'tsserver',
