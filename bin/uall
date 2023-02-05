@@ -64,7 +64,6 @@ section "Updating rust" "rustup update"
 section "Updating global npm packages" "npm update -g"
 section "Updating Oh My zsh" "sh ~/.oh-my-zsh/tools/upgrade.sh"
 section "Updating powerlevel10k" "git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull"
-section "Updating nvim plugins" "nvim +PlugClean! +qa && nvim +PlugUpdate! +qa && nvim +PlugUpgrade! +qa && nvim +TSUpdate! +qa"
 section "Updating tldr database" "tldr --update"
 
 exec "$SHELL"

@@ -33,10 +33,13 @@ lsp.configure('tsserver', {
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+  ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+  ['<C-e>'] = cmp.mapping.close(),
+  ['<C-f>'] = cmp.mapping.scroll_docs(4),
   ['<C-j>'] = cmp.mapping.complete(),
+  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
 })
 
 cmp_mappings['<Tab>'] = nil
@@ -59,18 +62,17 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc, remap = false })
   end
 
-  nmap('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
-  nmap('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+  nmap('<leader>rn', vim.lsp.buf.rename)
+  nmap('<leader>ca', vim.lsp.buf.code_action)
 
-  nmap('gd', vim.lsp.buf.definition, '[G]oto [D]efinition')
-  nmap('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
-  nmap('gI', vim.lsp.buf.implementation, '[G]oto [I]mplementation')
-  nmap('gy', vim.lsp.buf.type_definition, 'Type [D]efinition')
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
-  nmap('<leader>ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[W]orkspace [S]ymbols')
+  nmap('gd', vim.lsp.buf.definition)
+  nmap('gr', require('telescope.builtin').lsp_references)
+  nmap('gI', vim.lsp.buf.implementation)
+  nmap('gy', vim.lsp.buf.type_definition)
+  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols)
 
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, { buffer = bufnr, desc =  'Signature help', remap = false })
+  vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, { buffer = bufnr, desc = 'Signature help', remap = false })
 end)
 
 lsp.setup()
@@ -78,3 +80,13 @@ lsp.setup()
 vim.diagnostic.config({
   virtual_text = true
 })
+
+local function lspSymbol(name, icon)
+  vim.fn.sign_define("DiagnosticSign" .. name, { text = icon, numhl = "DiagnosticDefault" .. name })
+end
+
+lspSymbol("Error", "")
+lspSymbol("Information", "")
+lspSymbol("Hint", "")
+lspSymbol("Info", "")
+lspSymbol("Warning", "")
