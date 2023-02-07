@@ -10,14 +10,14 @@ source ~/bin/.env
 echo "Logging in with: $UNIVERSAL_LOGIN_EMAIL"
 
 case "$1" in
-  'prod')
+  'prod' | 'p')
     source ~/bin/.env.ul.prod
     ;;
-  'stage')
+  'stage' | 's')
     source ~/bin/.env.ul.stage
     ;;
   *)
-    echo "Unknown env $1, use 'prod' or 'stage'"
+    echo "Unknown env $1, use [p]rod or [s]tage"
     exit 1
     ;;
 esac
