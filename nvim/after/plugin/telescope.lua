@@ -10,4 +10,15 @@ vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
 vim.keymap.set('n', '<leader>sc', builtin.current_buffer_fuzzy_find, options)
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, options)
 
-
+require('telescope').setup({
+  defaults = {
+    mappings = {
+      n = {
+    	  ['<C-d>'] = require('telescope.actions').delete_buffer
+      },
+      i = {
+        ['<C-d>'] = require('telescope.actions').delete_buffer
+      }
+    }
+  }
+})

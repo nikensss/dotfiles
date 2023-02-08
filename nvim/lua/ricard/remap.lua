@@ -33,7 +33,6 @@ vim.keymap.set('n','<leader>+','5<C-w>>')
 vim.keymap.set('n','<leader>-','5<C-w><')
 vim.keymap.set('n','<leader><leader>+','<C-w>15+')
 vim.keymap.set('n','<leader><leader>-','<C-w>15-')
-vim.keymap.set('n','<leader><leader>-','<C-w>15-')
 
 -- Terminal in neovim
 _G.term_buf_of_tab = _G.term_buf_of_tab or {}
