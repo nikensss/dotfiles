@@ -29,18 +29,11 @@ echo "${GREEN}installing homebrew${RESET}"
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit pyenv asdf httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal lua-language-server fnm tmux helix postgresql@14 luarocks gnu-sed pnpm
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@14 luarocks gnu-sed pnpm
 brew upgrade
 
 fnm install --lts
 fnm use --lts
-npm i -g diagnostic-languageserver eslint_d live-server livedown prettier prettier-plugin-java prettier-plugin-prisma pyright typescript typescript-language-server yarn tree-sitter-yaml tree-sitter @astrojs/language-server
-
-echo "${GREEN}installing python"
-pyenv install $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
-pyenv global $(pyenv install --list | grep --extended-regexp "^\s*[0-9][0-9.]*[0-9]\s*$" | tail -1)
-python3 -m pip install --user --upgrade pynvim
-
 
 echo "${GREEN}tmux plugin manager and themes${RESET}"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
@@ -71,14 +64,6 @@ git clone https://github.com/microsoft/vscode-node-debug2.git
 cd vscode-node-debug2
 npm ci
 NODE_OPTIONS=--no-experimental-fetch npm run build
-
-echo "${GREEN}installing java language server${RESET}"
-cd ~/repos
-mkdir java
-cd java
-asdf plugin-add java
-asdf install java openjdk-17.0.2
-asdf global java openjdk-17.0.2
 
 echo "${GREEN}installing oh-my-zsh${RESET}"
 sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
