@@ -3,6 +3,16 @@ local nvim_lsp = require('lspconfig')
 
 lsp.preset('recommended')
 
+lsp.set_preferences({
+    suggest_lsp_servers = false,
+    sign_icons = {
+        error = '',
+        warn = '',
+        hint = '',
+        info = ''
+    }
+})
+
 lsp.ensure_installed({
     'eslint',
     'jsonls',
@@ -12,6 +22,8 @@ lsp.ensure_installed({
     'sumneko_lua',
     'tsserver',
 })
+
+lsp.skip_server_setup({ 'rust_analyzer' })
 
 -- Set up sumneko_lua according to the
 -- recommended settings by nvim-lspconfig
@@ -48,10 +60,6 @@ cmp_mappings['<S-Tab>'] = nil
 
 lsp.setup_nvim_cmp({
     mapping = cmp_mappings
-})
-
-lsp.set_preferences({
-    suggest_lsp_servers = false
 })
 
 local lsp_formatting_augroup = vim.api.nvim_create_augroup('LspFormatting', {})
@@ -99,14 +107,22 @@ vim.diagnostic.config({
     virtual_text = true
 })
 
-local function lspSymbol(name, icon)
-  vim.fn.sign_define('DiagnosticSign' .. name, { text = icon, numhl = 'DiagnosticDefault' .. name })
-end
-
-lspSymbol('Error', '')
-lspSymbol('Information', '')
-lspSymbol('Hint', '')
-lspSymbol('Info', '')
-lspSymbol('Warning', '')
-
 lsp.setup()
+
+local rt = require('rust-tools');
+local rust_lsp = lsp.build_options('rust_analyzer', {
+        single_file_support = false,
+        on_attach = function(_, bufnr)
+          vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
+          vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
+        end
+    })
+
+rt.setup({
+    server = rust_lsp,
+    tools = {
+        hover_actions = {
+            auto_focus = true
+        }
+    }
+})
