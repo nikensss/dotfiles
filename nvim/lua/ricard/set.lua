@@ -26,8 +26,10 @@ vim.opt.signcolumn = "yes"
 
 vim.opt.updatetime = 50
 
+vim.opt.cursorline = true
 vim.opt.colorcolumn = "80,100,120"
 
 vim.o.completeopt = 'menuone,noselect'
 
 vim.opt.clipboard='unnamedplus'
+
