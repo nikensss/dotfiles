@@ -31,5 +31,4 @@ vim.opt.colorcolumn = "80,100,120"
 
 vim.o.completeopt = 'menuone,noselect'
 
-vim.opt.clipboard='unnamedplus'
-
+vim.opt.clipboard = 'unnamedplus'

@@ -25,14 +25,14 @@ vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod +x %<CR>', { silent = true })
 
 -- increment/decrement amount
-vim.keymap.set('n','+','<C-a>')
-vim.keymap.set('n','-','<C-x>')
+vim.keymap.set('n', '+', '<C-a>')
+vim.keymap.set('n', '-', '<C-x>')
 
 -- resize windows
-vim.keymap.set('n','<leader>+','5<C-w>>')
-vim.keymap.set('n','<leader>-','5<C-w><')
-vim.keymap.set('n','<leader><leader>+','<C-w>15+')
-vim.keymap.set('n','<leader><leader>-','<C-w>15-')
+vim.keymap.set('n', '<leader>+', '5<C-w>>')
+vim.keymap.set('n', '<leader>-', '5<C-w><')
+vim.keymap.set('n', '<leader><leader>+', '<C-w>15+')
+vim.keymap.set('n', '<leader><leader>-', '<C-w>15-')
 
 -- Terminal in neovim
 _G.term_buf_of_tab = _G.term_buf_of_tab or {}
@@ -52,13 +52,13 @@ function Toggle_terminal()
   local cur_tab = vim.api.nvim_get_current_tabpage()
   local term_buf = term_buf_of_tab[cur_tab]
   if term_buf ~= nil then
-   local cur_buf = vim.api.nvim_get_current_buf()
-   if cur_buf == term_buf then
-     vim.cmd('q')
-   else
-     vim.cmd('vert sb' .. term_buf)
-     vim.cmd(':startinsert')
-   end
+    local cur_buf = vim.api.nvim_get_current_buf()
+    if cur_buf == term_buf then
+      vim.cmd('q')
+    else
+      vim.cmd('vert sb' .. term_buf)
+      vim.cmd(':startinsert')
+    end
   else
     Spawn_terminal()
     vim.cmd(':startinsert')
