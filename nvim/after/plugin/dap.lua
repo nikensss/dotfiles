@@ -1,34 +1,34 @@
 local dap = require('dap')
 
 dap.adapters.node2 = {
-    type = 'executable',
-    command = 'node',
-    args = { os.getenv('HOME') .. '/repos/javascript/vscode-node-debug2/out/src/nodeDebug.js' },
+  type = 'executable',
+  command = 'node',
+  args = { os.getenv('HOME') .. '/repos/javascript/vscode-node-debug2/out/src/nodeDebug.js' },
 }
 
 dap.configurations.typescript = {
-    {
-        type = 'node2',
-        request = 'launch',
-        name = 'Launch Program (Node2 with ts-node)',
-        cwd = vim.fn.getcwd(),
-        runtimeArgs = { '-r', 'ts-node/register', '-r', 'dotenv/config' },
-        runtimeExecutable = 'node',
-        args = { '--inspect', vim.fn.getcwd() .. '/src/index.ts' },
-        sourceMaps = true,
-        skipFiles = { '<node_internals>/**', 'node_modules/**' },
-    },
-    {
-        type = 'node2',
-        request = 'launch',
-        name = 'Launch NestJS app',
-        cwd = vim.fn.getcwd(),
-        runtimeArgs = { '-r', 'ts-node/register', '-r', 'dotenv/config' },
-        runtimeExecutable = 'node',
-        args = { '--inspect', vim.fn.getcwd() .. '/src/main.ts' },
-        sourceMaps = true,
-        skipFiles = { '<node_internals>/**', 'node_modules/**' },
-    },
+  {
+    type = 'node2',
+    request = 'launch',
+    name = 'Launch Program (Node2 with ts-node)',
+    cwd = vim.fn.getcwd(),
+    runtimeArgs = { '-r', 'ts-node/register', '-r', 'dotenv/config' },
+    runtimeExecutable = 'node',
+    args = { '--inspect', vim.fn.getcwd() .. '/src/index.ts' },
+    sourceMaps = true,
+    skipFiles = { '<node_internals>/**', 'node_modules/**' },
+  },
+  {
+    type = 'node2',
+    request = 'launch',
+    name = 'Launch NestJS app',
+    cwd = vim.fn.getcwd(),
+    runtimeArgs = { '-r', 'ts-node/register', '-r', 'dotenv/config' },
+    runtimeExecutable = 'node',
+    args = { '--inspect', vim.fn.getcwd() .. '/src/main.ts' },
+    sourceMaps = true,
+    skipFiles = { '<node_internals>/**', 'node_modules/**' },
+  },
 }
 
 require('dap').set_log_level('INFO')
@@ -91,26 +91,26 @@ vim.g.dap_virtual_text = true
 
 local dapui = require('dapui')
 dapui.setup({
-    layouts = {
-        {
-            elements = {
-                'watches',
-                'breakpoints',
-                'stacks',
-                'scopes',
-            },
-            size = 55, -- # of columns
-            position = 'left',
-        },
-        {
-            elements = {
-                'console',
-                'repl',
-            },
-            size = 0.25, -- 25% of total lines
-            position = 'bottom',
-        },
+  layouts = {
+    {
+      elements = {
+        'watches',
+        'breakpoints',
+        'stacks',
+        'scopes',
+      },
+      size = 55, -- # of columns
+      position = 'left',
     },
+    {
+      elements = {
+        'console',
+        'repl',
+      },
+      size = 0.25, -- 25% of total lines
+      position = 'bottom',
+    },
+  },
 })
 vim.keymap.set('n', '<leader>dp', function()
   dapui.toggle({})

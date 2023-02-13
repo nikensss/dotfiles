@@ -4,62 +4,62 @@ local nvim_lsp = require('lspconfig')
 lsp.preset('recommended')
 
 lsp.set_preferences({
-    suggest_lsp_servers = false,
-    sign_icons = {
-        error = '',
-        warn = '',
-        hint = '',
-        info = ''
-    }
+  suggest_lsp_servers = false,
+  sign_icons = {
+    error = '',
+    warn = '',
+    hint = '',
+    info = ''
+  }
 })
 
 lsp.ensure_installed({
-    'eslint',
-    'jsonls',
-    'prismals',
-    -- 'prettierd',
-    'rust_analyzer',
-    'sumneko_lua',
-    'tsserver',
+  'eslint',
+  'jsonls',
+  'prismals',
+  -- 'prettierd',
+  'rust_analyzer',
+  'lua_ls',
+  'tsserver',
 })
 
 lsp.skip_server_setup({ 'rust_analyzer' })
 
 -- Set up sumneko_lua according to the
 -- recommended settings by nvim-lspconfig
-lsp.configure('sumneko_lua', {
-    settings = {
-        Lua = {
-            runtime = { version = 'LuaJIT' },
-            diagnostics = { globals = { 'vim' } },
-            workspace = { library = vim.api.nvim_get_runtime_file('', true), checkThirdParty = false },
-            telemetry = { enable = false }
-        }
+lsp.configure('lua_ls', {
+  settings = {
+    Lua = {
+      runtime = { version = 'LuaJIT' },
+      diagnostics = { globals = { 'vim' } },
+      workspace = { library = vim.api.nvim_get_runtime_file('', true), checkThirdParty = false },
+      telemetry = { enable = false }
     }
+  }
 })
 
 lsp.configure('tsserver', {
-    root_dir = nvim_lsp.util.root_pattern('package.json'),
-    single_file_support = false,
+  root_dir = nvim_lsp.util.root_pattern('package.json'),
+  single_file_support = false,
 })
 
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-        ['<C-b>'] = cmp.mapping.scroll_docs( -4),
-        ['<C-e>'] = cmp.mapping.close(),
-        ['<C-f>'] = cmp.mapping.scroll_docs(4),
-        ['<C-j>'] = cmp.mapping.complete(),
-        ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-        ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-    })
+  ['<C-b>'] = cmp.mapping.scroll_docs( -4),
+  ['<C-e>'] = cmp.mapping.close(),
+  ['<C-f>'] = cmp.mapping.scroll_docs(4),
+  ['<C-j>'] = cmp.mapping.complete(),
+  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+})
 
 cmp_mappings['<Tab>'] = nil
 cmp_mappings['<S-Tab>'] = nil
 
 lsp.setup_nvim_cmp({
-    mapping = cmp_mappings
+  mapping = cmp_mappings
 })
 
 local lsp_formatting_augroup = vim.api.nvim_create_augroup('LspFormatting', {})
@@ -69,16 +69,16 @@ lsp.on_attach(function(client, bufnr)
   if client.supports_method('textDocument/formatting') then
     vim.api.nvim_clear_autocmds({ group = lsp_formatting_augroup, buffer = bufnr })
     vim.api.nvim_create_autocmd('BufWritePre', {
-        group = lsp_formatting_augroup,
-        buffer = bufnr,
-        callback = function()
-          vim.lsp.buf.format({
-              filter = function(filter_client)
-                return filter_client.name ~= 'tsserver'
-              end,
-              bufnr = bufnr,
-          })
-        end
+      group = lsp_formatting_augroup,
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format({
+          filter = function(filter_client)
+            return filter_client.name ~= 'tsserver'
+          end,
+          bufnr = bufnr,
+        })
+      end
     })
   end
 
@@ -104,25 +104,25 @@ lsp.on_attach(function(client, bufnr)
 end)
 
 vim.diagnostic.config({
-    virtual_text = true
+  virtual_text = true
 })
 
 lsp.setup()
 
 local rt = require('rust-tools');
 local rust_lsp = lsp.build_options('rust_analyzer', {
-        single_file_support = false,
-        on_attach = function(_, bufnr)
-          vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
-          vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
-        end
-    })
+  single_file_support = false,
+  on_attach = function(_, bufnr)
+    vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
+    vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
+  end
+})
 
 rt.setup({
-    server = rust_lsp,
-    tools = {
-        hover_actions = {
-            auto_focus = true
-        }
+  server = rust_lsp,
+  tools = {
+    hover_actions = {
+      auto_focus = true
     }
+  }
 })
