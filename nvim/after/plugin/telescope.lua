@@ -9,6 +9,7 @@ vim.keymap.set('n', '<leader>sh', builtin.help_tags, options)
 vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
 vim.keymap.set('n', '<leader>sc', builtin.current_buffer_fuzzy_find, options)
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, options)
+vim.keymap.set('n', '<leader>ch', builtin.command_history, options)
 
 require('telescope').setup({
   defaults = {
