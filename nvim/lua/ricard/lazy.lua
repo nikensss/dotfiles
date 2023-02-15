@@ -113,7 +113,7 @@ require('lazy').setup({
       'nvim-lua/plenary.nvim',
       'MunifTanjim/nui.nvim'
     },
-    config = {
+    opts = {
       filesystem = {
         follow_current_file = true,
         hijack_netrw_behavior = 'open_current'
