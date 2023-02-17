@@ -86,7 +86,14 @@ require('lazy').setup({
       'jose-elias-alvarez/null-ls.nvim'
     }
   },
-  'APZelos/blamer.nvim',
+  { 'APZelos/blamer.nvim',
+    init = function()
+      vim.g.blamer_enabled = 1
+      vim.g.blamer_delay = 700
+      vim.g.blamer_show_in_insert_modes = 1
+      vim.g.blamer_show_in_visual_modes = 0
+    end
+  },
   'airblade/vim-gitgutter',
   'christoomey/vim-sort-motion',
   'junegunn/gv.vim',
