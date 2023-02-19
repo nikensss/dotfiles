@@ -22,6 +22,7 @@
   wdiff = diff --word-diff=color --ignore-space-at-eol \
     --word-diff-regex='[[:alnum:]]+|[^[:space:][:alnum:]]+'
   pushpr = "!f() { git push origin master;git commit --allow-empty -m 'push to execute post-receive';git push origin master; }; f"
+  root = rev-parse --show-toplevel
 [init]
 	defaultBranch = main
 [pull]
