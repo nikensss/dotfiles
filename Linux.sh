@@ -22,19 +22,42 @@ setup_colors() {
 }
 setup_colors
 
-echo "${BLUE}installing zsh${RESET}"
+echo "${BLUE}installing zsh, curl, wget, git, and more...${RESET}"
 apt-get update
-apt-get install -y curl wget zsh neovim git
+apt-get install -y curl wget zsh git ripgrep tree-sitter lua fd
 
-echo "${BLUE}installing vim-plug${RESET}"
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+# cargo
+echo "${BLUE}installing cargo${RESET}"
+curl https://sh.rustup.rs -sSf | sh
+rustup component add rustfmt
+rustup component add clippy
 
-echo "${BLUE}installing nvm${RESET}"
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm install --lts
-npm i -g yarn typescript typescript-language-server diagnostic-languageserver eslint_d prettier pyright livedown
+# install fnm
+echo "${BLUE}installing fnm${RESET}"
+cargo install fnm
+fnm install --lts
+
+mkdir repos && cd repos
+
+echo "${BLUE}installing and building LuaJIT${RESET}"
+mkdir lua && cd lua
+git clone https://github.com/LuaJIT/LuaJIT.git
+cd LuaJIT
+make
+make install
+
+echo "${BLUE}installing and building node debugger${RESET}"
+cd ~/repos && mkdir javascript && cd javascript
+git clone https://github.com/microsoft/vscode-node-debug2.git
+cd vscode-node-debug2
+npm ci
+NODE_OPTIONS=--no-experimental-fetch npm run build
+
+echo "${BLUE}installing and building neovim${RESET}"
+git clone https://github.com/neovim/neovim.git
+cd neovim
+make CMAKE_EXTRA_FLAGS="-DUSE_LUAJIT=ON" CMAKE_BUILD_TYPE=Release
+make install
 
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
@@ -43,13 +66,17 @@ echo "${BLUE}installing plugins${RESET}"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
-echo "${CYAN}installing power10k theme${RESET}"
+echo "${BLUE}installing power10k theme${RESET}"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
 dir=$HOME/dotfiles
 olddir=$HOME/dotfiles_old
-files="zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
+oldconfig=$HOME/oldconfig
+files="tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
 config="nvim"
+
+echo "${BLUE}symlink for ~/bin${RESET}"
+ln -s $dir/bin ~/bin
 
 # create backup folder
 mkdir -p $olddir
@@ -74,13 +101,6 @@ for file in $config; do
   echo "${CYAN}creating symlink to $file${RESET}"
   ln -s $dir/$file $file
 done
-
-echo "${CYAN}installing vim Plug${RESET}"
-curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-
-# echo "${BLUE}installing vim plugins${RESET}"
-# nvim +'PlugInstall --sync' +qa
-# nvim +'CocInstall coc-json coc-tsserver' +qa
 
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)

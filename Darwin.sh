@@ -47,14 +47,6 @@ rustup component add clippy
 cd ~
 mkdir repos
 cd repos
-mkdir rust
-cd rust
-echo "${BLUE}cloning rust-analyzer${RESET}"
-git clone https://github.com/rust-analyzer/rust-analyzer.git
-cd rust-analyzer
-echo "${BLUE}installing rust language server${RESET}"
-cargo xtask install --server
-cargo install stylua
 
 echo "${GREEN}installing node-debug2${RESET}"
 cd ~/repos
