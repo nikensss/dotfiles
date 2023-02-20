@@ -135,5 +135,6 @@ require('lazy').setup({
       'mfussenegger/nvim-dap'
     }
   },
-  'mattn/emmet-vim'
+  'mattn/emmet-vim',
+  { 'catppuccin/nvim', name = 'catppuccin' }
 })

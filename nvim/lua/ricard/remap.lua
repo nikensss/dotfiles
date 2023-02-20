@@ -66,3 +66,26 @@ end
 vim.keymap.set('n', '<C-t>', Toggle_terminal)
 vim.keymap.set('n', '<leader>tr', [[:lua Toggle_terminal()<CR><C-\><C-n><C-w>Ti]])
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
+
+-- colorschemes
+vim.keymap.set('n', '<leader><leader>ca', function()
+  vim.cmd.colorscheme 'catppuccin'
+  vim.cmd.Catppuccin('mocha')
+end);
+vim.keymap.set('n', '<leader><leader>cb', function()
+  vim.cmd.colorscheme 'catppuccin'
+  vim.cmd.Catppuccin('macchiato')
+end);
+vim.keymap.set('n', '<leader><leader>cc', function()
+  vim.cmd.colorscheme 'catppuccin'
+  vim.cmd.Catppuccin('frappe')
+end);
+vim.keymap.set('n', '<leader><leader>cd', function()
+  vim.cmd.colorscheme 'catppuccin'
+  vim.cmd.Catppuccin('latte')
+end);
+
+vim.keymap.set('n', '<leader><leader>ta', function() vim.cmd [[colorscheme tokyonight-night]] end);
+vim.keymap.set('n', '<leader><leader>tb', function() vim.cmd [[colorscheme tokyonight-storm]] end);
+vim.keymap.set('n', '<leader><leader>tc', function() vim.cmd [[colorscheme tokyonight-moon]] end);
+vim.keymap.set('n', '<leader><leader>td', function() vim.cmd [[colorscheme tokyonight-day]] end);
