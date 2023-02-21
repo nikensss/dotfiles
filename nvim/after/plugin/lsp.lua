@@ -38,9 +38,24 @@ lsp.configure('lua_ls', {
   }
 })
 
+local function organize_imports()
+  local params = {
+    command = "_typescript.organizeImports",
+    arguments = { vim.api.nvim_buf_get_name(0) },
+    title = ""
+  }
+  vim.lsp.buf.execute_command(params)
+end
+
 lsp.configure('tsserver', {
   root_dir = nvim_lsp.util.root_pattern('package.json'),
   single_file_support = false,
+  commands = {
+    OrganizeImports = {
+      organize_imports,
+      description = "Organize imports"
+    }
+  }
 })
 
 local cmp = require('cmp')
