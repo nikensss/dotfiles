@@ -62,7 +62,26 @@ lsp.setup_nvim_cmp({
   mapping = cmp_mappings
 })
 
-lsp.on_attach(function(_, bufnr)
+local lsp_formatting_augroup = vim.api.nvim_create_augroup('LspFormatting', {})
+
+lsp.on_attach(function(client, bufnr)
+  -- make sure only null-ls is used to format typescript
+  if client.supports_method('textDocument/formatting') then
+    vim.api.nvim_clear_autocmds({ group = lsp_formatting_augroup, buffer = bufnr })
+    vim.api.nvim_create_autocmd('BufWritePre', {
+      group = lsp_formatting_augroup,
+      buffer = bufnr,
+      callback = function()
+        vim.lsp.buf.format({
+          filter = function(filter_client)
+            return filter_client.name ~= 'tsserver'
+          end,
+          bufnr = bufnr,
+        })
+      end
+    })
+  end
+
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
