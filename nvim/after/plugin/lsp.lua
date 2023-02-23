@@ -112,7 +112,6 @@ lsp.on_attach(function(client, bufnr)
   nmap('gr', require('telescope.builtin').lsp_references)
   nmap('gI', vim.lsp.buf.implementation)
   nmap('gy', vim.lsp.buf.type_definition)
-  nmap('<leader>ds', require('telescope.builtin').lsp_document_symbols)
 
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, { buffer = bufnr, desc = 'Signature help', remap = false })
