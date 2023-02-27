@@ -17,8 +17,7 @@
 	ignored = !git ls-files -v | grep "^[[:lower:]]"
   pullify = config --add remote.origin.fetch '+refs/pull/*/head:refs/remotes/origin/pr/*'
   pushup = ![[ $(git config "branch.$(git symbolic-ref --short HEAD).merge") = '' ]] && git push -u origin $(git symbolic-ref --short HEAD) || git push
-  lg = "log --pretty=format:'%C(yellow)%h%C(reset) %s \
-    %C(cyan)%cr%C(reset) %C(blue)%an%C(reset) %C(green)%d%C(reset)' --graph"
+  lg = "log --pretty=format:'%C(yellow)%h%C(reset) %s %C(cyan)%cD%C(reset) %C(blue)%an%C(reset) %C(green)%d%C(reset)' --graph"
   wdiff = diff --word-diff=color --ignore-space-at-eol \
     --word-diff-regex='[[:alnum:]]+|[^[:space:][:alnum:]]+'
   pushpr = "!f() { git push origin master;git commit --allow-empty -m 'push to execute post-receive';git push origin master; }; f"
