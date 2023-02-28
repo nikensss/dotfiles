@@ -136,5 +136,6 @@ require('lazy').setup({
     }
   },
   'mattn/emmet-vim',
-  { 'catppuccin/nvim', name = 'catppuccin' }
+  { 'catppuccin/nvim', name = 'catppuccin' },
+  'github/copilot.vim'
 })
