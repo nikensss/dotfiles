@@ -1,6 +1,6 @@
 alias rsh='exec $SHELL'
 alias vim='nvim'
-alias v='vim .'
+alias v='nvim .'
 
 # python
 alias py='python'
@@ -20,6 +20,7 @@ alias bd='npm run build && npm run start:dev'
 alias sb='npm run start:debug'
 alias bb='npm run build && npm run start:debug'
 alias tw='npm run test:watch'
+alias rmci='rm -rf node_modules && npm ci'
 alias ribs='rm -rf node_modules && npm ci && npm run build && npm run start'
 alias ribd='rm -rf node_modules && npm ci && npm run build && npm run start:dev'
 alias ribb='rm -rf node_modules && npm ci && npm run build && npm run start:debug'
