@@ -51,7 +51,7 @@ ctp(){
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
 
-  npx tsc --init
+  npx tsc --init --target ES2021
   mkdir src
   touch src/index.ts
   echo "const main = async (): Promise<void> => {console.log('Hello, World!');}\n\nmain().then( () => console.log('Done!') ).catch(console.error);" > src/index.ts
