@@ -14,18 +14,21 @@ lsp.set_preferences({
 })
 
 lsp.ensure_installed({
+  -- clang-format,
+  -- prettierd,
+  'bashls',
+  'clangd',
+  'cssls',
   'eslint',
   'jsonls',
-  'prismals',
-  -- 'prettierd',
-  'rust_analyzer',
   'lua_ls',
+  'prismals',
+  'rust_analyzer',
   'tsserver',
 })
 
 lsp.skip_server_setup({ 'rust_analyzer' })
 
--- Set up sumneko_lua according to the
 -- recommended settings by nvim-lspconfig
 lsp.configure('lua_ls', {
   settings = {
