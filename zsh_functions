@@ -35,7 +35,8 @@ ctp(){
       return 1
   fi
 
-  mcd $1
+  mkdir $1
+  cd $1
   git init
 
   echo "node_modules\n.DS_Store\n.env*\ndist" > .gitignore
