@@ -45,20 +45,32 @@ ctp(){
   npm init --yes
   echo 'save-exact=true' > .npmrc
 
-  npm i -D typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$(node -v | sed 's/^v\([^\.]*\)\..*$/\1/')
+  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$(node -v | sed 's/^v\([^\.]*\)\..*$/\1/') @total-typescript/ts-reset
   npm i dotenv
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
 
-  npx tsc --init --target ES2021
+  npx tsc --init --target ES2021 --outDir './dist/'
   mkdir src
   touch src/index.ts
-  echo "const main = async (): Promise<void> => {console.log('Hello, World!');}\n\nmain().then( () => console.log('Done!') ).catch(console.error);" > src/index.ts
+  cat << _EOF_ >> src/index.ts
+const main = async (): Promise<void> => {
+  console.log('Hello, World!');
+};
+
+main()
+  .then( () => console.log('Done!') )
+  .catch(console.error);
+_EOF_
+
+  echo "import '@total-typescript/ts-reset';" > reset.d.ts
 
   npm pkg set version="0.1.0"
-  npm pkg set scripts.start="ts-node -r dotenv/config src/index.ts"
+  npm pkg set scripts.build="rimraf ./dist && tsc"
+  npm pkg set scripts.start="node -r dotenv/config ./dist/index.js"
+  npm pkg set scripts.start:dev="ts-node -r dotenv/config ./src/index.ts"
   npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
   npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
   npm pkg set scripts.lint="eslint 'src/**/*.ts'"
@@ -89,11 +101,12 @@ echo \$GREEN'✓ No changes left to commit'\$NO_COLOR
 
 _EOF_
 
-  prettier --write './**/*{json,ts}'
+  npx prettier --write './**/*.{json,ts}'
 
   git add --all
   git commit -am "chore: initial commit"
 
+  npm run build
   npm run start
 }
 
