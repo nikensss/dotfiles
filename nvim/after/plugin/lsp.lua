@@ -64,13 +64,13 @@ lsp.configure('tsserver', {
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-b>'] = cmp.mapping.scroll_docs( -4),
-  ['<C-e>'] = cmp.mapping.close(),
-  ['<C-f>'] = cmp.mapping.scroll_docs(4),
-  ['<C-j>'] = cmp.mapping.complete(),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-e>'] = cmp.mapping.close(),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-j>'] = cmp.mapping.complete(),
+      ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+      ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+      ['<C-y>'] = cmp.mapping.confirm({ select = true }),
 })
 
 cmp_mappings['<Tab>'] = nil
