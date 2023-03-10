@@ -34,6 +34,7 @@ brew upgrade
 
 fnm install --lts
 fnm use --lts
+npm i -g livedown
 
 echo "${GREEN}tmux plugin manager and themes${RESET}"
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
