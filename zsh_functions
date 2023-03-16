@@ -132,14 +132,14 @@ fni(){
 }
 
 wsql(){
-  local ENV=$1
+  local TARGET=$1
 
-  if [[ -z "$ENV" ]]; then
-    echo "no environment provided: use 'stage' or 'prod'"
+  if [[ -z "$TARGET" ]]; then
+    echo "no target provided"
     exit 1
   fi
 
-  case "$ENV" in
+  case "$TARGET" in
     "production-body-metrics")
       source ~/bin/.env.bm.prod 
       ;;
@@ -148,6 +148,12 @@ wsql(){
       ;;
     "identification-service-pro")
       source ~/bin/.env.identification-service.pro
+      ;;
+    "production-universal-login")
+      source ~/bin/.env.ul.prod
+      ;;
+    "stage-universal-login")
+      source ~/bin/.env.ul.stage
       ;;
     "playtomic-bot-api-prod")
       source ~/bin/.env.playtomic-bot-api.prod
@@ -159,11 +165,16 @@ wsql(){
       source ~/bin/.env.playtomic-bot-api.test
       ;;
     *)
-      echo "unknown postregresql environment '$ENV'"
+      echo "unknown postgres target '$TARGET'"
       echo "use one of:"
       echo "\tproduction-body-metrics"
       echo "\tstaging-body-metrics"
       echo "\tidentification-service-pro"
+      echo "\tproduction-universal-login"
+      echo "\tstage-universal-login"
+      echo "\tplaytomic-bot-api-prod"
+      echo "\tplaytomic-bot-api-dev"
+      echo "\tplaytomic-bot-api-test"
       return
       ;;
   esac
