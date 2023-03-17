@@ -12,6 +12,9 @@ bind -r L resize-pane -R 5
 bind-key -n C-S-Left swap-window -t -1\; select-window -t -1
 bind-key -n C-S-Right swap-window -t +1\; select-window -t +1
 
+# tmux-sessionizer
+bind-key -r f run-shell "tmux neww ~/bin/tmux-sessionizer"
+
 # -- navigation ----------------------------------------------------------------
 
 # if you're running tmux within iTerm2
