@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+# This script will generate a markdown file with a summary of all your Heroku apps.
+#
+# It will show:
+# - version of the heroku stack
+# - amount of dynos
+# - add-ons and their price
+# - average requests per hour (over the last 7 days)
+# - last deployment
+#  - when
+#  - who deployed
+#  - description
+#  - if no deployment was found, it will say so
+#
+#  Usage:
+#  $  heroku-apps-report
+#  $  cat heroku-status.md
+#
+#  Requirements:
+#  - jq
+#  - heroku cli
+#  - curl
+#  - xargs
+#  - date
+#  - bash
+#
+#  Author: @nikensss
+
+echo "Getting the API key..."
+HEROKU_API_KEY=$(heroku auth:token)
+
+echo "Getting the list of apps..."
+APPS=$(heroku teams --json \
+  | jq -r '.[] | .name' \
+  | xargs -I{} heroku apps -t {} --json \
+  | jq -r '.[] | .name')
+
+# get today and the last 7 days
+END_TIME="$(date +"%Y-%m-%d")T00:00:00Z"
+START_TIME="$(date -v-7d +"%Y-%m-%d")T00:00:00Z"
+
+count=1
+total=$(echo $APPS | wc -w | xargs)
+
+echo "Found $total apps"
+
+SUMMARY="# Apps summary"
+for app in $APPS; do
+  echo -ne "\r\033[KChecking $count of $total: $app"
+
+  # generic info
+  APP_INFO=$(heroku apps:info -a $app --json)
+  SUMMARY+="\n## $app \n"
+  SUMMARY+="- stack: $(echo $APP_INFO | jq -r '.app.stack.name')\n"
+  SUMMARY+="- dynos: $(echo $APP_INFO | jq -r '.dynos | length')\n"
+  ADDONS=$(echo $APP_INFO | jq -r ' .addons | .[] | "\(.addon_service.name): \(.billed_price.cents / 100) EUR every \(.billed_price.unit)" ')
+  if [ -n "$ADDONS" ]; then
+    SUMMARY+="- add-ons\n"
+    while IFS= read -r addon; do
+      SUMMARY+="\t- $addon\n"
+    done <<< "$ADDONS"
+  fi
+
+  # metrics
+  APP_ID=$(echo $APP_INFO | jq -r '.app.id')
+  METRICS=$(curl -s -X GET "https://api.metrics.heroku.com/metrics/$APP_ID/router/status?process_type=web&start_time=$START_TIME&end_time=$END_TIME&step=60m&region=" \
+    -H "Accept: application/vnd.heroku+json; version=3.monitoring-events" \
+    -H "Authorization: Bearer $HEROKU_API_KEY")
+  TOTAL_REQUESTS=$(echo $METRICS | jq 'reduce (.data | to_entries)[] as $entry (0; . + (reduce $entry.value[] as $value (0; . + ($value // 0))))')
+  REQUESTS_PER_HOUR=$((TOTAL_REQUESTS / 7 / 24 / 60))
+  SUMMARY+="- average requests per hour (over the last 7 days): $REQUESTS_PER_HOUR\n"
+
+  # last activity
+  NUM=10
+  LAST_RELEASE=""
+  while [ -z "$LAST_RELEASE" ]; do
+    LAST_RELEASE=$(heroku releases -a $app --json --num $NUM | jq -r 'sort_by(.created_at) | reverse | first(.[] | select(.description | startswith("Deploy")))')
+
+    if [ "$NUM" -ge 1000 ]; then
+      SUMMARY+="- no deployments found in the last 1000 activities\n"
+      break
+    fi
+
+    NUM=$((NUM*10))
+    if [ "$NUM" -gt 1000 ]; then
+      NUM=1000
+    fi
+  done
+
+  if [ -n "$LAST_RELEASE" ]; then
+    SUMMARY+="- last deployment\n"
+    SUMMARY+="\t- on: $(echo $LAST_RELEASE | jq -r '.created_at')\n"
+    SUMMARY+="\t- by: $(echo $LAST_RELEASE | jq -r '.user.email')\n"
+    SUMMARY+="\t- description: $(echo $LAST_RELEASE | jq -r '.description')\n"
+  fi
+
+  count=$((count+1))
+done
+
+echo ""
+echo -e $SUMMARY > heroku-status.md
+echo "Results ready in heroku-status.md"
