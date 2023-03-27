@@ -47,7 +47,7 @@ total=$(echo $APPS | wc -w | xargs)
 echo "Found $total apps"
 
 MARKDOWN="# Apps summary"
-CSV="app,stack,dynos,addons_cost,requests_per_hour,last_deployment_date,last_deployment_by,last_deployment_description"
+CSV="app,team,pipeline,created_at,stack,dynos,addons_cost,average_requests_per_hour,max_requests_per_hour,last_deployment_date,last_deployment_by,last_deployment_description"
 
 for app in $APPS; do
   echo -ne "\r\033[KChecking $count of $total: $app"
@@ -56,6 +56,18 @@ for app in $APPS; do
   APP_INFO=$(heroku apps:info -a $app --json)
   MARKDOWN+="\n## $app \n"
   CSV+="\n$app"
+
+  TEAM=$(echo $APP_INFO | jq -r '.app.team.name')
+  MARKDOWN+="- team: $TEAM\n"
+  CSV+=",$TEAM"
+
+  PIPELINE=$(echo $APP_INFO | jq -r '.pipeline_coupling.pipeline.name')
+  MARKDOWN+="- pipeline: $PIPELINE\n"
+  CSV+=",$PIPELINE"
+
+  CREATED_AT=$(echo $APP_INFO | jq -r '.app.created_at')
+  MARKDOWN+="- created at: $CREATED_AT\n"
+  CSV+=",$CREATED_AT"
 
   STACK=$(echo $APP_INFO | jq -r '.app.stack.name')
   MARKDOWN+="- stack: $STACK\n"
@@ -82,8 +94,11 @@ for app in $APPS; do
     -H "Authorization: Bearer $HEROKU_API_KEY")
   TOTAL_REQUESTS=$(echo $METRICS | jq 'reduce (.data | to_entries)[] as $entry (0; . + (reduce $entry.value[] as $value (0; . + ($value // 0))))')
   REQUESTS_PER_HOUR=$((TOTAL_REQUESTS / 7 / 24 / 60))
-  MARKDOWN+="- average requests per hour (over the last 7 days): $REQUESTS_PER_HOUR\n"
-  CSV+=",$REQUESTS_PER_HOUR"
+  MAX_REQUESTS_PER_HOUR=$(echo $METRICS | jq '[ .data | to_entries | .[] | .value[] ] | max')
+  MARKDOWN+="- requests per hour (over the last 7 days)\n"
+  MARKDOWN+="\t- average: $REQUESTS_PER_HOUR\n"
+  MARKDOWN+="\t- max: $MAX_REQUESTS_PER_HOUR\n"
+  CSV+=",$REQUESTS_PER_HOUR,$MAX_REQUESTS_PER_HOUR"
 
   # last activity
   NUM=10
@@ -125,4 +140,4 @@ done
 echo ""
 echo -e $MARKDOWN > heroku-status.md
 echo -e $CSV > heroku-status.csv
-echo "Results ready in heroku-status.md"
+echo "Results ready in 'heroku-status.md' and 'heroku-status.csv'"
