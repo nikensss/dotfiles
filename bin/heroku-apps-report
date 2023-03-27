@@ -138,6 +138,6 @@ for app in $APPS; do
 done
 
 echo ""
-echo -e $MARKDOWN > heroku-status.md
-echo -e $CSV > heroku-status.csv
-echo "Results ready in 'heroku-status.md' and 'heroku-status.csv'"
+echo -e $MARKDOWN > heroku-apps-report.md
+echo -e $CSV > heroku-apps-report.csv
+echo "Results ready in 'heroku-apps-report.md' and 'heroku-apps-report.csv'"
