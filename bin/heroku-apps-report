@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# This script will generate a markdown file with a summary of all your Heroku apps.
+# This script will generate a markdown and a csv file with a summary of all
+# your Heroku apps.
 #
 # It will show:
 # - version of the heroku stack
@@ -45,22 +46,34 @@ total=$(echo $APPS | wc -w | xargs)
 
 echo "Found $total apps"
 
-SUMMARY="# Apps summary"
+MARKDOWN="# Apps summary"
+CSV="app,stack,dynos,addons_cost,requests_per_hour,last_deployment_date,last_deployment_by,last_deployment_description"
+
 for app in $APPS; do
   echo -ne "\r\033[KChecking $count of $total: $app"
 
   # generic info
   APP_INFO=$(heroku apps:info -a $app --json)
-  SUMMARY+="\n## $app \n"
-  SUMMARY+="- stack: $(echo $APP_INFO | jq -r '.app.stack.name')\n"
-  SUMMARY+="- dynos: $(echo $APP_INFO | jq -r '.dynos | length')\n"
+  MARKDOWN+="\n## $app \n"
+  CSV+="\n$app"
+
+  STACK=$(echo $APP_INFO | jq -r '.app.stack.name')
+  MARKDOWN+="- stack: $STACK\n"
+  CSV+=",$STACK"
+
+  DYNOS=$(echo $APP_INFO | jq -r '.dynos | length')
+  MARKDOWN+="- dynos: $DYNOS\n"
+  CSV+=",$DYNOS"
+
   ADDONS=$(echo $APP_INFO | jq -r ' .addons | .[] | "\(.addon_service.name): \(.billed_price.cents / 100) EUR every \(.billed_price.unit)" ')
   if [ -n "$ADDONS" ]; then
-    SUMMARY+="- add-ons\n"
+    MARKDOWN+="- add-ons\n"
     while IFS= read -r addon; do
-      SUMMARY+="\t- $addon\n"
+      MARKDOWN+="\t- $addon\n"
     done <<< "$ADDONS"
   fi
+  ADDONS_COST=$(echo $APP_INFO | jq -r ' .addons | map(.billed_price.cents) | (add // 0)/100 ')
+  CSV+=",$ADDONS_COST"
 
   # metrics
   APP_ID=$(echo $APP_INFO | jq -r '.app.id')
@@ -69,16 +82,18 @@ for app in $APPS; do
     -H "Authorization: Bearer $HEROKU_API_KEY")
   TOTAL_REQUESTS=$(echo $METRICS | jq 'reduce (.data | to_entries)[] as $entry (0; . + (reduce $entry.value[] as $value (0; . + ($value // 0))))')
   REQUESTS_PER_HOUR=$((TOTAL_REQUESTS / 7 / 24 / 60))
-  SUMMARY+="- average requests per hour (over the last 7 days): $REQUESTS_PER_HOUR\n"
+  MARKDOWN+="- average requests per hour (over the last 7 days): $REQUESTS_PER_HOUR\n"
+  CSV+=",$REQUESTS_PER_HOUR"
 
   # last activity
   NUM=10
-  LAST_RELEASE=""
-  while [ -z "$LAST_RELEASE" ]; do
-    LAST_RELEASE=$(heroku releases -a $app --json --num $NUM | jq -r 'sort_by(.created_at) | reverse | first(.[] | select(.description | startswith("Deploy")))')
+  LAST_DEPLOYMENT=""
+  while [ -z "$LAST_DEPLOYMENT" ]; do
+    LAST_DEPLOYMENT=$(heroku releases -a $app --json --num $NUM | jq -r 'sort_by(.created_at) | reverse | first(.[] | select(.description | startswith("Deploy")))')
 
     if [ "$NUM" -ge 1000 ]; then
-      SUMMARY+="- no deployments found in the last 1000 activities\n"
+      MARKDOWN+="- no deployments found in the last 1000 activities\n"
+      CSV+=",,,"
       break
     fi
 
@@ -88,16 +103,26 @@ for app in $APPS; do
     fi
   done
 
-  if [ -n "$LAST_RELEASE" ]; then
-    SUMMARY+="- last deployment\n"
-    SUMMARY+="\t- on: $(echo $LAST_RELEASE | jq -r '.created_at')\n"
-    SUMMARY+="\t- by: $(echo $LAST_RELEASE | jq -r '.user.email')\n"
-    SUMMARY+="\t- description: $(echo $LAST_RELEASE | jq -r '.description')\n"
+  if [ -n "$LAST_DEPLOYMENT" ]; then
+    LAST_DEPLOYMENT_DATE=$(echo $LAST_DEPLOYMENT | jq -r '.created_at')
+    LAST_DEPLOYMENT_BY=$(echo $LAST_DEPLOYMENT | jq -r '.user.email')
+    LAST_DEPLOYMENT_DESCRIPTION=$(echo $LAST_DEPLOYMENT | jq -r '.description') 
+
+    MARKDOWN+="- last deployment\n"
+    MARKDOWN+="\t- date: $LAST_DEPLOYMENT_DATE\n"
+    CSV+=",$LAST_DEPLOYMENT_DATE"
+
+    MARKDOWN+="\t- by: $LAST_DEPLOYMENT_BY\n"
+    CSV+=",$LAST_DEPLOYMENT_BY"
+
+    MARKDOWN+="\t- description: $LAST_DEPLOYMENT_DESCRIPTION\n"
+    CSV+=",$LAST_DEPLOYMENT_DESCRIPTION"
   fi
 
   count=$((count+1))
 done
 
 echo ""
-echo -e $SUMMARY > heroku-status.md
+echo -e $MARKDOWN > heroku-status.md
+echo -e $CSV > heroku-status.csv
 echo "Results ready in heroku-status.md"
