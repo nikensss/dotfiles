@@ -47,7 +47,7 @@ total=$(echo $APPS | wc -w | xargs)
 echo "Found $total apps"
 
 MARKDOWN="# Apps summary"
-CSV="app,team,pipeline,created_at,stack,dynos,addons_cost,average_requests_per_hour,max_requests_per_hour,last_deployment_date,last_deployment_by,last_deployment_description"
+CSV="app,team,pipeline_name,pipeline_stage,created_at,stack,dynos,addons_cost,average_requests_per_hour,max_requests_per_hour,last_deployment_date,last_deployment_by,last_deployment_description"
 
 for app in $APPS; do
   echo -ne "\r\033[KChecking $count of $total: $app"
@@ -57,23 +57,28 @@ for app in $APPS; do
   MARKDOWN+="\n## $app \n"
   CSV+="\n$app"
 
-  TEAM=$(echo $APP_INFO | jq -r '.app.team.name')
+  TEAM=$(echo $APP_INFO | jq -r '.app.team.name // ""')
   MARKDOWN+="- team: $TEAM\n"
   CSV+=",$TEAM"
 
-  PIPELINE=$(echo $APP_INFO | jq -r '.pipeline_coupling.pipeline.name')
-  MARKDOWN+="- pipeline: $PIPELINE\n"
-  CSV+=",$PIPELINE"
+  MARKDOWN+="- pipeline\n"
+  PIPELINE_NAME=$(echo $APP_INFO | jq -r '.pipeline_coupling.pipeline.name // ""')
+  MARKDOWN+="\t- name: $PIPELINE_NAME\n"
+  CSV+=",$PIPELINE_NAME"
 
-  CREATED_AT=$(echo $APP_INFO | jq -r '.app.created_at')
+  PIPELINE_STAGE=$(echo $APP_INFO | jq -r '.pipeline_coupling.stage // ""')
+  MARKDOWN+="\t- stage: $PIPELINE_STAGE\n"
+  CSV+=",$PIPELINE_STAGE"
+
+  CREATED_AT=$(echo $APP_INFO | jq -r '.app.created_at // ""')
   MARKDOWN+="- created at: $CREATED_AT\n"
   CSV+=",$CREATED_AT"
 
-  STACK=$(echo $APP_INFO | jq -r '.app.stack.name')
+  STACK=$(echo $APP_INFO | jq -r '.app.stack.name // ""')
   MARKDOWN+="- stack: $STACK\n"
   CSV+=",$STACK"
 
-  DYNOS=$(echo $APP_INFO | jq -r '.dynos | length')
+  DYNOS=$(echo $APP_INFO | jq -r '.dynos | length // 0')
   MARKDOWN+="- dynos: $DYNOS\n"
   CSV+=",$DYNOS"
 
@@ -94,7 +99,7 @@ for app in $APPS; do
     -H "Authorization: Bearer $HEROKU_API_KEY")
   TOTAL_REQUESTS=$(echo $METRICS | jq 'reduce (.data | to_entries)[] as $entry (0; . + (reduce $entry.value[] as $value (0; . + ($value // 0))))')
   REQUESTS_PER_HOUR=$((TOTAL_REQUESTS / 7 / 24 / 60))
-  MAX_REQUESTS_PER_HOUR=$(echo $METRICS | jq '[ .data | to_entries | .[] | .value[] ] | max')
+  MAX_REQUESTS_PER_HOUR=$(echo $METRICS | jq '[ .data | to_entries | .[] | .value[] ] | max // 0')
   MARKDOWN+="- requests per hour (over the last 7 days)\n"
   MARKDOWN+="\t- average: $REQUESTS_PER_HOUR\n"
   MARKDOWN+="\t- max: $MAX_REQUESTS_PER_HOUR\n"
@@ -119,9 +124,9 @@ for app in $APPS; do
   done
 
   if [ -n "$LAST_DEPLOYMENT" ]; then
-    LAST_DEPLOYMENT_DATE=$(echo $LAST_DEPLOYMENT | jq -r '.created_at')
-    LAST_DEPLOYMENT_BY=$(echo $LAST_DEPLOYMENT | jq -r '.user.email')
-    LAST_DEPLOYMENT_DESCRIPTION=$(echo $LAST_DEPLOYMENT | jq -r '.description') 
+    LAST_DEPLOYMENT_DATE=$(echo $LAST_DEPLOYMENT | jq -r '.created_at // ""')
+    LAST_DEPLOYMENT_BY=$(echo $LAST_DEPLOYMENT | jq -r '.user.email // ""')
+    LAST_DEPLOYMENT_DESCRIPTION=$(echo $LAST_DEPLOYMENT | jq -r '.description // ""') 
 
     MARKDOWN+="- last deployment\n"
     MARKDOWN+="\t- date: $LAST_DEPLOYMENT_DATE\n"
