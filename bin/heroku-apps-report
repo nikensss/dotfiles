@@ -61,14 +61,22 @@ for app in $APPS; do
   MARKDOWN+="- team: $TEAM\n"
   CSV+=",$TEAM"
 
-  MARKDOWN+="- pipeline\n"
   PIPELINE_NAME=$(echo $APP_INFO | jq -r '.pipeline_coupling.pipeline.name // ""')
-  MARKDOWN+="\t- name: $PIPELINE_NAME\n"
-  CSV+=",$PIPELINE_NAME"
-
   PIPELINE_STAGE=$(echo $APP_INFO | jq -r '.pipeline_coupling.stage // ""')
-  MARKDOWN+="\t- stage: $PIPELINE_STAGE\n"
-  CSV+=",$PIPELINE_STAGE"
+
+  if [[ -n "$PIPELINE_NAME" || -n "$PIPELINE_STAGE" ]]; then
+    MARKDOWN+="- pipeline\n"
+  fi
+
+  if [[ -n "$PIPELINE_NAME" ]]; then
+    MARKDOWN+="\t- name: $PIPELINE_NAME\n"
+  fi
+
+  if [[ -n "$PIPELINE_STAGE" ]]; then
+    MARKDOWN+="\t- name: $PIPELINE_STAGE\n"
+  fi
+
+  CSV+=",$PIPELINE_NAME,$PIPELINE_STAGE"
 
   CREATED_AT=$(echo $APP_INFO | jq -r '.app.created_at // ""')
   MARKDOWN+="- created at: $CREATED_AT\n"
