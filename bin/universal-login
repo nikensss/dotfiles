@@ -34,4 +34,4 @@ TOKEN=$(curl -s -X "POST" \
 echo $TOKEN | tr -d '\n' | pbcopy
 
 echo "Token: $TOKEN"
-echo "Available in the clipboard"
+echo "(available in the clipboard)"
