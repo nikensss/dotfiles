@@ -73,7 +73,7 @@ for app in $APPS; do
   fi
 
   if [[ -n "$PIPELINE_STAGE" ]]; then
-    MARKDOWN+="\t- name: $PIPELINE_STAGE\n"
+    MARKDOWN+="\t- stage: $PIPELINE_STAGE\n"
   fi
 
   CSV+="|$PIPELINE_NAME|$PIPELINE_STAGE"
