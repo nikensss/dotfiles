@@ -47,7 +47,7 @@ ctp(){
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
   npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset
-  npm i dotenv
+  npm i dotenv zod
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
@@ -55,10 +55,23 @@ ctp(){
 
   npx tsc --init --target ES2021 --outDir './dist/'
   mkdir src
+  touch src/env.ts
   touch src/index.ts
+  cat << _EOF_ >> src/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']),
+});
+
+export const env = envSchema.parse(process.env);
+_EOF_
+
   cat << _EOF_ >> src/index.ts
+import { env } from './env'; 
+
 const main = async (): Promise<void> => {
-  console.log('Hello, World!');
+  console.log('Hello, World!', { env });
 };
 
 main()
