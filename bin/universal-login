@@ -25,13 +25,15 @@ esac
 TOKEN=$(curl -s -X "POST" \
   "$UNIVERSAL_LOGIN_URL" \
   -H 'accept: application/json' \
+  -H "$UNIVERSAL_LOGIN_HEADER_NAME: $UNIVERSAL_LOGIN_HEADER_VALUE" \
   -H "client-id: $UNIVERSAL_LOGIN_CLIENT_ID" \
   -H "redirect-uri: $UNIVERSAL_LOGIN_REDIRECT_URI" \
   -H "Content-Type: application/json" \
   -d "{ \"email\": \"$UNIVERSAL_LOGIN_EMAIL\", \"password\": \"$UNIVERSAL_LOGIN_PASSWORD\", \"keepLoggedIn\": true }" \
   | jq '.accessToken' | xargs)
 
+echo "Token: $TOKEN"
+
 echo $TOKEN | tr -d '\n' | pbcopy
 
-echo "Token: $TOKEN"
 echo "(available in the clipboard)"
