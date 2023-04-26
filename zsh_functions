@@ -46,7 +46,7 @@ ctp(){
   echo 'save-exact=true' > .npmrc
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
-  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset
+  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os
   npm i dotenv zod
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
@@ -85,10 +85,16 @@ _EOF_
   npm pkg set scripts.build="rimraf ./dist && tsc"
   npm pkg set scripts.start="node -r dotenv/config ./dist/index.js"
   npm pkg set scripts.start:dev="ts-node -r dotenv/config ./src/index.ts"
-  npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
-  npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
-  npm pkg set scripts.lint="eslint 'src/**/*.ts'"
+  npm pkg set scripts.pretty="cross-os pretty"
+  npm pkg set scripts.pretty:check="cross-os pretty:check"
+  npm pkg set scripts.lint="cross-os lint"
   npm pkg set scripts.prepare="husky install"
+  npm pkg set cross-os.lint.darwin="eslint 'src/**/*.ts'"
+  npm pkg set cross-os.lint.win32="eslint src/**/*.ts"
+  npm pkg set cross-os.pretty:check.darwin="prettier --check 'src/**/*.ts'"
+  npm pkg set cross-os.pretty:check.win32="prettier --check src/**/*.ts"
+  npm pkg set cross-os.pretty.darwin="prettier --write 'src/**/*.ts'"
+  npm pkg set cross-os.pretty.win32="prettier --write src/**/*.ts"
 
   npm run prepare
 
