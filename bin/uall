@@ -65,5 +65,6 @@ section "Updating global npm packages" "npm update -g"
 section "Updating Oh My zsh" "sh ~/.oh-my-zsh/tools/upgrade.sh"
 section "Updating powerlevel10k" "git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull"
 section "Updating tldr database" "tldr --update"
+section "Updating nvim plugins" "nvim -c \"lua require('lazy').sync({wait = true})\" +qa"
 
 exec "$SHELL"
