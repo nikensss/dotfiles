@@ -158,5 +158,6 @@ require('lazy').setup({
       'RainbowDelimQuoted',
       'RainbowMultiDelim'
     }
-  }
+  },
+  'RubixDev/mason-update-all'
 })
