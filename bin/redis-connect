@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+if [[ ! -f ~/bin/.env.redis-urls ]]; then
+  echo "Missing '~/bin/.env.redis-urls' file"
+  exit 1
+fi
+
+source ~/bin/.env.redis-urls
+
+REDIS_URL=""
+
+case "$1" in
+  'basicfit-backend-dev')
+    REDIS_URL=$REDIS_URL_BASICFIT_BACKEND_DEV
+    ;;
+  'basicfit-backend-acc')
+    REDIS_URL=$REDIS_URL_BASICFIT_BACKEND_ACC
+    ;;
+  'basicfit-backend-test')
+    REDIS_URL=$REDIS_URL_BASICFIT_BACKEND_TEST
+    ;;
+  'basicfit-backend-prod')
+    REDIS_URL=$REDIS_URL_BASICFIT_BACKEND_PROD
+    ;;
+  'digital-fitness-platform-stage')
+    REDIS_URL=$REDIS_URL_DIGITAL_FITNESS_PLATFORM_STAGE
+    ;;
+  'digital-fitness-platform-prod')
+    REDIS_URL=$REDIS_URL_DIGITAL_FITNESS_PLATFORM_PROD
+    ;;
+  *)
+    echo "Unknown app '$1'"
+    exit 1
+    ;;
+esac
+
+if [[ -z "$REDIS_URL" ]]; then
+  echo "Missing REDIS_URL for '$1'"
+  exit 1
+fi
+
+redis-cli -u "$REDIS_URL"
