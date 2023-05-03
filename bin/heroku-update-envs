@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [[ ! -f ~/bin/.env.heroku-apps ]]; then
+  echo "Missing '~/bin/.env.heroku-apps' file"
+  exit 1
+fi
+
+while read -r app; do
+  # skip empty lines
+  if [[ -z "$app" ]]; then
+    continue
+  fi
+
+  echo "Updating envs for $app"
+  heroku-update-env -a $app -e .env.heroku
+done < <(cat ~/bin/.env.heroku-apps)
