@@ -12,15 +12,16 @@ vim.keymap.set('n', '<leader>sk', builtin.keymaps, options)
 vim.keymap.set('n', '<leader>ch', builtin.command_history, options)
 vim.keymap.set('n', '<leader>cs', builtin.lsp_document_symbols, options)
 vim.keymap.set('n', '<leader>sw', builtin.lsp_workspace_symbols, options)
+vim.keymap.set('n', '<leader>ss', builtin.lsp_dynamic_workspace_symbols, options)
 
 require('telescope').setup({
   defaults = {
     mappings = {
       n = {
-            ['<C-d>'] = require('telescope.actions').delete_buffer
+        ['<C-d>'] = require('telescope.actions').delete_buffer
       },
       i = {
-            ['<C-d>'] = require('telescope.actions').delete_buffer
+        ['<C-d>'] = require('telescope.actions').delete_buffer
       }
     }
   }
