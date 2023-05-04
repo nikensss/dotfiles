@@ -18,8 +18,11 @@ wu(){
 }
 
 cln(){
-  git clone $1
-  cd "$(basename "$1" .git)"
+  REPO=$1
+  DESTINATION=${2:=$(basename "$1")}
+
+  git clone $REPO $DESTINATION
+  cd "$(basename "$REPO" .git)"
   v
 }
 
