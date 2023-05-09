@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ENV=$1
-PEOPLE_ID=$2
+PEOPLE_ID=${2:-$(cat -)}
 
 src_file() {
     if [[ ! -f $1 ]]; then
@@ -23,10 +23,10 @@ esac
 
 src_file ~/bin/.env.gm.urls
 
-TOKEN=$(curl -s -X 'POST' $GYM_AUTH \
+TOKEN=$(curl -s -X 'POST' $GM_AUTH \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d "{ \"username\": \"$GYM_V6_AUTH_USER\", \"password\": \"$GYM_V6_AUTH_PASSWORD\", \"apiLicense\": \"$GYM_LICENSE\" }" \
+  -d "{ \"username\": \"$GM_V6_AUTH_USER\", \"password\": \"$GM_V6_AUTH_PASSWORD\", \"apiLicense\": \"$GM_LICENSE\" }" \
   | jq '.data' | xargs)
 
 if [[ "$TOKEN" == null ]]; then
@@ -34,7 +34,7 @@ if [[ "$TOKEN" == null ]]; then
   exit 1
 fi
 
-MEMBER_INFO=$(curl -s -X 'GET' $GYM_MEMBER_INFO \
+MEMBER_INFO=$(curl -s -X 'GET' $GM_MEMBER_INFO \
   -H 'accept: application/json' \
   -H "Authorization: $TOKEN" )
 

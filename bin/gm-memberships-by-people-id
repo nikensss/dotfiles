@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ENV=$1
-EMAIL=${2:-$(cat -)}
+PEOPLE_ID=${2:-$(cat -)}
 
 src_file() {
     if [[ ! -f $1 ]]; then
@@ -34,9 +34,9 @@ if [[ "$TOKEN" == null ]]; then
   exit 1
 fi
 
-MEMBER_INFO=$(curl -s -X 'GET' $GM_MEMBER_BY_EMAIL \
+MEMBERSHIPS=$(curl -s -X 'GET' $GM_MEMBERSHIPS_BY_PEOPLE_ID \
   -H 'accept: application/json' \
   -H "Authorization: $TOKEN" )
 
-echo "member info received:"
-echo $MEMBER_INFO | jq
+echo "memberships:"
+echo $MEMBERSHIPS | jq
