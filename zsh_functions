@@ -171,10 +171,13 @@ wsql(){
     "identification-service-pro")
       source ~/bin/.env.identification-service.pro
       ;;
-    "production-universal-login")
+    "production-auth-service")
       source ~/bin/.env.ul.prod
       ;;
-    "stage-universal-login")
+    "production-auth-service-write")
+      source ~/bin/.env.ul.prod.write
+      ;;
+    "staging-auth-service")
       source ~/bin/.env.ul.stage
       ;;
     "playtomic-bot-api-prod")
