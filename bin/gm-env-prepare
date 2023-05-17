@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+
+ENV=$1
+
+echo "ENV=$ENV" > ~/.gm.vars
+
+case $ENV in
+  'prod' | 'p')
+    cat ~/bin/.env.gm.prod >> ~/.gm.vars
+    ;;
+  *)
+    echo "unknown env '$1'; use [p]rod"
+    exit 1
+    ;;
+esac
+
+cat ~/bin/.env.gm.urls >> ~/.gm.vars
