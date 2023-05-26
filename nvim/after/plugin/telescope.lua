@@ -1,4 +1,5 @@
 local builtin = require('telescope.builtin')
+local actions = require('telescope.actions')
 local options = { noremap = true, silent = true }
 
 vim.keymap.set('n', '<leader>sg', builtin.live_grep, options)
@@ -18,10 +19,14 @@ require('telescope').setup({
   defaults = {
     mappings = {
       n = {
-        ['<C-d>'] = require('telescope.actions').delete_buffer
+        ['<C-d>'] = actions.delete_buffer,
+        ['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
+        ['<C-f>'] = actions.send_selected_to_qflist + actions.open_qflist
       },
       i = {
-        ['<C-d>'] = require('telescope.actions').delete_buffer
+        ['<C-d>'] = actions.delete_buffer,
+        ['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
+        ['<C-f>'] = actions.send_selected_to_qflist + actions.open_qflist
       }
     }
   }
