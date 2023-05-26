@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+PG_CONFIG=$1
+
+if [[ ! -f ~/bin/$PG_CONFIG ]]; then
+  echo "config file ~/bin/$PG_CONFIG not found"
+  exit 1
+fi
+
+source ~/bin/$PG_CONFIG
+
+psql $PG_URL
+
