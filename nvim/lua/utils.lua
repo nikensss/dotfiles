@@ -16,7 +16,7 @@ local function debugJest(testName, filename)
 end
 
 local function attachDebugger()
-  local port = vim.fn.input('Attach to port: ', '9230')
+  local port = vim.fn.input('Attach to port: ', '9229')
 
   dap.run({
     type = 'node2',
