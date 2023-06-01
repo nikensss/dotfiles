@@ -3,6 +3,7 @@ local actions = require('telescope.actions')
 local options = { noremap = true, silent = true }
 
 vim.keymap.set('n', '<leader>sg', builtin.live_grep, options)
+vim.keymap.set('n', '<leader>fc', builtin.grep_string, options)
 vim.keymap.set('n', '<leader>sf', builtin.find_files, options)
 vim.keymap.set('n', '<leader>sp', builtin.git_files, options)
 vim.keymap.set('n', '<leader>sb', builtin.buffers, options)
