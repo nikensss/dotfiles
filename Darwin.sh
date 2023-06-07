@@ -30,6 +30,7 @@ echo "${GREEN}installing homebrew${RESET}"
 
 brew update
 brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@14 luarocks gnu-sed pnpm fd fzf
+brew install --cask insomnia
 brew upgrade
 
 fnm install --lts
