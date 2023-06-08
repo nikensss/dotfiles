@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+while true; do
+  SELECTED=$(tmux list-sessions -F "#S" 2>/dev/null | fzf)
+
+  if [[ -z "$SELECTED" ]]; then
+    break
+  fi
+
+  tmux kill-session -t $SELECTED
+done
