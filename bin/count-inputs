@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+const count = {
+  data: {},
+  add: function (line) {
+    this.data[line] = (this.data[line] || 0) + 1;
+  },
+  print: function () {
+    process.stdout.cursorTo(0, 0);
+    process.stdout.clearScreenDown();
+    process.stdout.write(this.toString());
+  },
+  toString: function () {
+    return Object.entries(this.data)
+      .filter(([k]) => !!k) // remove empty lines
+      .sort(([, a], [, b]) => b - a) // sort from highest to lowest
+      .map(([key, value]) => `${key} -> ${value}`)
+      .join('\n');
+  }
+};
+
+process.stdin.on('data', (data) => {
+  data
+    .toString()
+    .split('\n')
+    .forEach((l) => count.add(l));
+
+  count.print();
+});
+
+process.stdin.on('end', () => {
+  count.print();
+  console.log('No more data to read!');
+});
