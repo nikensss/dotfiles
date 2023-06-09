@@ -49,14 +49,37 @@ ctp(){
   echo 'save-exact=true' > .npmrc
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
-  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os
+  npm i -D rimraf typescript tsx eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
   npm i dotenv zod
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
+  cat << _EOF_ >> jest.config.ts
+import type { JestConfigWithTsJest } from 'ts-jest';
 
-  npx tsc --init --target ES2021 --outDir './dist/'
+const jestConfig: JestConfigWithTsJest = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  roots: ['<rootDir>/tests'],
+  setupFiles: ['dotenv/config']
+};
+
+export default jestConfig;
+_EOF_
+
+  mkdir tests
+  touch tests/index.test.ts
+  cat << _EOF_ >> tests/index.test.ts
+describe('index', () => {
+  it('should pass', () => {
+    expect(true).toBe(true);
+  });
+});
+_EOF_
+
+  npx tsc --init --target ES2021 --outDir './dist' 
+
   mkdir src
   touch src/env.ts
   touch src/index.ts
@@ -85,9 +108,10 @@ _EOF_
   echo "import '@total-typescript/ts-reset';" > reset.d.ts
 
   npm pkg set version="0.1.0"
+  npm pkg set scripts.test="npm run build && cd ./dist && jest"
   npm pkg set scripts.build="rimraf ./dist && tsc"
-  npm pkg set scripts.start="node -r dotenv/config ./dist/index.js"
-  npm pkg set scripts.start:dev="ts-node -r dotenv/config ./src/index.ts"
+  npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
+  npm pkg set scripts.start:dev="tsx -r dotenv/config ./src/index.ts"
   npm pkg set scripts.pretty="cross-os pretty"
   npm pkg set scripts.pretty:check="cross-os pretty:check"
   npm pkg set scripts.lint="cross-os lint"
@@ -129,8 +153,10 @@ _EOF_
   git add --all
   git commit -am "chore: initial commit"
 
+  npm run start:dev
   npm run build
   npm run start
+  npm run test
 }
 
 md2pdf(){
