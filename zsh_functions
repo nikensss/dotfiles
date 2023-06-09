@@ -55,22 +55,28 @@ ctp(){
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
-  cat << _EOF_ >> jest.config.ts
-import type { JestConfigWithTsJest } from 'ts-jest';
 
-const jestConfig: JestConfigWithTsJest = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  roots: ['<rootDir>/tests'],
-  setupFiles: ['dotenv/config']
-};
+  cat << _EOF_ >> jest.config.json
+{
+  "testEnvironment": "node",
+  "roots": ["<rootDir>/dist/test"],
+  "setupFiles": ["dotenv/config"]
+}
 
-export default jestConfig;
+_EOF_
+  cat << _EOF_ >> ts-jest.config.json
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "roots": ["<rootDir>/test"],
+  "setupFiles": ["dotenv/config"]
+}
 _EOF_
 
-  mkdir tests
-  touch tests/index.test.ts
-  cat << _EOF_ >> tests/index.test.ts
+
+  mkdir test
+  touch test/index.test.ts
+  cat << _EOF_ >> test/index.test.ts
 describe('index', () => {
   it('should pass', () => {
     expect(true).toBe(true);
@@ -79,6 +85,10 @@ describe('index', () => {
 _EOF_
 
   npx tsc --init --target ES2021 --outDir './dist' 
+  # we can't pipe from one file to itself, so we use that chance to build the simple config, tsconfig.test.json
+  # and from that we build the stricter one, that one that only includes src, tsconfig.json
+  cat tsconfig.json | perl -pe 's/(^.*)\/\*.*\*\/(.*$)/\1\2/;s/(^.*)\/\/.*$/\1/' > tsconfig.test.json
+  cat tsconfig.test.json | jq '.include = ["src"]' > tsconfig.json
 
   mkdir src
   touch src/env.ts
@@ -108,9 +118,12 @@ _EOF_
   echo "import '@total-typescript/ts-reset';" > reset.d.ts
 
   npm pkg set version="0.1.0"
-  npm pkg set scripts.test="npm run build && cd ./dist && jest"
-  npm pkg set scripts.build="rimraf ./dist && tsc"
-  npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
+  npm pkg set scripts.build="rimraf ./dist && tsc -p tsconfig.json"
+  npm pkg set scripts.build:test:js="rimraf ./dist && tsc -p tsconfig.test.json"
+  npm pkg set scripts.test:js="npm run build:test:js && jest --config jest.config.json"
+  npm pkg set scripts.test:ts="jest --config ts-jest.config.json"
+  npm pkg set scripts.test="npm run test:ts"
+  npm pkg set scripts.start="node -r dotenv/config ./dist/index.js"
   npm pkg set scripts.start:dev="tsx -r dotenv/config ./src/index.ts"
   npm pkg set scripts.pretty="cross-os pretty"
   npm pkg set scripts.pretty:check="cross-os pretty:check"
@@ -154,9 +167,11 @@ _EOF_
   git commit -am "chore: initial commit"
 
   npm run start:dev
+  npm run test:ts
+
   npm run build
   npm run start
-  npm run test
+  npm run test:js
 }
 
 md2pdf(){
