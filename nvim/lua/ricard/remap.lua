@@ -35,6 +35,12 @@ vim.keymap.set('n', '<leader>-', '5<C-w><')
 vim.keymap.set('n', '<leader><leader>+', '<C-w>15+')
 vim.keymap.set('n', '<leader><leader>-', '<C-w>15-')
 
+-- split vertically and move to the right
+vim.keymap.set('n', '<C-w><C-v>', '<C-w>v<C-w>l')
+
+-- open terminal in vertical split
+vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR>a')
+
 -- Terminal in neovim
 _G.term_buf_of_tab = _G.term_buf_of_tab or {}
 _G.term_buf_max_nmb = _G.term_buf_max_nmb or 0
