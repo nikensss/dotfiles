@@ -64,13 +64,13 @@ lsp.configure('tsserver', {
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
 local cmp_mappings = lsp.defaults.cmp_mappings({
-      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-e>'] = cmp.mapping.close(),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
-      ['<C-j>'] = cmp.mapping.complete(),
-      ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-      ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-      ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+  ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+  ['<C-e>'] = cmp.mapping.close(),
+  ['<C-f>'] = cmp.mapping.scroll_docs(4),
+  ['<C-j>'] = cmp.mapping.complete(),
+  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
+  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
 })
 
 cmp_mappings['<Tab>'] = nil
@@ -112,6 +112,14 @@ lsp.on_attach(function(client, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action)
 
   nmap('gd', vim.lsp.buf.definition)
+  nmap('gv', function()
+    -- split vertically
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>v', true, true, true), 'n', true)
+    -- move to the right
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>l', true, true, true), 'n', true)
+    -- go to definition
+    vim.lsp.buf.definition()
+  end)
   nmap('gr', require('telescope.builtin').lsp_references)
   nmap('gI', vim.lsp.buf.implementation)
   nmap('gy', vim.lsp.buf.type_definition)
