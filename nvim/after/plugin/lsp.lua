@@ -112,7 +112,7 @@ lsp.on_attach(function(client, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action)
 
   nmap('gd', vim.lsp.buf.definition)
-  nmap('gv', function()
+  nmap('gs', function()
     -- split vertically
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>v', true, true, true), 'n', true)
     -- move to the right
