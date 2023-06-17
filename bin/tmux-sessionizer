@@ -7,8 +7,8 @@ function option_basename() {
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    session_basenames=$(tmux list-sessions -F '#S' 2>/dev/null | xargs echo)
-    sessions=$(tmux list-sessions -F '#S' 2>/dev/null | xargs -I _ echo \(session\) _ | sort | uniq)
+    session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs echo)
+    sessions=$(tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq)
     repos=$(fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort | uniq)
     repos_to_show=""
 
@@ -27,8 +27,9 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-trimmed=$(echo $selected | perl -pe 's/^\((repo|session)\) (.*)$/\2/')
-selected_name=$(basename $trimmed | tr . _)
+selected=$(echo $selected | perl -pe 's/^\((repo|session)\) (.*)$/\2/')
+selected_name=$(basename $selected | tr . _)
+
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
