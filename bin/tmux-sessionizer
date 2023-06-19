@@ -4,23 +4,25 @@ function option_basename() {
   basename $(echo $1 | perl -pe 's/^\((repo|session)\) (.*)$/\2/')
 }
 
-if [[ $# -eq 1 ]]; then
-    selected=$1
-else
+function options() {
     session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs echo)
-    sessions=$(tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq)
+    tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq
+
     repos=$(fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort | uniq)
     repos_to_show=""
 
     for repo in ${repos[@]}; do
       repo_basename=$(option_basename "$repo")
       if ! echo "$session_basenames" | grep -q "$repo_basename"; then
-        repos_to_show=""$repos_to_show"\n(repo) $repo"
+        echo "(repo) $repo"
       fi
     done
-    repos=("$repos_to_show")
+}
 
-    selected=$(echo -e "$sessions" "$repos" | fzf)
+if [[ $# -eq 1 ]]; then
+    selected=$1
+else
+    selected=$(options | fzf)
 fi
 
 if [[ -z $selected ]]; then
