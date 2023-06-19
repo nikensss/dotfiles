@@ -100,6 +100,12 @@ lsp.on_attach(function(client, bufnr)
     })
   end
 
+  client.handlers['textDocument/definition'] = function(_, result)
+    if not result then return end
+    vim.lsp.util.jump_to_location(result[1], client.offset_encoding)
+    vim.cmd('normal! zz')
+  end
+
   local nmap = function(keys, func, desc)
     if desc then
       desc = 'LSP: ' .. desc
@@ -112,7 +118,7 @@ lsp.on_attach(function(client, bufnr)
   nmap('<leader>ca', vim.lsp.buf.code_action)
 
   nmap('gd', vim.lsp.buf.definition)
-  nmap('gs', function()
+  nmap('<leader>gd', function()
     -- split vertically
     vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>v', true, true, true), 'n', true)
     -- move to the right
