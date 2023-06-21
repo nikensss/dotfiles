@@ -58,7 +58,10 @@ lsp.configure('tsserver', {
       organize_imports,
       description = "Organize imports"
     }
-  }
+  },
+  on_attach = function(_client, bufnr)
+    vim.keymap.set('n', '<leader>oi', organize_imports, { buffer = bufnr, desc = 'Organize imports' })
+  end
 })
 
 local cmp = require('cmp')
