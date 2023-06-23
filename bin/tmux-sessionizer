@@ -1,21 +1,17 @@
 #!/usr/bin/env bash
 
-function option_basename() {
-  basename $(echo $1 | perl -pe 's/^\((repo|session)\) (.*)$/\2/')
+function does_not_have_session(){
+  session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs)
+  while read -r line; do
+    if ! echo "$session_basenames" | grep -q "$(basename "$line")"; then
+      echo "(repo) $line"
+    fi
+  done
 }
 
 function get_options() {
-  session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs echo)
   tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq
-
-  repos=$(fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort | uniq)
-
-  for repo in ${repos[@]}; do
-    repo_basename=$(option_basename "$repo")
-    if ! echo "$session_basenames" | grep -q "$repo_basename"; then
-      echo "(repo) $repo"
-    fi
-  done
+  fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort | uniq | does_not_have_session
 }
 
 if [[ $# -eq 1 ]]; then
