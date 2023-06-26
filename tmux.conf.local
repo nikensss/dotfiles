@@ -16,7 +16,6 @@ bind-key -n C-S-Right swap-window -t +1\; select-window -t +1
 bind-key -r f run-shell "tmux neww ~/bin/tmux-sessionizer"
 bind-key -r C-f run-shell "tmux neww ~/bin/tmux-sessionizer"
 
-bind-key -r k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 
 # -- navigation ----------------------------------------------------------------
