@@ -22,14 +22,12 @@ require('telescope').setup({
       n = {
         ['<C-d>'] = actions.delete_buffer,
         ['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
-        ['<C-q>'] = actions.send_selected_to_qflist + actions.open_qflist,
         ['<C-j>'] = actions.preview_scrolling_down,
         ['<C-k>'] = actions.preview_scrolling_up,
       },
       i = {
         ['<C-d>'] = actions.delete_buffer,
         ['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
-        ['<C-q>'] = actions.send_selected_to_qflist + actions.open_qflist,
         ['<C-j>'] = actions.preview_scrolling_down,
         ['<C-k>'] = actions.preview_scrolling_up,
       }
