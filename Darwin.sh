@@ -22,15 +22,16 @@ setup_colors() {
 }
 setup_colors
 
+dir=$(pwd)
+
 echo "${GREEN}installing delevoper tools...${RESET}"
 xcode-select --install
 
 echo "${GREEN}installing homebrew${RESET}"
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 brew update
 brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@14 luarocks gnu-sed pnpm fd fzf
-brew install --cask insomnia
 brew upgrade
 
 fnm install --lts
@@ -60,19 +61,17 @@ npm ci
 NODE_OPTIONS=--no-experimental-fetch npm run build
 
 echo "${GREEN}installing oh-my-zsh${RESET}"
-sh -c "$(curl https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
-echo "${GREEN}installing vim-plug${RESET}"
-sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-echo "${GREEN}installing plugins${RESET}"
+echo "${GREEN}installing oh-my-zsh plugins${RESET}"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
 
 echo "${CYAN}installing power10k theme${RESET}"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 
-dir=$(pwd)
+cd $dir
+
 olddir=$HOME/dotfiles_old
 oldconfig=$HOME/oldconfig
 files="tmux.conf zshrc p10k.zsh zsh_aliases zsh_functions gitconfig"
@@ -99,7 +98,7 @@ cd ~/.config
 
 for file in $config; do
   echo "${LBLUE}backing $file up ($olddir)${RESET}"
-  mv .$file $oldconfig
+  mv $file $oldconfig
   echo "${CYAN}creating symlink to $file${RESET}"
   ln -s $dir/$file $file
 done
