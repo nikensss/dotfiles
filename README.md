@@ -68,3 +68,29 @@ git stash apply stash^{/my_stash_name}
 ```bash
 history -i
 ```
+
+## PSQL
+
+### output query results to a file
+
+```bash
+\o <filename>
+```
+
+One time to enable, then
+
+```bash
+\o
+```
+to disable.
+
+### transform query results to csv
+
+```bash
+\copy (<query>) to <file> with csv delimiter <delimier> header; 
+```
+
+Example:
+```bash
+\copy (select a, b, c from "TableName" order by "columnName" desc) to './destination.csv' with csv delimiter ',' header;
+```
