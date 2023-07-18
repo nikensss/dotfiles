@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+PEOPLE_ID=${1:-$(cat -)}
+
+source ~/.gm.vars
+
+BALANCE_SHEET=$(curl -s -X 'GET' $GM_BALANCE_SHEET \
+  -H 'accept: application/json' \
+  -H "Authorization: $TOKEN" )
+
+echo $BALANCE_SHEET | jq
