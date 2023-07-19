@@ -49,7 +49,7 @@ alias webdev='repos && cd webdev'
 alias wd='webdev'
 alias js='repos && cd javascript'
 alias ts='repos && cd typescript'
-alias bf='repos && cd basic-fit'
+alias bf='repos && cd basic-fit/repos'
 alias vpl='cd ~/.local/share/nvim/plugged'
 
 # editing dotfiles
