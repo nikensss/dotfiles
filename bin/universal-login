@@ -14,7 +14,7 @@ case "$1" in
     source ~/bin/.env.ul.prod
     ;;
   'stage' | 's')
-    source ~/bin/.env.ul.stage
+    source ~/bin/.env.ul.staging
     ;;
   *)
     echo "Unknown env $1, use [p]rod or [s]tage"
@@ -22,7 +22,7 @@ case "$1" in
     ;;
 esac
 
-TOKEN=$(curl -s -X "POST" \
+RESPONSE=$(curl -s -X "POST" \
   "$UNIVERSAL_LOGIN_URL" \
   -H 'accept: application/json' \
   -H "$UNIVERSAL_LOGIN_HEADER_NAME: $UNIVERSAL_LOGIN_HEADER_VALUE" \
@@ -30,10 +30,16 @@ TOKEN=$(curl -s -X "POST" \
   -H "redirect-uri: $UNIVERSAL_LOGIN_REDIRECT_URI" \
   -H "Content-Type: application/json" \
   -d "{ \"email\": \"$UNIVERSAL_LOGIN_EMAIL\", \"password\": \"$UNIVERSAL_LOGIN_PASSWORD\", \"keepLoggedIn\": true }" \
-  | jq '.accessToken' | xargs)
+  | jq )
+
+TOKEN=$(echo "$RESPONSE" | jq -r '.accessToken')
+
+if [[ "$TOKEN" == "null" ]]; then
+  echo "Login failed: $(echo "$RESPONSE" | jq -r '.message')"
+  exit 1
+fi
 
 echo "Token: $TOKEN"
-
 echo $TOKEN | tr -d '\n' | pbcopy
 
 echo "(available in the clipboard)"
