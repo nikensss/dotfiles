@@ -168,6 +168,10 @@ if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
 fi
 
+if command -v ngrok &>/dev/null; then
+    eval "$(ngrok completion)"
+fi
+
 source ~/.zsh_aliases
 source ~/.zsh_functions
 
