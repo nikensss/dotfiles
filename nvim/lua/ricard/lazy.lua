@@ -159,4 +159,5 @@ require('lazy').setup({
       'RainbowMultiDelim'
     }
   },
+  'numToStr/FTerm.nvim'
 })
