@@ -24,6 +24,8 @@ lsp.ensure_installed({
   'lua_ls',
   'prismals',
   'rust_analyzer',
+  'sqlls',
+  'tailwindcss',
   'tsserver',
 })
 
