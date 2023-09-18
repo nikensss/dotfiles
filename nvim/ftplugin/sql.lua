@@ -1,5 +1,6 @@
 local group = vim.api.nvim_create_augroup('sql_format_on_save', { clear = false })
-local event = 'BufWritePost'
+local event = 'BufWritePre'
+
 vim.api.nvim_clear_autocmds({ group = group })
 vim.api.nvim_create_autocmd(event, {
   group = group,
