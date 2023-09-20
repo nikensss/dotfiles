@@ -94,3 +94,31 @@ Example:
 ```bash
 \copy (select a, b, c from "TableName" order by "columnName" desc) to './destination.csv' with csv delimiter ',' header;
 ```
+### count entries per table
+
+```bash
+SELECT
+    table_schema,
+    table_name,
+    (xpath('/row/cnt/text()', xml_count)) [1] :: text :: int AS row_count
+FROM
+    (
+        SELECT
+            table_name,
+            table_schema,
+            query_to_xml(
+                format(
+                    'select count(*) as cnt from %I.%I',
+                    table_schema,
+                    table_name
+                ),
+                false,
+                TRUE,
+                ''
+            ) AS xml_count
+        FROM
+            information_schema.tables
+        WHERE
+            table_schema = 'public'
+    ) t;
+```
