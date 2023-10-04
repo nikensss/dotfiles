@@ -61,6 +61,9 @@ cd vscode-node-debug2
 npm ci
 NODE_OPTIONS=--no-experimental-fetch npm run build
 
+echo "${GREEN}installing bun${RESET}"
+curl -fsSL https://bun.sh/install | bash
+
 echo "${GREEN}installing oh-my-zsh${RESET}"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
