@@ -1,164 +1,155 @@
-local lsp = require('lsp-zero')
-local nvim_lsp = require('lspconfig')
+-- import lspconfig plugin
+local lspconfig = require("lspconfig")
 
-lsp.preset('recommended')
+-- import cmp-nvim-lsp plugin
+local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-lsp.set_preferences({
-  suggest_lsp_servers = false,
-  sign_icons = {
-    error = '',
-    warn = '',
-    hint = '',
-    info = ''
-  }
-})
+local keymap = vim.keymap -- for conciseness
 
-lsp.ensure_installed({
-  -- clang-format,
-  -- prettierd,
-  'bashls',
-  'clangd',
-  'cssls',
-  'eslint',
-  'jsonls',
-  'lua_ls',
-  'prismals',
-  'rust_analyzer',
-  'sqlls',
-  'tailwindcss',
-  'tsserver',
-})
+local opts = { noremap = true, silent = true }
+local on_attach = function(client, bufnr)
+	opts.buffer = bufnr
 
-lsp.skip_server_setup({ 'rust_analyzer' })
+	-- set keybinds
+	opts.desc = "Show LSP references"
+	keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
 
--- recommended settings by nvim-lspconfig
-lsp.configure('lua_ls', {
-  settings = {
-    Lua = {
-      runtime = { version = 'LuaJIT' },
-      diagnostics = { globals = { 'vim' } },
-      workspace = { library = vim.api.nvim_get_runtime_file('', true), checkThirdParty = false },
-      telemetry = { enable = false }
-    }
-  }
-})
+	opts.desc = "Go to declaration"
+	keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
 
-local function organize_imports()
-  local params = {
-    command = "_typescript.organizeImports",
-    arguments = { vim.api.nvim_buf_get_name(0) },
-    title = ""
-  }
-  vim.lsp.buf.execute_command(params)
+	opts.desc = "Show LSP definitions"
+	keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+
+	opts.desc = "Show LSP implementations"
+	keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
+
+	opts.desc = "Show LSP type definitions"
+	keymap.set("n", "gy", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+
+	opts.desc = "See available code actions"
+	keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+
+	opts.desc = "Smart rename"
+	keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
+
+	opts.desc = "Show buffer diagnostics"
+	keymap.set("n", "<leader>sd", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
+
+	opts.desc = "Show line diagnostics"
+	keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts) -- show diagnostics for line
+
+	opts.desc = "Go to previous diagnostic"
+	keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+
+	opts.desc = "Go to next diagnostic"
+	keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+
+	opts.desc = "Show documentation for what is under cursor"
+	keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+
+	opts.desc = "Show signature help for what is under cursor"
+	keymap.set("n", "<C-k>", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+
+	opts.desc = "Restart LSP"
+	keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
 end
 
-lsp.configure('tsserver', {
-  root_dir = nvim_lsp.util.root_pattern('package.json'),
-  single_file_support = false,
-  commands = {
-    OrganizeImports = {
-      organize_imports,
-      description = "Organize imports"
-    }
-  },
-  on_attach = function(_client, bufnr)
-    vim.keymap.set('n', '<leader>oi', organize_imports, { buffer = bufnr, desc = 'Organize imports' })
-  end
+-- used to enable autocompletion (assign to every lsp server config)
+local capabilities = cmp_nvim_lsp.default_capabilities()
+
+-- Change the Diagnostic symbols in the sign column (gutter)
+-- (not in youtube nvim video)
+local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+for type, icon in pairs(signs) do
+	local hl = "DiagnosticSign" .. type
+	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+end
+
+-- configure html server
+lspconfig["html"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
-local cmp = require('cmp')
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-  ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-  ['<C-e>'] = cmp.mapping.close(),
-  ['<C-f>'] = cmp.mapping.scroll_docs(4),
-  ['<C-j>'] = cmp.mapping.complete(),
-  ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-  ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-  ['<C-y>'] = cmp.mapping.confirm({ select = true }),
+-- configure typescript server with plugin
+lspconfig["tsserver"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
-cmp_mappings['<Tab>'] = nil
-cmp_mappings['<S-Tab>'] = nil
-
-lsp.setup_nvim_cmp({
-  mapping = cmp_mappings
+-- configure css server
+lspconfig["cssls"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
-local lsp_formatting_augroup = vim.api.nvim_create_augroup('LspFormatting', {})
-
-lsp.on_attach(function(client, bufnr)
-  -- make sure only null-ls is used to format typescript
-  if client.supports_method('textDocument/formatting') then
-    vim.api.nvim_clear_autocmds({ group = lsp_formatting_augroup, buffer = bufnr })
-    vim.api.nvim_create_autocmd('BufWritePre', {
-      group = lsp_formatting_augroup,
-      buffer = bufnr,
-      callback = function()
-        vim.lsp.buf.format({
-          filter = function(filter_client)
-            return filter_client.name ~= 'tsserver'
-          end,
-          bufnr = bufnr,
-        })
-      end
-    })
-  end
-
-  client.handlers['textDocument/definition'] = function(_, result)
-    if not result then return end
-    vim.lsp.util.jump_to_location(result[1], client.offset_encoding)
-    vim.cmd('normal! zz')
-  end
-
-  local nmap = function(keys, func, desc)
-    if desc then
-      desc = 'LSP: ' .. desc
-    end
-
-    vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc, remap = false })
-  end
-
-  nmap('<leader>rn', vim.lsp.buf.rename)
-  nmap('<leader>ca', vim.lsp.buf.code_action)
-
-  nmap('gd', vim.lsp.buf.definition)
-  nmap('<leader>gd', function()
-    -- split vertically
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>v', true, true, true), 'n', true)
-    -- move to the right
-    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<C-w>l', true, true, true), 'n', true)
-    -- go to definition
-    vim.lsp.buf.definition()
-  end)
-  nmap('gr', require('telescope.builtin').lsp_references)
-  nmap('gI', vim.lsp.buf.implementation)
-  nmap('gy', vim.lsp.buf.type_definition)
-
-  nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  vim.keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, { buffer = bufnr, desc = 'Signature help', remap = false })
-end)
-
-vim.diagnostic.config({
-  virtual_text = true
+-- configure tailwindcss server
+lspconfig["tailwindcss"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
-lsp.setup()
-
-local rt = require('rust-tools');
-local rust_lsp = lsp.build_options('rust_analyzer', {
-  single_file_support = false,
-  on_attach = function(_, bufnr)
-    vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
-    vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
-  end
+-- configure prisma orm server
+lspconfig["prismals"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
-rt.setup({
-  server = rust_lsp,
-  tools = {
-    hover_actions = {
-      auto_focus = true
-    }
-  }
+-- configure graphql language server
+lspconfig["graphql"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
 })
+
+-- configure sql language server
+lspconfig["sqlls"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	filetypes = { "sql" },
+})
+
+-- configure python server
+lspconfig["pyright"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
+-- configure lua server (with special settings)
+lspconfig["lua_ls"].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	settings = { -- custom settings for lua
+		Lua = {
+			-- make the language server recognize "vim" global
+			diagnostics = {
+				globals = { "vim" },
+			},
+			workspace = {
+				-- make language server aware of runtime files
+				library = {
+					[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+					[vim.fn.stdpath("config") .. "/lua"] = true,
+				},
+			},
+		},
+	},
+})
+
+-- local rt = require('rust-tools');
+-- local rust_lsp = lsp.build_options('rust_analyzer', {
+--   single_file_support = false,
+--   on_attach = function(_, bufnr)
+--     vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
+--     vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
+--   end
+-- })
+
+-- rt.setup({
+--   server = rust_lsp,
+--   tools = {
+--     hover_actions = {
+--       auto_focus = true
+--     }
+--   }
+-- })
