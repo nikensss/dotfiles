@@ -143,21 +143,6 @@ if [[ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]]; then . "$HOME/google-cl
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/ricard/.pyenv/versions/miniforge3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [[ $? -eq 0 ]]; then
-    eval "$__conda_setup"
-else
-    if [[ -f "/Users/ricard/.pyenv/versions/miniforge3/etc/profile.d/conda.sh" ]]; then
-        . "/Users/ricard/.pyenv/versions/miniforge3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/ricard/.pyenv/versions/miniforge3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
