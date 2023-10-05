@@ -136,20 +136,16 @@ lspconfig["lua_ls"].setup({
 	},
 })
 
--- local rt = require('rust-tools');
--- local rust_lsp = lsp.build_options('rust_analyzer', {
---   single_file_support = false,
---   on_attach = function(_, bufnr)
---     vim.keymap.set('n', '<leader>ca', rt.hover_actions.hover_actions, { buffer = bufnr })
---     vim.keymap.set('n', '<leader>a', rt.code_action_group.code_action_group, { buffer = bufnr })
---   end
--- })
+local rt = require("rust-tools")
 
--- rt.setup({
---   server = rust_lsp,
---   tools = {
---     hover_actions = {
---       auto_focus = true
---     }
---   }
--- })
+rt.setup({
+	server = {
+		on_attach = function(_, bufnr)
+			on_attach(_, bufnr)
+			-- Hover actions
+			keymap.set("n", "<leader>ha", rt.hover_actions.hover_actions, { buffer = bufnr })
+			-- Code action groups
+			keymap.set("n", "<leader>ca", rt.code_action_group.code_action_group, { buffer = bufnr })
+		end,
+	},
+})
