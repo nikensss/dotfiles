@@ -82,18 +82,21 @@ One time to enable, then
 ```bash
 \o
 ```
+
 to disable.
 
 ### transform query results to csv
 
 ```bash
-\copy (<query>) to <file> with csv delimiter <delimier> header; 
+\copy (<query>) to <file> with csv delimiter <delimier> header;
 ```
 
 Example:
+
 ```bash
 \copy (select a, b, c from "TableName" order by "columnName" desc) to './destination.csv' with csv delimiter ',' header;
 ```
+
 ### count entries per table
 
 ```bash
@@ -122,3 +125,7 @@ FROM
             table_schema = 'public'
     ) t;
 ```
+
+## Scrolling up in tmux/ssh/screen:
+
+`ctrl-a`+`[`
