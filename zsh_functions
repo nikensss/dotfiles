@@ -49,7 +49,7 @@ ctp(){
   echo 'save-exact=true' > .npmrc
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
-  npm i -D rimraf typescript tsx eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
+  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
   npm i dotenv zod
 
   echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
@@ -124,7 +124,7 @@ _EOF_
   npm pkg set scripts.test:ts="jest --config ts-jest.config.json"
   npm pkg set scripts.test="npm run test:ts"
   npm pkg set scripts.start="node -r dotenv/config ./dist/index.js"
-  npm pkg set scripts.start:dev="tsx -r dotenv/config ./src/index.ts"
+  npm pkg set scripts.start:dev="ts-node -r dotenv/config ./src/index.ts"
   npm pkg set scripts.pretty="cross-os pretty"
   npm pkg set scripts.pretty:check="cross-os pretty:check"
   npm pkg set scripts.lint="cross-os lint"
