@@ -57104,11 +57104,11 @@
 			<key>Name</key>
 			<string>Normal</string>
 			<key>Non Ascii Font</key>
-			<string>Monaco 12</string>
+			<string>HackNF-Regular 12</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCodeNerdFontComplete-Retina 12</string>
+			<string>FiraCodeNF-Ret 12</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
@@ -58222,7 +58222,7 @@
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
-			<string>FiraCodeNerdFontComplete-Retina 12</string>
+			<string>FiraCodeNF-Ret 12</string>
 			<key>Only The Default BG Color Uses Transparency</key>
 			<true/>
 			<key>Option Key Sends</key>
