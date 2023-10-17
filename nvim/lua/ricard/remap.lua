@@ -6,8 +6,8 @@ vim.keymap.set('n', '<leader>qc', vim.cmd.cclose)
 
 vim.keymap.set('x', '<leader>p', [["_dP]])
 
-vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
+vim.keymap.set('v', 'J', ':m \'>+1<CR>gv=gv')
+vim.keymap.set('v', 'K', ':m \'<-2<CR>gv=gv')
 
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -41,60 +41,33 @@ vim.keymap.set('n', '<C-w><C-v>', '<C-w>v<C-w>l')
 -- open terminal in vertical split
 vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR>a')
 
--- Terminal in neovim
-_G.term_buf_of_tab = _G.term_buf_of_tab or {}
-_G.term_buf_max_nmb = _G.term_buf_max_nmb or 0
-
-function Spawn_terminal()
-  local cur_tab = vim.api.nvim_get_current_tabpage()
-  vim.cmd('vs | terminal')
-  local cur_buf = vim.api.nvim_get_current_buf()
-  _G.term_buf_max_nmb = _G.term_buf_max_nmb + 1
-  vim.api.nvim_buf_set_name(cur_buf, 'Terminal ' .. _G.term_buf_max_nmb)
-  table.insert(_G.term_buf_of_tab, cur_tab, cur_buf)
-  vim.cmd(':startinsert')
-end
-
-function Toggle_terminal()
-  local cur_tab = vim.api.nvim_get_current_tabpage()
-  local term_buf = term_buf_of_tab[cur_tab]
-  if term_buf ~= nil then
-    local cur_buf = vim.api.nvim_get_current_buf()
-    if cur_buf == term_buf then
-      vim.cmd('q')
-    else
-      vim.cmd('vert sb' .. term_buf)
-      vim.cmd(':startinsert')
-    end
-  else
-    Spawn_terminal()
-    vim.cmd(':startinsert')
-  end
-end
-
-vim.keymap.set('n', '<C-t>', Toggle_terminal)
-vim.keymap.set('n', '<leader>tr', [[:lua Toggle_terminal()<CR><C-\><C-n><C-w>Ti]])
-vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
-
 -- colorschemes
 vim.keymap.set('n', '<leader><leader>ca', function()
-  vim.cmd.colorscheme 'catppuccin'
-  vim.cmd.Catppuccin('mocha')
-end);
+	vim.cmd.colorscheme('catppuccin')
+	vim.cmd.Catppuccin('mocha')
+end)
 vim.keymap.set('n', '<leader><leader>cb', function()
-  vim.cmd.colorscheme 'catppuccin'
-  vim.cmd.Catppuccin('macchiato')
-end);
+	vim.cmd.colorscheme('catppuccin')
+	vim.cmd.Catppuccin('macchiato')
+end)
 vim.keymap.set('n', '<leader><leader>cc', function()
-  vim.cmd.colorscheme 'catppuccin'
-  vim.cmd.Catppuccin('frappe')
-end);
+	vim.cmd.colorscheme('catppuccin')
+	vim.cmd.Catppuccin('frappe')
+end)
 vim.keymap.set('n', '<leader><leader>cd', function()
-  vim.cmd.colorscheme 'catppuccin'
-  vim.cmd.Catppuccin('latte')
-end);
+	vim.cmd.colorscheme('catppuccin')
+	vim.cmd.Catppuccin('latte')
+end)
 
-vim.keymap.set('n', '<leader><leader>ta', function() vim.cmd [[colorscheme tokyonight-night]] end);
-vim.keymap.set('n', '<leader><leader>tb', function() vim.cmd [[colorscheme tokyonight-storm]] end);
-vim.keymap.set('n', '<leader><leader>tc', function() vim.cmd [[colorscheme tokyonight-moon]] end);
-vim.keymap.set('n', '<leader><leader>td', function() vim.cmd [[colorscheme tokyonight-day]] end);
+vim.keymap.set('n', '<leader><leader>ta', function()
+	vim.cmd([[colorscheme tokyonight-night]])
+end)
+vim.keymap.set('n', '<leader><leader>tb', function()
+	vim.cmd([[colorscheme tokyonight-storm]])
+end)
+vim.keymap.set('n', '<leader><leader>tc', function()
+	vim.cmd([[colorscheme tokyonight-moon]])
+end)
+vim.keymap.set('n', '<leader><leader>td', function()
+	vim.cmd([[colorscheme tokyonight-day]])
+end)
