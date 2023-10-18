@@ -173,4 +173,12 @@ require('lazy').setup({
 		dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
 		opts = {},
 	},
+	{
+		'nvimdev/lspsaga.nvim',
+		config = function() end,
+		dependencies = {
+			'nvim-treesitter/nvim-treesitter', -- optional
+			'nvim-tree/nvim-web-devicons', -- optional
+		},
+	},
 })
