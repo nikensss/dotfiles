@@ -1,6 +1,10 @@
 -- import lspconfig plugin
 local lspconfig = require('lspconfig')
-require('lspsaga').setup({})
+require('lspsaga').setup({
+	outline = {
+		close_after_jump = true,
+	},
+})
 
 -- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
@@ -21,11 +25,26 @@ local on_attach = function(client, bufnr)
 	opts.desc = 'Show LSP definitions'
 	keymap.set('n', 'gd', '<cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
 
-	opts.desc = 'Show LSP implementations'
-	keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>', opts) -- show lsp implementations
-
 	opts.desc = 'Show LSP type definitions'
 	keymap.set('n', 'gy', '<cmd>Lspsaga goto_type_definition<CR>', opts) -- show lsp type definitions
+
+	opts.desc = 'Peek LSP definitions'
+	keymap.set('n', 'gf', '<cmd>Lspsaga peek_definition<CR>', opts) -- show lsp definitions
+
+	opts.desc = 'Show LSP type definitions'
+	keymap.set('n', 'gu', '<cmd>Lspsaga peek_type_definition<CR>', opts) -- show lsp type definitions
+
+	opts.desc = 'Show LSP implementations'
+	keymap.set('n', 'gi', '<cmd>Lspsaga finder imp<CR>', opts) -- show lsp implementations
+
+	opts.desc = 'Show outline'
+	keymap.set('n', 'go', '<cmd>Lspsaga outline<CR>', opts) -- show outline
+
+	opts.desc = 'Show incoming calls'
+	keymap.set('n', 'gj', '<cmd>Lspsaga incoming_calls<CR>', opts) -- show outline
+
+	opts.desc = 'Show outgoing calls'
+	keymap.set('n', 'gk', '<cmd>Lspsaga outgoing_calls<CR>', opts) -- show outline
 
 	opts.desc = 'See available code actions'
 	keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>Lspsaga code_action<CR>', opts) -- see available code actions, in visual mode will apply to selection
@@ -47,9 +66,6 @@ local on_attach = function(client, bufnr)
 
 	opts.desc = 'Show documentation for what is under cursor'
 	keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', opts) -- show documentation for what is under cursor
-
-	opts.desc = 'Show signature help for what is under cursor'
-	keymap.set('n', '<C-k>', vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
 	opts.desc = 'Restart LSP'
 	keymap.set('n', '<leader>rs', ':LspRestart<CR>', opts) -- mapping to restart lsp if necessary
