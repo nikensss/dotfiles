@@ -57104,7 +57104,7 @@
 			<key>Name</key>
 			<string>Normal</string>
 			<key>Non Ascii Font</key>
-			<string>HackNF-Regular 12</string>
+			<string>Monaco 12</string>
 			<key>Non-ASCII Anti Aliased</key>
 			<true/>
 			<key>Normal Font</key>
