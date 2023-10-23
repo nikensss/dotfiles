@@ -162,7 +162,7 @@ rt.setup({
 			-- Hover actions
 			keymap.set('n', '<leader>ha', rt.hover_actions.hover_actions, { buffer = bufnr })
 			-- Code action groups
-			keymap.set('n', '<leader>ca', rt.code_action_group.code_action_group, { buffer = bufnr })
+			-- keymap.set('n', '<leader>ca', rt.code_action_group.code_action_group, { buffer = bufnr })
 		end,
 	},
 })
