@@ -181,4 +181,5 @@ require('lazy').setup({
 			'nvim-tree/nvim-web-devicons', -- optional
 		},
 	},
+	{ 'rest-nvim/rest.nvim', dependencies = { 'nvim-lua/plenary.nvim' } },
 })
