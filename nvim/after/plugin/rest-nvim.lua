@@ -2,7 +2,7 @@ require('rest-nvim').setup({
 	-- Open request results in a horizontal split
 	result_split_horizontal = false,
 	-- Keep the http file buffer above|left when split horizontal|vertical
-	result_split_in_place = false,
+	result_split_in_place = true,
 	-- Skip SSL verification, useful for unknown certificates
 	skip_ssl_verification = false,
 	-- Encode URL before making request
@@ -17,7 +17,7 @@ require('rest-nvim').setup({
 		show_url = true,
 		-- show the generated curl command in case you want to launch
 		-- the same request via the terminal (can be verbose)
-		show_curl_command = false,
+		show_curl_command = true,
 		show_http_info = true,
 		show_headers = true,
 		-- executables or functions for formatting response body [optional]
@@ -35,3 +35,7 @@ require('rest-nvim').setup({
 	custom_dynamic_variables = {},
 	yank_dry_run = true,
 })
+
+vim.keymap.set('n', '<leader>rr', '<Plug>RestNvim', { desc = '[rest.nvim] send request under cursor', silent = true })
+vim.keymap.set('n', '<leader>rp', '<Plug>RestNvimPreview', { desc = '[rest.nvim] show request preview', silent = true })
+vim.keymap.set('n', '<leader>rl', '<Plug>RestNvimLast', { desc = '[rest.nvim] send last request', silent = true })
