@@ -4,8 +4,8 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-if [[ -f ~/.env-variables ]]; then
-  source ~/.env-variables
+if [[ -f ~/.env ]]; then
+  source ~/.env
 fi
 
 # If you come from bash you might have to change your $PATH.
