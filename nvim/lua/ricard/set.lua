@@ -22,13 +22,15 @@ vim.o.ignorecase = true
 vim.opt.termguicolors = true
 
 vim.opt.scrolloff = 5
-vim.opt.signcolumn = "yes"
+vim.opt.signcolumn = 'yes'
 
 vim.opt.updatetime = 50
 
 vim.opt.cursorline = true
-vim.opt.colorcolumn = "80,100,120"
+vim.opt.colorcolumn = '80,100,120'
 
 vim.o.completeopt = 'menuone,noselect'
 
 vim.opt.clipboard = 'unnamedplus'
+
+vim.o.splitright = true

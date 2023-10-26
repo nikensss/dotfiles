@@ -38,9 +38,6 @@ vim.keymap.set('n', '<leader><leader>-', '<C-w>15-')
 -- terminal mode
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
 
--- split vertically and move to the right
-vim.keymap.set('n', '<C-w><C-v>', '<C-w>v<C-w>l')
-
 -- open terminal in vertical split
 vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR>a')
 
