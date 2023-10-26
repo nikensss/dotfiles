@@ -121,6 +121,17 @@ require('lazy').setup({
 	'nvim-telescope/telescope-dap.nvim',
 	'rcarriga/nvim-dap-ui',
 	'theHamsta/nvim-dap-virtual-text',
+	'folke/neodev.nvim',
+	{
+		'nvim-neotest/neotest',
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+			'antoinemadec/FixCursorHold.nvim',
+			'nvim-neotest/neotest-plenary',
+			'nvim-neotest/neotest-vim-test',
+			'nvim-neotest/neotest-jest',
+		},
+	},
 	'jiangmiao/auto-pairs',
 	{
 		'nvim-neo-tree/neo-tree.nvim',
