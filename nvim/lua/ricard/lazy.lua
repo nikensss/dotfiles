@@ -50,6 +50,10 @@ require('lazy').setup({
 	},
 	'tpope/vim-fugitive',
 	{
+		'L3MON4D3/LuaSnip',
+		dependencies = { 'rafamadriz/friendly-snippets' },
+	},
+	{
 		'hrsh7th/nvim-cmp',
 		event = 'InsertEnter',
 		dependencies = {
