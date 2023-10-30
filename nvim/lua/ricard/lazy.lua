@@ -215,4 +215,5 @@ require('lazy').setup({
 		end,
 	},
 	'folke/twilight.nvim',
+	'ThePrimeagen/git-worktree.nvim',
 })
