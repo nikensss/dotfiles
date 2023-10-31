@@ -29,10 +29,10 @@ local on_attach = function(client, bufnr)
 	keymap.set('n', 'gy', '<cmd>Lspsaga goto_type_definition<CR>', opts) -- show lsp type definitions
 
 	opts.desc = 'Peek LSP definitions'
-	keymap.set('n', 'gf', '<cmd>Lspsaga peek_definition<CR>', opts) -- show lsp definitions
+	keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', opts) -- show lsp definitions
 
 	opts.desc = 'Show LSP type definitions'
-	keymap.set('n', 'gu', '<cmd>Lspsaga peek_type_definition<CR>', opts) -- show lsp type definitions
+	keymap.set('n', '<leader>py', '<cmd>Lspsaga peek_type_definition<CR>', opts) -- show lsp type definitions
 
 	opts.desc = 'Show LSP implementations'
 	keymap.set('n', 'gi', '<cmd>Lspsaga finder imp<CR>', opts) -- show lsp implementations
