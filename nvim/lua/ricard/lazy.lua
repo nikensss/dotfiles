@@ -215,5 +215,13 @@ require('lazy').setup({
 		end,
 	},
 	'folke/twilight.nvim',
+	{
+		'folke/zen-mode.nvim',
+		opts = {
+			window = {
+				width = 180,
+			},
+		},
+	},
 	'ThePrimeagen/git-worktree.nvim',
 })

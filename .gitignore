@@ -109,3 +109,5 @@ dist
 .DS_Store
 lazy-lock.json
 env-variables
+
+*.session
