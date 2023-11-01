@@ -23,3 +23,21 @@ vim.api.nvim_create_autocmd('FileType', {
 		vim.opt.colorcolumn = '0'
 	end,
 })
+
+local function db_completion()
+	require('cmp').setup.buffer({ sources = { { name = 'vim-dadbod-completion' } } })
+end
+
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = { 'sql' },
+	group = vim.api.nvim_create_augroup('sql-dadbod-autocompletion', { clear = true }),
+	command = [[setlocal omnifunc=vim_dadbod_completion#omni]],
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = { 'sql', 'mysql', 'plsql' },
+	group = vim.api.nvim_create_augroup('sql-dadbod-autocompletion-1', { clear = true }),
+	callback = function()
+		vim.schedule(db_completion)
+	end,
+})
