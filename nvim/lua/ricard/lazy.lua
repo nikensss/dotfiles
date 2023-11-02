@@ -51,8 +51,8 @@ require('lazy').setup({
 	'tpope/vim-fugitive',
 	{
 		'hrsh7th/nvim-cmp',
-		event = 'InsertEnter',
 		dependencies = {
+			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/cmp-buffer', -- source for text in buffer
 			'hrsh7th/cmp-path', -- source for file system paths
 			{ 'L3MON4D3/LuaSnip', build = 'make install_jsregexp' }, -- snippet engine
@@ -66,7 +66,16 @@ require('lazy').setup({
 		event = { 'BufReadPre', 'BufNewFile' },
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
-			{ 'antosha417/nvim-lsp-file-operations', config = true },
+			{
+				'antosha417/nvim-lsp-file-operations',
+				dependencies = {
+					'nvim-lua/plenary.nvim',
+					'nvim-neo-tree/neo-tree.nvim',
+				},
+				config = function()
+					require('lsp-file-operations').setup()
+				end,
+			},
 			'j-hui/fidget.nvim',
 		},
 	},

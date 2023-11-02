@@ -1,7 +1,7 @@
-require('luasnip.loaders.from_vscode').lazy_load()
-
 local cmp = require('cmp')
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
+
+require('luasnip.loaders.from_vscode').lazy_load()
 
 cmp.setup({
 	snippet = { -- configure how nvim-cmp interacts with snippet engine
@@ -13,15 +13,15 @@ cmp.setup({
 		['<C-b>'] = cmp.mapping.scroll_docs(-4),
 		['<C-e>'] = cmp.mapping.close(),
 		['<C-f>'] = cmp.mapping.scroll_docs(4),
-		['<C-j>'] = cmp.mapping.complete(),
+		['<C-l>'] = cmp.mapping.complete(),
 		['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
 		['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
 		['<CR>'] = cmp.mapping.confirm({ select = true }),
 	}),
 	-- sources for autocompletion
 	sources = cmp.config.sources({
-		{ name = 'nvim_lsp' },
 		{ name = 'luasnip' }, -- snippets
+		{ name = 'nvim_lsp' },
 	}, {
 		{ name = 'buffer' }, -- text within current buffer
 		{ name = 'path' }, -- file system paths
