@@ -1,6 +1,11 @@
 -- import lspconfig plugin
 local lspconfig = require('lspconfig')
 require('lspsaga').setup({
+	finder = {
+		methods = {
+			tyd = 'textDocument/typeDefinition',
+		},
+	},
 	outline = {
 		close_after_jump = true,
 	},
@@ -17,7 +22,7 @@ local on_attach = function(client, bufnr)
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'
-	keymap.set('n', 'gr', '<cmd>Lspsaga finder<CR>', opts) -- show definition, references
+	keymap.set('n', 'gr', '<cmd>Lspsaga finder ref+imp+def+tyd<CR>', opts) -- show definition, references
 
 	opts.desc = 'Go to declaration'
 	keymap.set('n', 'gD', vim.lsp.buf.declaration, opts) -- go to declaration
