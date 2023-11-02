@@ -75,6 +75,9 @@ local on_attach = function(client, bufnr)
 	opts.desc = 'Show documentation for what is under cursor'
 	keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', opts) -- show documentation for what is under cursor
 
+	opts.desc = 'Signature help'
+	keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, opts) -- show documentation for what is under cursor
+
 	opts.desc = 'Restart LSP'
 	keymap.set('n', '<leader>rs', ':LspRestart<CR>', opts) -- mapping to restart lsp if necessary
 end
