@@ -67,6 +67,7 @@ require('lazy').setup({
 		dependencies = {
 			'hrsh7th/cmp-nvim-lsp',
 			{ 'antosha417/nvim-lsp-file-operations', config = true },
+			'j-hui/fidget.nvim',
 		},
 	},
 	{
@@ -115,7 +116,16 @@ require('lazy').setup({
 	'tpope/vim-abolish',
 	'tpope/vim-commentary',
 	'tpope/vim-repeat',
-	'tpope/vim-surround',
+	{
+		'kylechui/nvim-surround',
+		version = '*', -- Use for stability; omit to use `main` branch for the latest features
+		event = 'VeryLazy',
+		config = function()
+			require('nvim-surround').setup({
+				-- Configuration here, or leave empty to use defaults
+			})
+		end,
+	},
 	'tpope/vim-unimpaired',
 	'mfussenegger/nvim-dap',
 	'nvim-telescope/telescope-dap.nvim',
@@ -220,4 +230,13 @@ require('lazy').setup({
 		},
 	},
 	'ThePrimeagen/git-worktree.nvim',
+	{
+		'Wansmer/treesj',
+		keys = { '<leader>m', '<leader>j', '<leader>s' },
+		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+		config = function()
+			require('treesj').setup({--[[ your config ]]
+			})
+		end,
+	},
 })

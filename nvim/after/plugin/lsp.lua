@@ -11,6 +11,9 @@ require('lspsaga').setup({
 	},
 })
 
+-- lsp status report
+require('fidget').setup()
+
 -- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
