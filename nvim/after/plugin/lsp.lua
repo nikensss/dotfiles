@@ -20,7 +20,7 @@ local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local keymap = vim.keymap -- for conciseness
 
 local opts = { noremap = true, silent = true }
-local on_attach = function(client, bufnr)
+local on_attach = function(_, bufnr)
 	opts.buffer = bufnr
 
 	-- set keybinds
@@ -99,12 +99,6 @@ lspconfig['html'].setup({
 	on_attach = on_attach,
 })
 
--- configure typescript server with plugin
--- lspconfig["tsserver"].setup({
--- 	capabilities = capabilities,
--- 	on_attach = on_attach,
--- })
-
 -- configure css server
 lspconfig['cssls'].setup({
 	capabilities = capabilities,
@@ -171,3 +165,74 @@ rt.setup({
 		end,
 	},
 })
+
+-- typescript-tools
+require('typescript-tools').setup({
+	on_attach = function(_, bufnr)
+		opts.buffer = bufnr
+
+		-- set keybinds
+		opts.desc = 'Show LSP references'
+		keymap.set('n', 'gr', '<cmd>Lspsaga finder ref+imp+def+tyd<CR>', opts) -- show definition, references
+
+		opts.desc = 'Go to declaration'
+		keymap.set('n', 'gD', vim.lsp.buf.declaration, opts) -- go to declaration
+
+		opts.desc = '[LspSaga] Show LSP definitions'
+		keymap.set('n', 'gd', '<cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
+
+		opts.desc = '[LspSaga] Show LSP type definitions'
+		keymap.set('n', 'gy', '<cmd>Lspsaga goto_type_definition<CR>', opts) -- show lsp type definitions
+
+		opts.desc = '[LspSaga] Peek LSP definitions'
+		keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', opts) -- show lsp definitions
+
+		opts.desc = '[LspSaga] Show LSP type definitions'
+		keymap.set('n', '<leader>py', '<cmd>Lspsaga peek_type_definition<CR>', opts) -- show lsp type definitions
+
+		opts.desc = '[LspSaga] Show LSP implementations'
+		keymap.set('n', 'gi', '<cmd>Lspsaga finder imp<CR>', opts) -- show lsp implementations
+
+		opts.desc = '[LspSaga] Show outline'
+		keymap.set('n', 'go', '<cmd>Lspsaga outline<CR>', opts) -- show outline
+
+		opts.desc = '[LspSaga] Show incoming calls'
+		keymap.set('n', 'gj', '<cmd>Lspsaga incoming_calls<CR>', opts) -- show outline
+
+		opts.desc = '[LspSaga] Show outgoing calls'
+		keymap.set('n', 'gk', '<cmd>Lspsaga outgoing_calls<CR>', opts) -- show outline
+
+		opts.desc = '[LspSaga] See available code actions'
+		keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>Lspsaga code_action<CR>', opts) -- see available code actions, in visual mode will apply to selection
+
+		opts.desc = '[LspSaga] Smart rename'
+		keymap.set('n', '<leader>rn', '<cmd>Lspsaga rename<CR>', opts) -- smart rename
+
+		opts.desc = '[LspSaga] Show buffer diagnostics'
+		keymap.set('n', '<leader>sd', '<cmd>Lspsaga show_buf_diagnostics<CR>', opts) -- show  diagnostics for file
+
+		opts.desc = '[LspSaga] Show line diagnostics'
+		keymap.set('n', '<leader>ld', '<cmd>Lspsaga show_line_diagnostics<CR>', opts) -- show diagnostics for line
+
+		opts.desc = '[LspSaga] Go to previous diagnostic'
+		keymap.set('n', '[d', '<cmd>Lspsaga diagnostic_jump_prev<CR>', opts) -- jump to previous diagnostic in buffer
+
+		opts.desc = '[LspSaga] Go to next diagnostic'
+		keymap.set('n', ']d', '<cmd>Lspsaga diagnostic_jump_next<CR>', opts) -- jump to next diagnostic in buffer
+
+		opts.desc = '[LspSaga] Show documentation for what is under cursor'
+		keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', opts) -- show documentation for what is under cursor
+
+		opts.desc = 'Signature help'
+		keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, opts) -- show documentation for what is under cursor
+
+		opts.desc = 'Restart LSP'
+		keymap.set('n', '<leader>rs', ':LspRestart<CR>', opts) -- mapping to restart lsp if necessary
+	end,
+})
+
+vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, { desc = '[ts-tools] organize imports' })
+vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsSortImports, { desc = '[ts-tools] sort imports' })
+vim.keymap.set('n', '<leader>tsr', vim.cmd.TSToolsRemoveUnused, { desc = '[ts-tools] remove unused statements' })
+vim.keymap.set('n', '<leader>tsx', vim.cmd.TSToolsRemoveUnusedImports, { desc = '[ts-tools] remove unused imports' })
+vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, { desc = '[ts-tools] add missing imports' })
