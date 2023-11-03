@@ -36,7 +36,7 @@ mason_lspconfig.setup({
 mason_tool_installer.setup({
 	ensure_installed = {
 		'black', -- python formatter
-		'eslint_d', -- js linter
+		'eslint', -- js linter
 		'isort', -- python formatter
 		'prettier', -- prettier formatter
 		'pylint', -- python linter
