@@ -1,3 +1,5 @@
+local get_current_folder_name = require('ricard.functions').get_current_folder_name
+
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = { 'gitcommit', 'markdown', 'txt' },
 	group = vim.api.nvim_create_augroup('prose_writting', { clear = true }),
@@ -39,5 +41,30 @@ vim.api.nvim_create_autocmd('FileType', {
 	group = vim.api.nvim_create_augroup('sql-dadbod-autocompletion-1', { clear = true }),
 	callback = function()
 		vim.schedule(db_completion)
+	end,
+})
+
+vim.api.nvim_create_autocmd('VimLeave', {
+	group = vim.api.nvim_create_augroup('save_session', { clear = true }),
+	callback = function()
+		local target = vim.fn.expand('~/.config/nvim/' .. get_current_folder_name() .. '.session')
+		vim.cmd('mksession! ' .. target)
+		print('session saved to ' .. target)
+	end,
+})
+
+vim.api.nvim_create_autocmd('VimEnter', {
+	group = vim.api.nvim_create_augroup('restore_session', { clear = true }),
+	callback = function()
+		local target = vim.fn.expand('~/.config/nvim/' .. get_current_folder_name() .. '.session')
+		if vim.fn.filereadable(target) == 1 then
+			print('loading session from ' .. target)
+			vim.defer_fn(function()
+				vim.cmd('source ' .. target)
+				print('session loaded from ' .. target)
+			end, 1000)
+		else
+			print('no session found')
+		end
 	end,
 })

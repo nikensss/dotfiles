@@ -1,3 +1,5 @@
+local get_current_folder_name = require('ricard.functions').get_current_folder_name
+
 vim.g.mapleader = ' '
 
 vim.keymap.set('n', '<leader>w', vim.cmd.write)
@@ -71,3 +73,10 @@ end)
 vim.keymap.set('n', '<leader><leader>td', function()
 	vim.cmd([[colorscheme tokyonight-day]])
 end)
+
+vim.keymap.set('n', '<leader>ls', function()
+	local session = '~/.config/nvim/' .. get_current_folder_name() .. '.session'
+	if vim.fn.filereadable(vim.fn.expand(session)) == 1 then
+		vim.cmd('source ' .. session)
+	end
+end, { silent = true, desc = 'load session' })
