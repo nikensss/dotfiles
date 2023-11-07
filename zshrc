@@ -36,7 +36,6 @@ fi
 
 export PS4='$LINENO > '
 export JDTLS_HOME="~/repos/java/jdtls-160"
-export NODE_ENV=development
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
