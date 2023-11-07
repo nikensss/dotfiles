@@ -24,7 +24,7 @@ vim.keymap.set('n', 'Q', '<nop>')
 
 vim.keymap.set('n', '<leader>ff', vim.lsp.buf.format)
 
-vim.keymap.set('n', '<leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set('n', '<leader><leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod u+x %<CR>', { silent = true })
 
 -- increment/decrement amount
@@ -78,5 +78,12 @@ vim.keymap.set('n', '<leader>ls', function()
 	local session = '~/.config/nvim/' .. get_current_folder_name() .. '.session'
 	if vim.fn.filereadable(vim.fn.expand(session)) == 1 then
 		vim.cmd('source ' .. session)
+		print('loaded session from ' .. session)
 	end
-end, { silent = true, desc = 'load session' })
+end, { silent = true, desc = '[l]oad [s]ession' })
+
+vim.keymap.set('n', '<leader>ms', function()
+	local target = vim.fn.expand('~/.config/nvim/' .. get_current_folder_name() .. '.session')
+	vim.cmd('mksession! ' .. target)
+	print('session saved to ' .. target)
+end, { silent = true, desc = '[m]ake [s]ession' })
