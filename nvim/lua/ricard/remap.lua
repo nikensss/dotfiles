@@ -22,8 +22,6 @@ vim.keymap.set('n', 'N', 'Nzzzv')
 
 vim.keymap.set('n', 'Q', '<nop>')
 
-vim.keymap.set('n', '<leader>ff', vim.lsp.buf.format)
-
 vim.keymap.set('n', '<leader><leader>s', [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 vim.keymap.set('n', '<leader>x', '<cmd>!chmod u+x %<CR>', { silent = true })
 
