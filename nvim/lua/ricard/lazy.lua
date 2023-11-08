@@ -241,11 +241,15 @@ require('lazy').setup({
 	'ThePrimeagen/git-worktree.nvim',
 	{
 		'Wansmer/treesj',
-		keys = { '<leader>m', '<leader>j', '<leader>s' },
 		dependencies = { 'nvim-treesitter/nvim-treesitter' },
 		config = function()
-			require('treesj').setup({--[[ your config ]]
-			})
+			require('treesj').setup({})
+			vim.keymap.set(
+				'n',
+				'<leader>mm',
+				require('treesj').toggle,
+				{ silent = true, noremap = true, desc = '[treesj] oneline text object' }
+			)
 		end,
 	},
 })
