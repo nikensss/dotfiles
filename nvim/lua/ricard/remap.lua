@@ -46,30 +46,36 @@ vim.keymap.set('n', '<leader><leader>ca', function()
 	vim.cmd.colorscheme('catppuccin')
 	vim.cmd.Catppuccin('mocha')
 end)
+
 vim.keymap.set('n', '<leader><leader>cb', function()
 	vim.cmd.colorscheme('catppuccin')
 	vim.cmd.Catppuccin('macchiato')
 end)
+
 vim.keymap.set('n', '<leader><leader>cc', function()
 	vim.cmd.colorscheme('catppuccin')
 	vim.cmd.Catppuccin('frappe')
 end)
+
 vim.keymap.set('n', '<leader><leader>cd', function()
 	vim.cmd.colorscheme('catppuccin')
 	vim.cmd.Catppuccin('latte')
 end)
 
 vim.keymap.set('n', '<leader><leader>ta', function()
-	vim.cmd([[colorscheme tokyonight-night]])
+	vim.cmd.colorscheme('tokyonight-night')
 end)
+
 vim.keymap.set('n', '<leader><leader>tb', function()
-	vim.cmd([[colorscheme tokyonight-storm]])
+	vim.cmd.colorscheme('tokyonight-storm')
 end)
+
 vim.keymap.set('n', '<leader><leader>tc', function()
-	vim.cmd([[colorscheme tokyonight-moon]])
+	vim.cmd.colorscheme('tokyonight-moon')
 end)
+
 vim.keymap.set('n', '<leader><leader>td', function()
-	vim.cmd([[colorscheme tokyonight-day]])
+	vim.cmd.colorscheme('tokyonight-day')
 end)
 
 vim.keymap.set('n', '<leader>ls', function()
