@@ -242,6 +242,7 @@ require('lazy').setup({
 	{
 		'Wansmer/treesj',
 		dependencies = { 'nvim-treesitter/nvim-treesitter' },
+		keys = { '<leader>mm' },
 		config = function()
 			require('treesj').setup({})
 			vim.keymap.set(
