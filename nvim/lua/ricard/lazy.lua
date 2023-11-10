@@ -29,6 +29,9 @@ require('lazy').setup({
 		'folke/tokyonight.nvim',
 		lazy = false,
 		priority = 1000,
+		config = function()
+			vim.cmd.colorscheme('tokyonight-night')
+		end,
 	},
 	{
 		'nvim-treesitter/nvim-treesitter',
@@ -175,10 +178,6 @@ require('lazy').setup({
 	{
 		'catppuccin/nvim',
 		name = 'catppuccin',
-		config = function()
-			vim.cmd.colorscheme('catppuccin')
-			vim.cmd.Catppuccin('mocha')
-		end,
 	},
 	'github/copilot.vim',
 	'shime/vim-livedown',
