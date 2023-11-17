@@ -91,3 +91,16 @@ vim.keymap.set('n', '<leader>ms', function()
 	vim.cmd('mksession! ' .. target)
 	print('session saved to ' .. target)
 end, { silent = true, desc = '[m]ake [s]ession' })
+
+vim.keymap.set(
+	'v',
+	'<leader>ip',
+	'<Plug>(nvim-surround-visual)`<Plug>(nvim-surround-normal)i`}i$<ESC>',
+	{ silent = false, noremap = true, desc = 'interpolate string' }
+)
+vim.keymap.set(
+	'n',
+	'<leader>ir',
+	'<Plug>(nvim-surround-delete)`x<Plug>(nvim-surround-delete)}',
+	{ silent = false, noremap = true, desc = 'remove interpolation' }
+)
