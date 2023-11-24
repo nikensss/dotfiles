@@ -247,12 +247,15 @@ require('lazy').setup({
 		dependencies = { 'nvim-treesitter/nvim-treesitter' },
 		keys = { '<leader>mm' },
 		config = function()
-			require('treesj').setup({})
+			require('treesj').setup({
+				use_default_keymaps = false,
+			})
+
 			vim.keymap.set(
 				'n',
 				'<leader>mm',
 				require('treesj').toggle,
-				{ silent = true, noremap = true, desc = '[treesj] oneline text object' }
+				{ silent = true, noremap = true, desc = '[treesj] toogle one-lining' }
 			)
 		end,
 	},
