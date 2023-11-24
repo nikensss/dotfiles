@@ -90,10 +90,7 @@ local function show_available_sessions(on_selection)
 		hidden = true,
 		no_ignore = true,
 		find_command = { 'find', '.', '-type', 'f', '-name', '*.session' },
-		layout_strategy = 'vertical',
 		layout_config = {
-			mirror = true,
-			width = 0.5,
 			prompt_position = 'top',
 		},
 		attach_mappings = function(prompt_bufnr, map)
