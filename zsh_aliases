@@ -7,6 +7,12 @@ alias py='python'
 alias cve='python -m venv --system-site-packages ./venv'
 alias ave='source venv/bin/activate'
 
+# cherry
+alias show-cherry='ps aux | grep "cherry.*src/app/start" | grep -v "grep"'
+alias sc='show-cherry'
+alias kill-cherry='show-cherry | perl -pe "s/ricard *(\d*) .*$/\1/" | xargs -I {} kill -9 {}'
+alias kc='kill-cherry'
+
 # node.js
 alias rmnm='rm -rf node_modules'
 alias i='npm ci'
