@@ -2,19 +2,19 @@ local conform = require('conform')
 
 conform.setup({
 	formatters_by_ft = {
-		css = { { 'prettier' } },
-		graphql = { { 'prettier' } },
-		html = { { 'prettier' } },
-		javascript = { { 'prettier' } },
-		javascriptreact = { { 'prettier' } },
-		json = { { 'prettier' } },
+		css = { { 'prettierd', 'prettier' } },
+		graphql = { { 'prettierd', 'prettier' } },
+		html = { { 'prettierd', 'prettier' } },
+		javascript = { { 'prettierd', 'prettier' } },
+		javascriptreact = { { 'prettierd', 'prettier' } },
+		json = { { 'prettierd', 'prettier' } },
 		lua = { 'stylua' },
-		markdown = { { 'prettier' } },
+		markdown = { { 'prettierd', 'prettier' } },
 		python = { 'isort', 'black' },
 		sql = { 'sleek' },
-		typescript = { { 'prettier' } },
-		typescriptreact = { { 'prettier' } },
-		yaml = { { 'prettier' } },
+		typescript = { { 'prettierd', 'prettier' } },
+		typescriptreact = { { 'prettierd', 'prettier' } },
+		yaml = { { 'prettierd', 'prettier' } },
 	},
 	format_on_save = {
 		lsp_fallback = true,
@@ -28,7 +28,7 @@ conform.setup({
 	},
 })
 
-vim.keymap.set({ 'n', 'v' }, '<leader>ff', function()
+vim.keymap.set({ 'n', 'v' }, '<leader>mp', function()
 	conform.format({
 		lsp_fallback = true,
 		async = false,
