@@ -149,6 +149,7 @@ require('lazy').setup({
 			'nvim-neotest/neotest-plenary',
 			'nvim-neotest/neotest-vim-test',
 			'nvim-neotest/neotest-jest',
+			'rouge8/neotest-rust',
 		},
 	},
 	'jiangmiao/auto-pairs',

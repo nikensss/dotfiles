@@ -154,6 +154,8 @@ lspconfig['lua_ls'].setup({
 
 local rt = require('rust-tools')
 
+-- local codelldb_path = '~/.local/share/nvim/mason/bin'
+
 rt.setup({
 	server = {
 		on_attach = function(_, bufnr)
