@@ -6,10 +6,40 @@ neotest.setup({
 			jestConfigFile = function()
 				local file = vim.fn.expand('%:p')
 				if string.find(file, '/packages/') then
-					return string.match(file, '(.-/[^/]+/)src') .. 'jest.config.js'
+					local tsjestjs = string.match(file, '(.-/[^/]+/)src') .. 'ts-jest.config.js'
+					if vim.fn.filereadable(vim.fn.expand(tsjestjs)) == 1 then
+						return tsjestjs
+					end
+
+					local tsjestjson = string.match(file, '(.-/[^/]+/)src') .. 'ts-jest.config.json'
+					if vim.fn.filereadable(vim.fn.expand(tsjestjson)) == 1 then
+						return tsjestjson
+					end
+
+					local jestjs = string.match(file, '(.-/[^/]+/)src') .. 'jest.config.js'
+					if vim.fn.filereadable(vim.fn.expand(jestjs)) == 1 then
+						return jestjs
+					end
+
+					return string.match(file, '(.-/[^/]+/)src') .. 'jest.config.json'
 				end
 
-				return vim.fn.getcwd() .. '/jest.config.js'
+				local tsjestjs = vim.fn.getcwd() .. '/ts-jest.config.js'
+				if vim.fn.filereadable(vim.fn.expand(tsjestjs)) == 1 then
+					return tsjestjs
+				end
+
+				local tsjestjson = vim.fn.getcwd() .. '/ts-jest.config.json'
+				if vim.fn.filereadable(vim.fn.expand(tsjestjson)) == 1 then
+					return tsjestjson
+				end
+
+				local jestjs = vim.fn.getcwd() .. '/jest.config.js'
+				if vim.fn.filereadable(vim.fn.expand(jestjs)) == 1 then
+					return jestjs
+				end
+
+				return vim.fn.getcwd() .. '/jest.config.json'
 			end,
 			cwd = function()
 				local file = vim.fn.expand('%:p')
