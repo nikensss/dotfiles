@@ -18,6 +18,14 @@ function M.get_branch_name()
 	end
 end
 
+function M.get_session_path()
+	local fixed_branch_name = string.gsub(M.get_branch_name(), '/', '_')
+	local session_name = M.get_current_folder_name() .. '__' .. fixed_branch_name .. '.session'
+	local session_path = vim.fn.expand('~/.config/nvim/' .. session_name)
+
+	return session_path
+end
+
 function M.get_buffers_in_tabs()
 	local tabs_buffers = {}
 	local tabs = vim.api.nvim_list_tabpages()

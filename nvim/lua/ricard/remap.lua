@@ -2,8 +2,7 @@ local telescope = require('telescope.builtin')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 
-local get_current_folder_name = require('ricard.functions').get_current_folder_name
-local get_branch_name = require('ricard.functions').get_branch_name
+local get_session_path = require('ricard.functions').get_session_path
 
 vim.g.mapleader = ' '
 
@@ -111,10 +110,10 @@ local function pick_session()
 end
 
 vim.keymap.set('n', '<leader>ls', function()
-	local session = '~/.config/nvim/' .. get_current_folder_name() .. '__' .. get_branch_name() .. '.session'
-	if vim.fn.filereadable(vim.fn.expand(session)) == 1 then
-		vim.cmd('source ' .. session)
-		print('loaded session from ' .. session)
+	local session_path = get_session_path()
+	if vim.fn.filereadable(vim.fn.expand(session_path)) == 1 then
+		vim.cmd('source ' .. session_path)
+		print('loaded session from ' .. session_path)
 	else
 		pick_session()
 	end
@@ -123,10 +122,9 @@ end, { silent = true, desc = '[l]oad [s]ession' })
 vim.keymap.set('n', '<leader>ps', pick_session, { silent = true, desc = '[p]ick [s]ession' })
 
 vim.keymap.set('n', '<leader>ms', function()
-	local target =
-		vim.fn.expand('~/.config/nvim/' .. get_current_folder_name() .. '__' .. get_branch_name() .. '.session')
-	vim.cmd('mksession! ' .. target)
-	print('session saved to ' .. target)
+	local session_path = get_session_path()
+	vim.cmd('mksession! ' .. session_path)
+	print('session saved to ' .. session_path)
 end, { silent = true, desc = '[m]ake [s]ession' })
 
 vim.keymap.set(
