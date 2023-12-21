@@ -85,10 +85,10 @@ describe('index', () => {
 _EOF_
 
   npx tsc --init --target ES2021 --outDir './dist' 
-  # we can't pipe from one file to itself, so we use that chance to build the simple config, tsconfig.test.json
-  # and from that we build the stricter one, that one that only includes src, tsconfig.json
-  cat tsconfig.json | perl -pe 's/(^.*)\/\*.*\*\/(.*$)/\1\2/;s/(^.*)\/\/.*$/\1/' > tsconfig.test.json
-  cat tsconfig.test.json | jq '.include = ["src"]' > tsconfig.json
+  # we can't pipe from one file to itself, so we use that chance to build the tsconfig.test.json
+  cat tsconfig.json | jq '.include = ["src","test"]' > tsconfig.test.json
+  cp tsconfig.test.json tsconfig.json
+  echo '{ "extends": "./tsconfig.json" }' > tsconfig.test.json
 
   mkdir src
   touch src/env.ts
@@ -97,7 +97,7 @@ _EOF_
 import { z } from 'zod';
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('production')
 });
 
 export const env = envSchema.parse(process.env);
@@ -106,13 +106,13 @@ _EOF_
   cat << _EOF_ >> src/index.ts
 import { env } from './env'; 
 
-const main = async (): Promise<void> => {
-  console.log('Hello, World!', { env });
-};
-
 main()
   .then(() => console.log('Done!'))
   .catch(console.error);
+
+async function main(): Promise<void> {
+  console.log('Hello, World!', { env });
+};
 _EOF_
 
   echo "import '@total-typescript/ts-reset';" > reset.d.ts
