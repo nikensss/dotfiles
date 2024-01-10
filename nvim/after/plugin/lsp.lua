@@ -32,6 +32,7 @@ local on_attach = function(_, bufnr)
 
 	opts.desc = 'Show LSP definitions'
 	keymap.set('n', 'gd', '<cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
+	keymap.set('n', '<C-g><C-d>', '<C-w><C-v><cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
 
 	opts.desc = 'Show LSP type definitions'
 	keymap.set('n', 'gy', '<cmd>Lspsaga goto_type_definition<CR>', opts) -- show lsp type definitions
