@@ -1,5 +1,4 @@
 -- import lspconfig plugin
-local lspconfig = require('lspconfig')
 require('lspsaga').setup({
 	finder = {
 		methods = {
@@ -14,6 +13,7 @@ require('lspsaga').setup({
 -- lsp status report
 require('fidget').setup()
 
+local lspconfig = require('lspconfig')
 -- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
@@ -22,6 +22,8 @@ local keymap = vim.keymap -- for conciseness
 local opts = { noremap = true, silent = true }
 local on_attach = function(_, bufnr)
 	opts.buffer = bufnr
+
+	print('setting Lspsaga keybinds...')
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'
@@ -81,6 +83,8 @@ local on_attach = function(_, bufnr)
 
 	opts.desc = 'Restart LSP'
 	keymap.set('n', '<leader>rs', ':LspRestart<CR>', opts) -- mapping to restart lsp if necessary
+
+	print('Lspsaga keybinds set!')
 end
 
 -- used to enable autocompletion (assign to every lsp server config)
@@ -179,3 +183,6 @@ vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsSortImports, { desc = '[ts-too
 vim.keymap.set('n', '<leader>tsr', vim.cmd.TSToolsRemoveUnused, { desc = '[ts-tools] remove unused statements' })
 vim.keymap.set('n', '<leader>tsx', vim.cmd.TSToolsRemoveUnusedImports, { desc = '[ts-tools] remove unused imports' })
 vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, { desc = '[ts-tools] add missing imports' })
+vim.keymap.set('n', '<leader>tsk', function()
+	on_attach(nil, vim.api.nvim_get_current_buf())
+end, { desc = '[ts-tools] add missing imports' })
