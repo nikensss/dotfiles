@@ -172,6 +172,11 @@ rt.setup({
 -- typescript-tools
 require('typescript-tools').setup({
 	on_attach = on_attach,
+	settings = {
+		tsserver_file_preferences = {
+			importModuleSpecifierPreference = 'non-relative',
+		},
+	},
 })
 
 vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, { desc = '[ts-tools] organize imports' })
