@@ -1,4 +1,5 @@
-local telescope = require('telescope.builtin')
+local telescope_builtin = require('telescope.builtin')
+local pickers = require('telescope.pickers')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 
@@ -46,44 +47,94 @@ vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
 vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR>a')
 
 -- colorschemes
-vim.keymap.set('n', '<leader><leader>ca', function()
-	vim.cmd.colorscheme('catppuccin')
-	vim.cmd.Catppuccin('mocha')
-end)
+local function theme_picker()
+	local themes = {
+		{
+			name = 'catppuccin - mocha',
+			activate = function()
+				vim.cmd.colorscheme('catppuccin')
+				vim.cmd.Catppuccin('mocha')
+			end,
+		},
+		{
+			name = 'catppuccin - macchiato',
+			activate = function()
+				vim.cmd.colorscheme('catppuccin')
+				vim.cmd.Catppuccin('macchiato')
+			end,
+		},
+		{
+			name = 'catppuccin - frappe',
+			activate = function()
+				vim.cmd.colorscheme('catppuccin')
+				vim.cmd.Catppuccin('frappe')
+			end,
+		},
+		{
+			name = 'catppuccin - latte',
+			activate = function()
+				vim.cmd.colorscheme('catppuccin')
+				vim.cmd.Catppuccin('latte')
+			end,
+		},
+		{
+			name = 'tokyonight - night',
+			activate = function()
+				vim.cmd.colorscheme('tokyonight-night')
+			end,
+		},
+		{
+			name = 'tokyonight - storm',
+			activate = function()
+				vim.cmd.colorscheme('tokyonight-storm')
+			end,
+		},
+		{
+			name = 'tokyonight - moon',
+			activate = function()
+				vim.cmd.colorscheme('tokyonight-moon')
+			end,
+		},
+		{
+			name = 'tokyonight - day',
+			activate = function()
+				vim.cmd.colorscheme('tokyonight-day')
+			end,
+		},
+	}
 
-vim.keymap.set('n', '<leader><leader>cb', function()
-	vim.cmd.colorscheme('catppuccin')
-	vim.cmd.Catppuccin('macchiato')
-end)
+	local names = {}
+	for _, theme in ipairs(themes) do
+		table.insert(names, theme.name)
+	end
 
-vim.keymap.set('n', '<leader><leader>cc', function()
-	vim.cmd.colorscheme('catppuccin')
-	vim.cmd.Catppuccin('frappe')
-end)
+	pickers
+		.new({}, {
+			prompt_title = 'Themes',
+			finder = require('telescope.finders').new_table({ results = names }),
+			sorter = require('telescope.config').values.generic_sorter({}),
+			attach_mappings = function(prompt_bufnr, _)
+				actions.select_default:replace(function()
+					local selection = action_state.get_selected_entry()
+					actions.close(prompt_bufnr)
+					for _, theme in ipairs(themes) do
+						if theme.name == selection.value then
+							theme.activate()
+							break
+						end
+					end
+				end)
 
-vim.keymap.set('n', '<leader><leader>cd', function()
-	vim.cmd.colorscheme('catppuccin')
-	vim.cmd.Catppuccin('latte')
-end)
+				return true
+			end,
+		})
+		:find()
+end
 
-vim.keymap.set('n', '<leader><leader>ta', function()
-	vim.cmd.colorscheme('tokyonight-night')
-end)
-
-vim.keymap.set('n', '<leader><leader>tb', function()
-	vim.cmd.colorscheme('tokyonight-storm')
-end)
-
-vim.keymap.set('n', '<leader><leader>tc', function()
-	vim.cmd.colorscheme('tokyonight-moon')
-end)
-
-vim.keymap.set('n', '<leader><leader>td', function()
-	vim.cmd.colorscheme('tokyonight-day')
-end)
+vim.keymap.set('n', '<leader><leader>tp', theme_picker, { silent = true, desc = '[t]heme [p]icker' })
 
 local function show_available_sessions(on_selection)
-	telescope.find_files({
+	telescope_builtin.find_files({
 		prompt_title = 'Available sessions',
 		cwd = '~/.config/nvim/',
 		hidden = true,
