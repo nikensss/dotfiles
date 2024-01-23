@@ -27,7 +27,6 @@ mason_lspconfig.setup({
 		'prismals',
 		'pyright',
 		'rust_analyzer',
-		'sqlls',
 	},
 	-- auto-install configured servers (with lspconfig)
 	automatic_installation = true, -- not the same as ensure_installed
@@ -41,6 +40,5 @@ mason_tool_installer.setup({
 		'prettier', -- prettier formatter
 		'pylint', -- python linter
 		'stylua', -- lua formatter
-		'sql-formatter', -- sql formatter
 	},
 })
