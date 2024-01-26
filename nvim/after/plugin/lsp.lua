@@ -112,6 +112,12 @@ lspconfig['prismals'].setup({
 	on_attach = on_attach,
 })
 
+-- configure tailwind css server
+lspconfig['tailwindcss'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
 -- configure graphql language server
 lspconfig['graphql'].setup({
 	capabilities = capabilities,
