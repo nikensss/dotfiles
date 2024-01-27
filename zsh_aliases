@@ -42,7 +42,7 @@ alias please='sudo'
 alias slogin='/usr/local/bin/zsh --login'
 alias caff='caffeinate -i'
 alias st='networkQuality -v'
-alias la='exa --long --all --git --icons'
+alias la='ls -la'
 alias cal='gcal --starting-day=1'
 
 # cd
