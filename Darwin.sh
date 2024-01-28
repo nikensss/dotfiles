@@ -54,8 +54,6 @@ cd repos
 
 echo "${GREEN}installing node-debug2${RESET}"
 cd ~/repos
-mkdir javascript
-cd javascript
 git clone https://github.com/microsoft/vscode-node-debug2.git
 cd vscode-node-debug2
 npm ci
