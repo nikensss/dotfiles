@@ -163,6 +163,11 @@ local rt = require('rust-tools')
 
 -- local codelldb_path = '~/.local/share/nvim/mason/bin'
 
+HOME_PATH = os.getenv('HOME') .. '/'
+MASON_PATH = HOME_PATH .. '.local/share/nvim/mason/packages/'
+local codelldb_path = MASON_PATH .. 'codelldb/extension/adapter/codelldb'
+local liblldb_path = MASON_PATH .. 'codelldb/extension/lldb/lib/liblldb.dylib'
+
 rt.setup({
 	server = {
 		on_attach = function(_, bufnr)
@@ -172,6 +177,9 @@ rt.setup({
 			-- Code action groups
 			-- keymap.set('n', '<leader>ca', rt.code_action_group.code_action_group, { buffer = bufnr })
 		end,
+	},
+	dap = {
+		adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path),
 	},
 })
 
