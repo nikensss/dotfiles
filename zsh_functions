@@ -106,13 +106,13 @@ _EOF_
   cat << _EOF_ >> src/index.ts
 import { env } from './env'; 
 
-main()
-  .then(() => console.log('Done!'))
-  .catch(console.error);
-
 async function main(): Promise<void> {
   console.log('Hello, World!', { env });
 };
+
+main()
+  .then(() => console.log('Done!'))
+  .catch(console.error);
 _EOF_
 
   echo "import '@total-typescript/ts-reset';" > reset.d.ts
