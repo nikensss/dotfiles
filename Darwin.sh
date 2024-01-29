@@ -36,6 +36,8 @@ fi
 
 brew update
 brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@14 luarocks gnu-sed pnpm fd fzf tidy-html5 cargo-nextest tailspin
+brew tap oven-sh/bun 
+brew install bun
 brew upgrade
 
 fnm install --lts
@@ -73,9 +75,6 @@ if [ ! -d ~/repos/vscode-node-debug2 ]; then
   npm ci
   NODE_OPTIONS=--no-experimental-fetch npm run build
 fi
-
-echo "${GREEN}installing bun${RESET}"
-curl -fsSL https://bun.sh/install | bash
 
 if [ ! -d ~/.oh-my-zsh ]; then
   echo "${GREEN}installing oh-my-zsh${RESET}"
