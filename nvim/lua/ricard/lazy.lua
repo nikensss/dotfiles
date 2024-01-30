@@ -76,7 +76,6 @@ require('lazy').setup({
 					require('lsp-file-operations').setup()
 				end,
 			},
-			'j-hui/fidget.nvim',
 		},
 	},
 	{
@@ -108,7 +107,7 @@ require('lazy').setup({
 	{
 		'APZelos/blamer.nvim',
 		init = function()
-			vim.g.blamer_enabled = 1
+			vim.g.blamer_enabled = 0
 			vim.g.blamer_delay = 700
 			vim.g.blamer_show_in_insert_modes = 1
 			vim.g.blamer_show_in_visual_modes = 0
@@ -206,14 +205,6 @@ require('lazy').setup({
 		'pmizio/typescript-tools.nvim',
 		dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
 		opts = {},
-	},
-	{
-		'nvimdev/lspsaga.nvim',
-		config = function() end,
-		dependencies = {
-			'nvim-treesitter/nvim-treesitter', -- optional
-			'nvim-tree/nvim-web-devicons', -- optional
-		},
 	},
 	{
 		'rest-nvim/rest.nvim',
@@ -331,5 +322,25 @@ require('lazy').setup({
 			vim.keymap.set('n', '<leader>ut', '<cmd>UndotreeToggle<cr>', options)
 			vim.g.undotree_SetFocusWhenToggle = 1
 		end,
+	},
+	{
+		'aznhe21/actions-preview.nvim',
+		config = function()
+			vim.keymap.set({ 'v', 'n' }, 'gf', require('actions-preview').code_actions)
+		end,
+	},
+	{
+		'stevearc/dressing.nvim',
+		opts = {},
+	},
+	-- lazy.nvim
+	{
+		'folke/noice.nvim',
+		event = 'VeryLazy',
+		opts = {},
+		dependencies = {
+			'MunifTanjim/nui.nvim',
+			'rcarriga/nvim-notify',
+		},
 	},
 })

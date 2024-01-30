@@ -22,8 +22,8 @@ vim.keymap.set('n', '<leader>sb', builtin.buffers, options)
 options.desc = '[s]earch [h]elp'
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, options)
 
-options.desc = '[s]how [d]iagnostics'
-vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
+-- options.desc = '[s]how [d]iagnostics'
+-- vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
 
 options.desc = '[s]earch in [c]urrent buffer (fuzzy find)'
 vim.keymap.set('n', '<leader>sc', builtin.current_buffer_fuzzy_find, options)
@@ -42,6 +42,9 @@ vim.keymap.set('n', '<leader>sw', builtin.lsp_workspace_symbols, options)
 
 options.desc = 'dynamic workspace [[s]]ymbols'
 vim.keymap.set('n', '<leader>ss', builtin.lsp_dynamic_workspace_symbols, options)
+
+options.desc = '[s]how [j]umplist'
+vim.keymap.set('n', '<leader>sj', builtin.jumplist, options)
 
 require('telescope').setup({
 	defaults = {
@@ -63,3 +66,4 @@ require('telescope').setup({
 })
 
 require('telescope').load_extension('git_worktree')
+require('telescope').load_extension('noice')

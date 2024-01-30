@@ -1,18 +1,3 @@
--- import lspconfig plugin
-require('lspsaga').setup({
-	finder = {
-		methods = {
-			tyd = 'textDocument/typeDefinition',
-		},
-	},
-	outline = {
-		close_after_jump = true,
-	},
-})
-
--- lsp status report
-require('fidget').setup()
-
 local lspconfig = require('lspconfig')
 -- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
@@ -25,56 +10,47 @@ local on_attach = function(_, bufnr)
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'
-	keymap.set('n', 'gr', '<cmd>Lspsaga finder ref+imp+def+tyd<CR>', opts) -- show definition, references
+	keymap.set('n', 'gr', '<cmd>Telescope lsp_references<CR>', opts) -- show definition, references
 
 	opts.desc = 'Go to declaration'
 	keymap.set('n', 'gD', vim.lsp.buf.declaration, opts) -- go to declaration
 
 	opts.desc = 'Show LSP definitions'
-	keymap.set('n', 'gd', '<cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
-	keymap.set('n', '<C-g><C-d>', '<C-w><C-v><cmd>Lspsaga goto_definition<CR>', opts) -- show lsp definitions
+	keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<CR>', opts) -- show lsp definitions
+	keymap.set('n', '<C-g><C-d>', '<C-w><C-v><cmd>Telescope lsp_definitions<CR>', opts) -- show lsp definitions
 
 	opts.desc = 'Show LSP type definitions'
-	keymap.set('n', 'gy', '<cmd>Lspsaga goto_type_definition<CR>', opts) -- show lsp type definitions
-
-	opts.desc = 'Peek LSP definitions'
-	keymap.set('n', '<leader>pd', '<cmd>Lspsaga peek_definition<CR>', opts) -- show lsp definitions
-
-	opts.desc = 'Show LSP type definitions'
-	keymap.set('n', '<leader>py', '<cmd>Lspsaga peek_type_definition<CR>', opts) -- show lsp type definitions
+	keymap.set('n', 'gy', '<cmd>Telescope lsp_type_definitions<CR>', opts) -- show lsp type definitions
 
 	opts.desc = 'Show LSP implementations'
-	keymap.set('n', 'gi', '<cmd>Lspsaga finder imp<CR>', opts) -- show lsp implementations
-
-	opts.desc = 'Show outline'
-	keymap.set('n', 'go', '<cmd>Lspsaga outline<CR>', opts) -- show outline
+	keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>', opts) -- show lsp implementations
 
 	opts.desc = 'Show incoming calls'
-	keymap.set('n', 'gj', '<cmd>Lspsaga incoming_calls<CR>', opts) -- show outline
+	keymap.set('n', 'gj', '<cmd>Telescope lsp_incoming_calls<CR>', opts) -- show outline
 
 	opts.desc = 'Show outgoing calls'
-	keymap.set('n', 'gk', '<cmd>Lspsaga outgoing_calls<CR>', opts) -- show outline
+	keymap.set('n', 'gk', '<cmd>Telescope lsp_outgoing_calls<CR>', opts) -- show outline
 
-	opts.desc = 'See available code actions'
-	keymap.set({ 'n', 'v' }, '<leader>ca', '<cmd>Lspsaga code_action<CR>', opts) -- see available code actions, in visual mode will apply to selection
+	-- opts.desc = 'See available code actions'
+	-- keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
 
 	opts.desc = 'Smart rename'
-	keymap.set('n', '<leader>rn', '<cmd>Lspsaga rename<CR>', opts) -- smart rename
+	keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts) -- smart rename
 
 	opts.desc = 'Show buffer diagnostics'
-	keymap.set('n', '<leader>sd', '<cmd>Lspsaga show_buf_diagnostics<CR>', opts) -- show  diagnostics for file
+	keymap.set('n', '<leader>sd', '<cmd>Telescope diagnostics bufnr=0<CR>', opts) -- show  diagnostics for file
 
 	opts.desc = 'Show line diagnostics'
-	keymap.set('n', '<leader>ld', '<cmd>Lspsaga show_line_diagnostics<CR>', opts) -- show diagnostics for line
+	keymap.set('n', '<leader>ld', vim.diagnostic.open_float, opts) -- show diagnostics for line
 
 	opts.desc = 'Go to previous diagnostic'
-	keymap.set('n', '[d', '<cmd>Lspsaga diagnostic_jump_prev<CR>', opts) -- jump to previous diagnostic in buffer
+	keymap.set('n', '[d', vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
 
 	opts.desc = 'Go to next diagnostic'
-	keymap.set('n', ']d', '<cmd>Lspsaga diagnostic_jump_next<CR>', opts) -- jump to next diagnostic in buffer
+	keymap.set('n', ']d', vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
 	opts.desc = 'Show documentation for what is under cursor'
-	keymap.set('n', 'K', '<cmd>Lspsaga hover_doc<CR>', opts) -- show documentation for what is under cursor
+	keymap.set('n', 'K', vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
 	opts.desc = 'Signature help'
 	keymap.set('i', '<C-k>', vim.lsp.buf.signature_help, opts) -- show documentation for what is under cursor
