@@ -138,7 +138,6 @@ local function show_available_sessions(on_selection)
 		prompt_title = 'Available sessions',
 		cwd = '~/.config/nvim/',
 		hidden = true,
-		no_ignore = true,
 		find_command = { 'find', '.', '-type', 'f', '-name', '*.session' },
 		layout_config = {
 			prompt_position = 'top',
