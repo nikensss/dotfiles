@@ -196,8 +196,7 @@ require('typescript-tools').setup({
 })
 
 local format_diagnostic_message = function(diagnostic)
-	local severity = get_key_from_table(vim.diagnostic.severity, diagnostic.severity)
-
+	local severity = vim.diagnostic.severity[diagnostic.severity]
 	return string.format('[%s] %s (%s)', severity, diagnostic.message, diagnostic.source)
 end
 
@@ -209,9 +208,7 @@ vim.diagnostic.config({
 		source = false,
 		header = '',
 		prefix = '',
-		format = function(diagnostic)
-			return format_diagnostic_message(diagnostic)
-		end,
+		format = format_diagnostic_message,
 	},
 	virtual_text = {
 		spacing = 2,

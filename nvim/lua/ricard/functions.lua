@@ -60,14 +60,4 @@ function M.find_tab_with_buffer(buffer_name)
 	return nil
 end
 
-function M.get_key_from_table(table, value)
-	for k, v in pairs(table) do
-		if v == value then
-			return k
-		end
-	end
-
-	return nil
-end
-
 return M
