@@ -194,3 +194,23 @@ fni(){
   echo $GLOBAL_PACKAGES | xargs npm i -g
 }
 
+_npm_run_completion() {
+  if [[ ! -f package.json ]]; then
+    return 0
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    return 0
+  fi
+
+  if ! jq -e '.scripts' package.json &> /dev/null; then
+    return 0
+  fi
+
+  local -a script_names
+  script_names=($(jq -r '.scripts | keys[]' package.json))
+
+  _describe 'script' script_names
+}
+
+compdef _npm_run_completion "npm run"
