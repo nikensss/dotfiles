@@ -1,3 +1,4 @@
+local get_key_from_table = require('ricard.functions').get_key_from_table
 local lspconfig = require('lspconfig')
 -- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
@@ -164,7 +165,29 @@ rt.setup({
 
 -- typescript-tools
 require('typescript-tools').setup({
-	on_attach = on_attach,
+	on_attach = function(_, bufnr)
+		on_attach(_, bufnr)
+
+		local options = { desc = '[ts-tools] organize imports' }
+		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
+
+		options = { desc = '[ts-tools] organize imports' }
+		vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsSortImports, options)
+
+		options = { desc = '[ts-tools] remove unused statements' }
+		vim.keymap.set('n', '<leader>tsr', vim.cmd.TSToolsRemoveUnused, options)
+
+		options = { desc = '[ts-tools] fix current file' }
+		vim.keymap.set('n', '<leader>tsx', vim.cmd.TSToolsRemoveUnusedImports, options)
+
+		options = { desc = '[ts-tools] add missing imports' }
+		vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, options)
+
+		options = { desc = '[ts-tools] re-attach lsp' }
+		vim.keymap.set('n', '<leader>tsk', function()
+			on_attach(nil, vim.api.nvim_get_current_buf())
+		end, options)
+	end,
 	settings = {
 		tsserver_file_preferences = {
 			importModuleSpecifierPreference = 'non-relative',
@@ -172,11 +195,26 @@ require('typescript-tools').setup({
 	},
 })
 
-vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, { desc = '[ts-tools] organize imports' })
-vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsSortImports, { desc = '[ts-tools] sort imports' })
-vim.keymap.set('n', '<leader>tsr', vim.cmd.TSToolsRemoveUnused, { desc = '[ts-tools] remove unused statements' })
-vim.keymap.set('n', '<leader>tsx', vim.cmd.TSToolsRemoveUnusedImports, { desc = '[ts-tools] remove unused imports' })
-vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, { desc = '[ts-tools] add missing imports' })
-vim.keymap.set('n', '<leader>tsk', function()
-	on_attach(nil, vim.api.nvim_get_current_buf())
-end, { desc = '[ts-tools] add missing imports' })
+local format_diagnostic_message = function(diagnostic)
+	local severity = get_key_from_table(vim.diagnostic.severity, diagnostic.severity)
+
+	return string.format('[%s] %s (%s)', severity, diagnostic.message, diagnostic.source)
+end
+
+vim.diagnostic.config({
+	float = {
+		focusable = false,
+		style = 'minimal',
+		border = 'rounded',
+		source = false,
+		header = '',
+		prefix = '',
+		format = function(diagnostic)
+			return format_diagnostic_message(diagnostic)
+		end,
+	},
+	virtual_text = {
+		spacing = 2,
+		format = format_diagnostic_message,
+	},
+})
