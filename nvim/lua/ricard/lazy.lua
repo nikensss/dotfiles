@@ -339,7 +339,14 @@ require('lazy').setup({
 	{
 		'folke/noice.nvim',
 		event = 'VeryLazy',
-		opts = {},
+		opts = {
+			views = {
+				hover = {
+					border = { style = 'rounded' },
+					position = { row = 2 },
+				},
+			},
+		},
 		dependencies = {
 			'MunifTanjim/nui.nvim',
 			'rcarriga/nvim-notify',
