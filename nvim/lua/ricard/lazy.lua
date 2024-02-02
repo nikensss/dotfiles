@@ -346,6 +346,16 @@ require('lazy').setup({
 					position = { row = 2 },
 				},
 			},
+			routes = {
+				{
+					filter = {
+						event = 'msg_show',
+						kind = '',
+						find = 'written',
+					},
+					opts = { skip = true },
+				},
+			},
 		},
 		dependencies = {
 			'MunifTanjim/nui.nvim',
