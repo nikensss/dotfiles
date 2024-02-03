@@ -48,6 +48,12 @@ vim.keymap.set('n', '<leader>ss', builtin.lsp_dynamic_workspace_symbols, options
 options.desc = '[s]how [j]umplist'
 vim.keymap.set('n', '<leader>sj', builtin.jumplist, options)
 
+options.desc = '[s]how [n]otifications'
+vim.keymap.set('n', '<leader>sn', ':Telescope notify<CR>', options)
+
+options.desc = '[s]how [m]essages'
+vim.keymap.set('n', '<leader>sm', ':Telescope noice<CR>', options)
+
 require('telescope').setup({
 	defaults = {
 		mappings = {

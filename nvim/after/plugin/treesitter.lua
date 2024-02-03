@@ -17,6 +17,7 @@ require('nvim-treesitter.configs').setup({
 		'markdown_inline',
 		'prisma',
 		'python',
+		'regex',
 		'rust',
 		'scss',
 		'sql',
