@@ -145,6 +145,7 @@ require('lazy').setup({
 	{
 		'nvim-neotest/neotest',
 		dependencies = {
+			'nvim-treesitter/nvim-treesitter',
 			'nvim-lua/plenary.nvim',
 			'antoinemadec/FixCursorHold.nvim',
 			'nvim-neotest/neotest-plenary',

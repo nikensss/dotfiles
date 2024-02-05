@@ -1,57 +1,47 @@
 local neotest = require('neotest')
 neotest.setup({
 	adapters = {
-		require('neotest-rust')({}),
 		require('neotest-jest')({
 			jestConfigFile = function()
 				local file = vim.fn.expand('%:p')
+
+				local configFiles = {
+					'ts-jest.config.js',
+					'ts-jest.config.json',
+					'jest.config.js',
+					'jest.config.json',
+				}
+
 				if string.find(file, '/packages/') then
-					local tsjestjs = string.match(file, '(.-/[^/]+/)src') .. 'ts-jest.config.js'
-					if vim.fn.filereadable(vim.fn.expand(tsjestjs)) == 1 then
-						return tsjestjs
+					for _, configFile in ipairs(configFiles) do
+						local jestConfig = string.match(file, '(.-/[^/]+/)src') .. configFile
+						if vim.fn.filereadable(vim.fn.expand(jestConfig)) == 1 then
+							return jestConfig
+						end
 					end
+				end
 
-					local tsjestjson = string.match(file, '(.-/[^/]+/)src') .. 'ts-jest.config.json'
-					if vim.fn.filereadable(vim.fn.expand(tsjestjson)) == 1 then
-						return tsjestjson
+				for _, configFile in ipairs(configFiles) do
+					local jestConfig = vim.fn.getcwd() .. '/' .. configFile
+					if vim.fn.filereadable(vim.fn.expand(jestConfig)) == 1 then
+						return jestConfig
 					end
-
-					local jestjs = string.match(file, '(.-/[^/]+/)src') .. 'jest.config.js'
-					if vim.fn.filereadable(vim.fn.expand(jestjs)) == 1 then
-						return jestjs
-					end
-
-					return string.match(file, '(.-/[^/]+/)src') .. 'jest.config.json'
 				end
-
-				local tsjestjs = vim.fn.getcwd() .. '/ts-jest.config.js'
-				if vim.fn.filereadable(vim.fn.expand(tsjestjs)) == 1 then
-					return tsjestjs
-				end
-
-				local tsjestjson = vim.fn.getcwd() .. '/ts-jest.config.json'
-				if vim.fn.filereadable(vim.fn.expand(tsjestjson)) == 1 then
-					return tsjestjson
-				end
-
-				local jestjs = vim.fn.getcwd() .. '/jest.config.js'
-				if vim.fn.filereadable(vim.fn.expand(jestjs)) == 1 then
-					return jestjs
-				end
-
-				return vim.fn.getcwd() .. '/jest.config.json'
 			end,
 			cwd = function()
 				local file = vim.fn.expand('%:p')
+
 				if string.find(file, '/packages/') then
 					return string.match(file, '(.-/[^/]+/)src')
 				end
+
 				return vim.fn.getcwd()
 			end,
 		}),
+		require('neotest-rust')({}),
 		require('neotest-plenary'),
 		require('neotest-vim-test')({
-			ignore_file_types = { 'javascript', 'typescript', 'vim', 'lua' },
+			ignore_file_types = { 'javascript', 'typescript', 'vim', 'lua', 'rs' },
 		}),
 	},
 })
