@@ -38,7 +38,7 @@ neotest.setup({
 				return vim.fn.getcwd()
 			end,
 		}),
-		require('neotest-rust')({}),
+		require('rustaceanvim.neotest'),
 		require('neotest-plenary'),
 		require('neotest-vim-test')({
 			ignore_file_types = { 'javascript', 'typescript', 'vim', 'lua', 'rs' },

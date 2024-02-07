@@ -78,6 +78,10 @@ require('lazy').setup({
 					require('lsp-file-operations').setup()
 				end,
 			},
+			{
+				'lvimuser/lsp-inlayhints.nvim',
+				opts = {},
+			},
 		},
 	},
 	{
@@ -151,7 +155,6 @@ require('lazy').setup({
 			'nvim-neotest/neotest-plenary',
 			'nvim-neotest/neotest-vim-test',
 			'nvim-neotest/neotest-jest',
-			'rouge8/neotest-rust',
 		},
 	},
 	'jiangmiao/auto-pairs',
@@ -167,14 +170,6 @@ require('lazy').setup({
 				follow_current_file = true,
 				hijack_netrw_behavior = 'open_current',
 			},
-		},
-	},
-	{
-		'simrat39/rust-tools.nvim',
-		dependencies = {
-			'neovim/nvim-lspconfig',
-			'nvim-lua/plenary.nvim',
-			'mfussenegger/nvim-dap',
 		},
 	},
 	'mattn/emmet-vim',
@@ -404,5 +399,15 @@ require('lazy').setup({
 				require('trouble').next({ skip_groups = true, jump = true })
 			end)
 		end,
+	},
+	{
+		'mrcjkb/rustaceanvim',
+		version = '^4', -- Recommended
+		ft = { 'rust' },
+		dependencies = {
+			'lvimuser/lsp-inlayhints.nvim',
+			'nvim-lua/plenary.nvim',
+			'mfussenegger/nvim-dap',
+		},
 	},
 })

@@ -1,13 +1,14 @@
-local get_key_from_table = require('ricard.functions').get_key_from_table
 local lspconfig = require('lspconfig')
--- import cmp-nvim-lsp plugin
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
 local keymap = vim.keymap -- for conciseness
-
 local opts = { noremap = true, silent = true }
-local on_attach = function(_, bufnr)
+
+local on_attach = function(client, bufnr)
 	opts.buffer = bufnr
+
+	require('lsp-inlayhints').on_attach(client, bufnr)
+	require('lsp-inlayhints').show()
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'
@@ -139,36 +140,10 @@ lspconfig['lua_ls'].setup({
 	},
 })
 
-local rt = require('rust-tools')
-
--- local codelldb_path = '~/.local/share/nvim/mason/bin'
-
-HOME_PATH = os.getenv('HOME') .. '/'
-MASON_PATH = HOME_PATH .. '.local/share/nvim/mason/packages/'
-local codelldb_path = MASON_PATH .. 'codelldb/extension/adapter/codelldb'
-local liblldb_path = MASON_PATH .. 'codelldb/extension/lldb/lib/liblldb.dylib'
-
-rt.setup({
-	server = {
-		on_attach = function(_, bufnr)
-			on_attach(_, bufnr)
-			-- Hover actions
-			keymap.set('n', '<leader>ha', rt.hover_actions.hover_actions, { buffer = bufnr })
-			-- Code action groups
-			-- keymap.set('n', '<leader>ca', rt.code_action_group.code_action_group, { buffer = bufnr })
-
-			vim.keymap.set('n', '<leader>rd', vim.cmd.RustDebuggables, { desc = '[rust-tools] rust debuggables' })
-		end,
-	},
-	dap = {
-		adapter = require('rust-tools.dap').get_codelldb_adapter(codelldb_path, liblldb_path),
-	},
-})
-
 -- typescript-tools
 require('typescript-tools').setup({
-	on_attach = function(_, bufnr)
-		on_attach(_, bufnr)
+	on_attach = function(client, bufnr)
+		on_attach(client, bufnr)
 
 		local options = { desc = '[ts-tools] organize imports' }
 		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
@@ -187,12 +162,20 @@ require('typescript-tools').setup({
 
 		options = { desc = '[ts-tools] re-attach lsp' }
 		vim.keymap.set('n', '<leader>tsk', function()
-			on_attach(nil, vim.api.nvim_get_current_buf())
+			on_attach(client, vim.api.nvim_get_current_buf())
 		end, options)
 	end,
 	settings = {
 		tsserver_file_preferences = {
 			importModuleSpecifierPreference = 'non-relative',
+			includeInlayParameterNameHints = 'all',
+			includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+			includeInlayFunctionParameterTypeHints = true,
+			includeInlayVariableTypeHints = true,
+			includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+			includeInlayPropertyDeclarationTypeHints = true,
+			includeInlayFunctionLikeReturnTypeHints = true,
+			includeInlayEnumMemberValueHints = true,
 		},
 	},
 })
@@ -217,3 +200,54 @@ vim.diagnostic.config({
 		format = format_diagnostic_message,
 	},
 })
+
+-- rustacean.nvim
+
+HOME_PATH = os.getenv('HOME') .. '/'
+MASON_PATH = HOME_PATH .. '.local/share/nvim/mason/packages/'
+local codelldb_path = MASON_PATH .. 'codelldb/extension/adapter/codelldb'
+local liblldb_path = MASON_PATH .. 'codelldb/extension/lldb/lib/liblldb.dylib'
+
+vim.g.rustaceanvim = function()
+	local cfg = require('rustaceanvim.config')
+	return {
+		tools = {
+			hover_actions = {
+				auto_focus = true,
+			},
+		},
+		server = {
+			on_attach = function(client, bufnr)
+				on_attach(client, bufnr)
+
+				vim.keymap.set('n', '<leader>rb', function()
+					vim.cmd.RustLsp('debuggables')
+				end, { desc = '[rustaceanvim] rust debuggables' })
+
+				vim.keymap.set('n', '<leader>rl', function()
+					vim.cmd.RustLsp({ 'debuggables', bang = true })
+				end, { desc = '[rustaceanvim] rust test nearest' })
+
+				vim.keymap.set('n', '<leader>ra', function()
+					vim.cmd.RustLsp('codeAction')
+				end, { silent = true, desc = '[rustaceanvim] code actions' })
+
+				vim.keymap.set('n', '<leader>rh', function()
+					vim.cmd.RustLsp({ 'hover', 'actions' })
+				end, { silent = true, desc = '[rustaceanvim] hover actions' })
+
+				vim.keymap.set('n', '<leader>re', function()
+					vim.cmd.RustLsp('explainError')
+				end, { silent = true, desc = '[rustaceanvim] render diagnostics' })
+
+				vim.keymap.set('n', '<leader>rd', function()
+					vim.cmd.RustLsp('renderDiagnostic')
+				end, { silent = true, desc = '[rustaceanvim] render diagnostics' })
+			end,
+		},
+		-- DAP configuration
+		dap = {
+			adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
+		},
+	}
+end
