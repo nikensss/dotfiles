@@ -148,14 +148,14 @@ require('typescript-tools').setup({
 		local options = { desc = '[ts-tools] organize imports' }
 		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
 
-		options = { desc = '[ts-tools] organize imports' }
-		vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsSortImports, options)
+		options = { desc = '[ts-tools] sort imports' }
+		vim.keymap.set('n', '<leader>tsi', vim.cmd.TSToolsSortImports, options)
 
 		options = { desc = '[ts-tools] remove unused statements' }
-		vim.keymap.set('n', '<leader>tsr', vim.cmd.TSToolsRemoveUnused, options)
+		vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsRemoveUnused, options)
 
-		options = { desc = '[ts-tools] fix current file' }
-		vim.keymap.set('n', '<leader>tsx', vim.cmd.TSToolsRemoveUnusedImports, options)
+		options = { desc = '[ts-tools] remove unused imports' }
+		vim.keymap.set('n', '<leader>tsu', vim.cmd.TSToolsRemoveUnusedImports, options)
 
 		options = { desc = '[ts-tools] add missing imports' }
 		vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, options)
