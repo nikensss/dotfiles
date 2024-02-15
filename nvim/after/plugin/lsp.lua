@@ -182,7 +182,20 @@ require('typescript-tools').setup({
 
 local format_diagnostic_message = function(diagnostic)
 	local severity = vim.diagnostic.severity[diagnostic.severity]
-	return string.format('[%s] %s (%s)', severity, diagnostic.message, diagnostic.source)
+	local message = ''
+	if severity ~= nil then
+		message = string.format('[%s]', severity)
+	end
+
+	if diagnostic.message ~= nil then
+		message = string.format('%s %s', message, diagnostic.message)
+	end
+
+	if diagnostic.source ~= nil then
+		message = string.format('%s (%s)', message, diagnostic.source)
+	end
+
+	return message
 end
 
 vim.diagnostic.config({
