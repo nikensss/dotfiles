@@ -410,4 +410,10 @@ require('lazy').setup({
 			'mfussenegger/nvim-dap',
 		},
 	},
+	{
+		'chentoast/marks.nvim',
+		config = function()
+			require('marks').setup({})
+		end,
+	},
 })
