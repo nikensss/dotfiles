@@ -119,7 +119,8 @@ require('lazy').setup({
 			vim.g.blamer_show_in_visual_modes = 0
 		end,
 	},
-	'airblade/vim-gitgutter',
+
+	'lewis6991/gitsigns.nvim',
 	'christoomey/vim-sort-motion',
 	'junegunn/gv.vim',
 	{ 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
@@ -415,5 +416,19 @@ require('lazy').setup({
 		config = function()
 			require('marks').setup({})
 		end,
+	},
+	{
+		'pwntester/octo.nvim',
+		config = function()
+			require('octo').setup({ enable_builtin = true })
+		end,
+		keys = {
+			{ '<leader>O', '<cmd>Octo<CR>', desc = 'Octo' },
+		},
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope.nvim',
+			'nvim-tree/nvim-web-devicons',
+		},
 	},
 })
