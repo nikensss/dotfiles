@@ -12,7 +12,11 @@ vim.keymap.set('n', '<leader>fc', builtin.grep_string, options)
 
 options.desc = '[s]earch [f]iles'
 vim.keymap.set('n', '<leader>sf', function()
-	builtin.find_files({ hidden = true })
+	builtin.find_files({
+		file_ignore_patterns = { 'node%_modules/*', '%.git/*', '%.next/*' },
+		hidden = true,
+		no_ignore = true,
+	})
 end, options)
 
 options.desc = '[s]earch in [p]roject'

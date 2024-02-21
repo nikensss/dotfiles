@@ -109,6 +109,12 @@ require('lazy').setup({
 			'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
 			'MunifTanjim/nui.nvim',
 		},
+		opts = {
+			filesystem = {
+				follow_current_file = true,
+				hijack_netrw_behavior = 'open_current',
+			},
+		},
 	},
 	{
 		'APZelos/blamer.nvim',
@@ -159,20 +165,6 @@ require('lazy').setup({
 		},
 	},
 	'jiangmiao/auto-pairs',
-	{
-		'nvim-neo-tree/neo-tree.nvim',
-		branch = 'v2.x',
-		dependencies = {
-			'nvim-lua/plenary.nvim',
-			'MunifTanjim/nui.nvim',
-		},
-		opts = {
-			filesystem = {
-				follow_current_file = true,
-				hijack_netrw_behavior = 'open_current',
-			},
-		},
-	},
 	'mattn/emmet-vim',
 	{
 		'catppuccin/nvim',
