@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Required parameters:
+# @raycast.schemaVersion 1
+# @raycast.title npm
+# @raycast.mode compact
+
+# Optional parameters:
+# @raycast.icon 🤖
+# @raycast.argument1 { "type": "text", "placeholder": "" }
+
+# Documentation:
+# @raycast.description search package in npm
+
+PACKAGE_NAME="$1"
+
+URL="https://www.npmjs.com/package/$PACKAGE_NAME"
+
+open $URL

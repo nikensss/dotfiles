@@ -10,6 +10,7 @@ vim.g.mapleader = ' '
 vim.keymap.set('n', '<leader>w', vim.cmd.write)
 vim.keymap.set('n', '<leader>qa', vim.cmd.quitall)
 vim.keymap.set('n', '<leader>qc', vim.cmd.cclose)
+vim.keymap.set('n', '<leader>qo', vim.cmd.copen)
 
 vim.keymap.set('x', '<leader>p', [["_dP]])
 
