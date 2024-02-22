@@ -113,11 +113,6 @@ require('lazy').setup({
 			filesystem = {
 				follow_current_file = true,
 				hijack_netrw_behavior = 'open_current',
-				window = {
-					mappings = {
-						['<ESC>'] = 'quit',
-					},
-				},
 			},
 		},
 	},
@@ -371,31 +366,31 @@ require('lazy').setup({
 		config = function()
 			vim.keymap.set('n', '<leader>ee', function()
 				require('trouble').toggle()
-			end)
+			end, { desc = '[trouble] toggle' })
 
 			vim.keymap.set('n', '<leader>ew', function()
 				require('trouble').toggle('workspace_diagnostics')
-			end)
+			end, { desc = '[trouble] toggle workspace diagnostics' })
 
 			vim.keymap.set('n', '<leader>ed', function()
 				require('trouble').toggle('document_diagnostics')
-			end)
+			end, { desc = '[trouble] toggle document diagnostics' })
 
 			vim.keymap.set('n', '<leader>eq', function()
 				require('trouble').toggle('quickfix')
-			end)
+			end, { desc = '[trouble] toggle quickfix' })
 
 			vim.keymap.set('n', '<leader>el', function()
 				require('trouble').toggle('loclist')
-			end)
+			end, { desc = '[trouble] toggle loclist' })
 
 			vim.keymap.set('n', '[e', function()
 				require('trouble').previous({ skip_groups = true, jump = true })
-			end)
+			end, { desc = '[trouble] previous diagnostic' })
 
 			vim.keymap.set('n', ']e', function()
 				require('trouble').next({ skip_groups = true, jump = true })
-			end)
+			end, { desc = '[trouble] next diagnostic' })
 		end,
 	},
 	{
