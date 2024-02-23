@@ -82,6 +82,23 @@ require('lazy').setup({
 				'lvimuser/lsp-inlayhints.nvim',
 				opts = {},
 			},
+			{
+				'SmiteshP/nvim-navbuddy',
+				dependencies = {
+					'SmiteshP/nvim-navic',
+					'MunifTanjim/nui.nvim',
+				},
+				opts = { lsp = { auto_attach = true } },
+				keys = {
+					{
+						'<leader>nb',
+						function()
+							require('nvim-navbuddy').open()
+						end,
+						desc = 'Open NavBuddy',
+					},
+				},
+			},
 		},
 	},
 	{
@@ -415,7 +432,7 @@ require('lazy').setup({
 			require('octo').setup({ enable_builtin = true })
 		end,
 		keys = {
-			{ '<leader>O', '<cmd>Octo<CR>', desc = 'Octo' },
+			{ '<leader>o', '<cmd>Octo<CR>', desc = 'Octo' },
 		},
 		dependencies = {
 			'nvim-lua/plenary.nvim',
@@ -449,12 +466,7 @@ require('lazy').setup({
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300
 		end,
-		opts = {
-			-- your configuration comes here
-			--     -- or leave it empty to use the default settings
-			--         -- refer to the configuration section below
-			--
-		},
+		opts = {},
 	},
 	{
 		'windwp/nvim-ts-autotag',
@@ -463,16 +475,10 @@ require('lazy').setup({
 		end,
 	},
 	{
-		'stevearc/aerial.nvim',
-		opts = {},
-		-- Optional dependencies
-		dependencies = {
-			'nvim-treesitter/nvim-treesitter',
-			'nvim-tree/nvim-web-devicons',
-		},
-	},
-	{
 		'SmiteshP/nvim-navic',
 		requires = 'neovim/nvim-lspconfig',
+		config = function()
+			require('nvim-navic').setup()
+		end,
 	},
 })

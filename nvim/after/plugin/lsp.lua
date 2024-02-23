@@ -1,5 +1,6 @@
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
+local navbuddy = require('nvim-navbuddy')
 local navic = require('nvim-navic')
 
 local keymap = vim.keymap -- for conciseness
@@ -10,7 +11,11 @@ local on_attach = function(client, bufnr)
 
 	require('lsp-inlayhints').on_attach(client, bufnr)
 	require('lsp-inlayhints').show()
-	navic.attach(client, bufnr)
+
+	if client.server_capabilities.documentSymbolProvider then
+		navbuddy.attach(client, bufnr)
+		navic.attach(client, bufnr)
+	end
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'

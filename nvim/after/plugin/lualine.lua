@@ -1,3 +1,5 @@
+local navic = require('nvim-navic')
+
 require('lualine').setup({
 	options = {
 		icons_enabled = true,
@@ -5,6 +7,18 @@ require('lualine').setup({
 		section_separators = { left = '', right = '' },
 		component_separators = { left = '', right = '' },
 		disabled_filetypes = {},
+	},
+	winbar = {
+		lualine_c = {
+			{
+				function()
+					return navic.get_location()
+				end,
+				cond = function()
+					return navic.is_available()
+				end,
+			},
+		},
 	},
 	sections = {
 		lualine_a = { 'mode' },
