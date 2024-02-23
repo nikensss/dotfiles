@@ -456,4 +456,23 @@ require('lazy').setup({
 			--
 		},
 	},
+	{
+		'windwp/nvim-ts-autotag',
+		config = function()
+			require('nvim-ts-autotag').setup()
+		end,
+	},
+	{
+		'stevearc/aerial.nvim',
+		opts = {},
+		-- Optional dependencies
+		dependencies = {
+			'nvim-treesitter/nvim-treesitter',
+			'nvim-tree/nvim-web-devicons',
+		},
+	},
+	{
+		'SmiteshP/nvim-navic',
+		requires = 'neovim/nvim-lspconfig',
+	},
 })

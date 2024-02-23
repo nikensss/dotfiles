@@ -1,5 +1,6 @@
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
+local navic = require('nvim-navic')
 
 local keymap = vim.keymap -- for conciseness
 local opts = { noremap = true, silent = true }
@@ -9,6 +10,7 @@ local on_attach = function(client, bufnr)
 
 	require('lsp-inlayhints').on_attach(client, bufnr)
 	require('lsp-inlayhints').show()
+	navic.attach(client, bufnr)
 
 	-- set keybinds
 	opts.desc = 'Show LSP references'
