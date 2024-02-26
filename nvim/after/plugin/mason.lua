@@ -20,8 +20,9 @@ mason_lspconfig.setup({
 	-- list of servers for mason to install
 	ensure_installed = {
 		'bashls',
-		-- 'codelldb',
 		'cssls',
+		'emmet_language_server',
+		'eslint',
 		'graphql',
 		'html',
 		'lua_ls',
@@ -29,6 +30,14 @@ mason_lspconfig.setup({
 		'pyright',
 		'rust_analyzer',
 		'tailwindcss',
+		-- 'black'
+		-- 'codelldb'
+		-- 'isort'
+		-- 'prettier'
+		-- 'prettierd'
+		-- 'pylint'
+		-- 'pyright'
+		-- 'stylua'
 	},
 	-- auto-install configured servers (with lspconfig)
 	automatic_installation = true, -- not the same as ensure_installed

@@ -184,7 +184,6 @@ require('lazy').setup({
 		},
 	},
 	'jiangmiao/auto-pairs',
-	'mattn/emmet-vim',
 	{
 		'catppuccin/nvim',
 		name = 'catppuccin',
@@ -481,6 +480,12 @@ require('lazy').setup({
 		requires = 'neovim/nvim-lspconfig',
 		config = function()
 			require('nvim-navic').setup()
+		end,
+	},
+	{
+		'olrtg/nvim-emmet',
+		config = function()
+			vim.keymap.set({ 'n', 'v' }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
 		end,
 	},
 })
