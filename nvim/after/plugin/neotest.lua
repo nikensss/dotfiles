@@ -48,20 +48,24 @@ neotest.setup({
 
 vim.keymap.set('n', '<leader>tt', function()
 	neotest.run.run()
-end)
+end, { desc = 'run nearest' })
+
+vim.keymap.set('n', '<leader>tl', function()
+	neotest.run.run_last()
+end, { desc = 'run nearest' })
 
 vim.keymap.set('n', '<leader>td', function()
 	neotest.run.run({ strategy = 'dap' })
-end)
+end, { desc = 'debug nearest' })
 
 vim.keymap.set('n', '<leader>tf', function()
 	neotest.run.run(vim.fn.expand('%'))
-end)
+end, { desc = 'run file' })
 
 vim.keymap.set('n', '<leader>tp', function()
 	neotest.summary.toggle()
-end)
+end, { desc = 'neotest panel' })
 
 vim.keymap.set('n', '<leader>tv', function()
 	neotest.output.open({ enter = true })
-end)
+end, { desc = 'neotest view output' })

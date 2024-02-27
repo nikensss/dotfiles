@@ -9,10 +9,20 @@ require('lualine').setup({
 		disabled_filetypes = {},
 	},
 	winbar = {
-		lualine_a = { 'mode' },
-		lualine_b = { 'branch', 'diff', 'diagnostics' },
 		lualine_c = {
-			{ 'filename', file_status = true, path = 1 },
+			{
+				function()
+					return navic.get_location()
+				end,
+				cond = function()
+					return navic.is_available()
+				end,
+				draw_empty = true,
+			},
+		},
+	},
+	inactive_winbar = {
+		lualine_c = {
 			{
 				function()
 					return navic.get_location()
@@ -22,6 +32,11 @@ require('lualine').setup({
 				end,
 			},
 		},
+	},
+	sections = {
+		lualine_a = { 'mode' },
+		lualine_b = { 'branch', 'diff', 'diagnostics' },
+		lualine_c = { { 'filename', file_status = true, path = 1 } },
 		lualine_x = {
 			{
 				require('noice').api.statusline.mode.get,
@@ -35,7 +50,7 @@ require('lualine').setup({
 		lualine_y = { 'progress' },
 		lualine_z = { 'location' },
 	},
-	inactive_winbar = {
+	inactive_sections = {
 		lualine_a = { 'mode' },
 		lualine_b = { 'branch', 'diff', 'diagnostics' },
 		lualine_c = {
