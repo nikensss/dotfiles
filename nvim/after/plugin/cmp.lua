@@ -3,6 +3,11 @@ local cmp_select = { behavior = cmp.SelectBehavior.Select }
 
 require('luasnip.loaders.from_vscode').lazy_load()
 
+local ls = require('luasnip')
+ls.add_snippets('all', {
+	ls.parser.parse_snippet({ trig = 'co', wordTrig = true }, 'console.log({ ${1:name} })'),
+})
+
 cmp.setup({
 	snippet = { -- configure how nvim-cmp interacts with snippet engine
 		expand = function(args)
@@ -18,8 +23,20 @@ cmp.setup({
 		['<C-e>'] = cmp.mapping.close(),
 		['<C-f>'] = cmp.mapping.scroll_docs(4),
 		['<C-l>'] = cmp.mapping.complete(),
-		['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-		['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
+		['<C-n>'] = cmp.mapping(function()
+			if cmp.visible() then
+				cmp.select_next_item(cmp_select)
+			elseif ls.jumpable(1) then
+				ls.jump(1)
+			end
+		end),
+		['<C-p>'] = cmp.mapping(function()
+			if cmp.visible() then
+				cmp.select_prev_item(cmp_select)
+			elseif ls.jumpable(-1) then
+				ls.jump(-1)
+			end
+		end),
 		['<C-y>'] = cmp.mapping.confirm({ select = true }),
 		['<CR>'] = cmp.mapping.confirm({ select = true }),
 	}),
