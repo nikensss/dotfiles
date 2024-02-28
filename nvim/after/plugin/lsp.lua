@@ -120,6 +120,25 @@ lspconfig['sqlls'].setup({
 	filetypes = { 'sql' },
 })
 
+-- configure go server
+lspconfig['gopls'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	settings = {
+		gopls = {
+			hints = {
+				assignVariableTypes = true,
+				compositeLiteralFields = true,
+				compositeLiteralTypes = true,
+				constantValues = true,
+				functionTypeParameters = true,
+				parameterNames = true,
+				rangeVariableTypes = true,
+			},
+		},
+	},
+})
+
 -- configure python server
 lspconfig['pyright'].setup({
 	capabilities = capabilities,
@@ -276,3 +295,13 @@ vim.g.rustaceanvim = function()
 		},
 	}
 end
+
+vim.api.nvim_create_autocmd('FileType', {
+	pattern = 'sh',
+	callback = function()
+		vim.lsp.start({
+			name = 'bash-language-server',
+			cmd = { 'bash-language-server', 'start' },
+		})
+	end,
+})

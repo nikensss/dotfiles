@@ -181,6 +181,7 @@ require('lazy').setup({
 			'nvim-neotest/neotest-plenary',
 			'nvim-neotest/neotest-vim-test',
 			'nvim-neotest/neotest-jest',
+			'nvim-neotest/neotest-go',
 		},
 	},
 	'jiangmiao/auto-pairs',
@@ -487,5 +488,22 @@ require('lazy').setup({
 		config = function()
 			vim.keymap.set({ 'n', 'v' }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
 		end,
+	},
+	{
+		'ray-x/go.nvim',
+		dependencies = { -- optional packages
+			'ray-x/guihua.lua',
+			'neovim/nvim-lspconfig',
+			'nvim-treesitter/nvim-treesitter',
+			'leoluz/nvim-dap-go',
+		},
+		config = function()
+			require('go').setup({
+				dap_debug_keymap = false,
+			})
+		end,
+		event = { 'CmdlineEnter' },
+		ft = { 'go', 'gomod' },
+		build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
 	},
 })

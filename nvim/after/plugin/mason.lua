@@ -23,6 +23,7 @@ mason_lspconfig.setup({
 		'cssls',
 		'emmet_language_server',
 		'eslint',
+		'gopls',
 		'graphql',
 		'html',
 		'lua_ls',
@@ -30,14 +31,7 @@ mason_lspconfig.setup({
 		'pyright',
 		'rust_analyzer',
 		'tailwindcss',
-		-- 'black'
 		-- 'codelldb'
-		-- 'isort'
-		-- 'prettier'
-		-- 'prettierd'
-		-- 'pylint'
-		-- 'pyright'
-		-- 'stylua'
 	},
 	-- auto-install configured servers (with lspconfig)
 	automatic_installation = true, -- not the same as ensure_installed
@@ -47,8 +41,10 @@ mason_tool_installer.setup({
 	ensure_installed = {
 		'black', -- python formatter
 		'eslint', -- js linter
+		'goimports',
 		'isort', -- python formatter
 		'prettier', -- prettier formatter
+		-- 'prettierd' -- prettier but daemon
 		'pylint', -- python linter
 		'stylua', -- lua formatter
 	},

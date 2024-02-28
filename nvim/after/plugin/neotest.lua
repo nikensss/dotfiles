@@ -1,6 +1,9 @@
 local neotest = require('neotest')
 neotest.setup({
 	adapters = {
+		require('neotest-go')({
+			recursive_run = true,
+		}),
 		require('neotest-jest')({
 			jestConfigFile = function()
 				local file = vim.fn.expand('%:p')
