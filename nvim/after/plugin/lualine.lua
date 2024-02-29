@@ -12,10 +12,18 @@ require('lualine').setup({
 		lualine_c = {
 			{
 				function()
-					return navic.get_location()
+					if not navic.is_available() then
+						return ''
+					end
+
+					local loc = navic.get_location()
+					if loc == '' then
+						return ''
+					end
+					return loc
 				end,
 				cond = function()
-					return navic.is_available()
+					return true
 				end,
 				draw_empty = true,
 			},
@@ -25,11 +33,20 @@ require('lualine').setup({
 		lualine_c = {
 			{
 				function()
-					return navic.get_location()
+					if not navic.is_available() then
+						return ''
+					end
+
+					local loc = navic.get_location()
+					if loc == '' then
+						return ''
+					end
+					return loc
 				end,
 				cond = function()
-					return navic.is_available()
+					return true
 				end,
+				draw_empty = true,
 			},
 		},
 	},
