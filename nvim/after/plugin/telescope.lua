@@ -31,25 +31,23 @@ vim.keymap.set('n', '<leader>sh', builtin.help_tags, options)
 -- options.desc = '[s]how [d]iagnostics'
 -- vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
 
-options.desc = '[s]earch in [c]urrent buffer (fuzzy find)'
-vim.keymap.set('n', '<leader>sc', builtin.current_buffer_fuzzy_find, options)
-vim.keymap.set('n', '/', builtin.current_buffer_fuzzy_find, options)
-
 options.desc = '[s]how [k]eymaps'
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, options)
 
 options.desc = '[c]ommand [h]istory'
 vim.keymap.set('n', '<leader>ch', builtin.command_history, options)
 
-options.desc = '[c]urrent buffer [s]ymbols'
-vim.keymap.set('n', '<leader>cs', builtin.lsp_document_symbols, options)
-vim.keymap.set('n', '?', builtin.lsp_document_symbols, options)
+options.desc = 'fuzzy find current buffer'
+vim.keymap.set('n', '<leader>/', builtin.current_buffer_fuzzy_find, options)
 
-options.desc = '[s]ymbols in [w]orkspace (fuzzy find)'
-vim.keymap.set('n', '<leader>sw', builtin.lsp_workspace_symbols, options)
+options.desc = 'fuzzy find symbols current buffer'
+vim.keymap.set('n', '<leader>?', builtin.lsp_document_symbols, options)
 
-options.desc = 'dynamic workspace [[s]]ymbols (exact match)'
-vim.keymap.set('n', '<leader>ss', builtin.lsp_dynamic_workspace_symbols, options)
+options.desc = 'find symbols workspace'
+vim.keymap.set('n', '<leader><leader>/', builtin.lsp_dynamic_workspace_symbols, options)
+
+options.desc = 'fuzzy find symbols in workspace'
+vim.keymap.set('n', '<leader><leader>?', builtin.lsp_workspace_symbols, options)
 
 options.desc = '[s]how [j]umplist'
 vim.keymap.set('n', '<leader>sj', builtin.jumplist, options)
