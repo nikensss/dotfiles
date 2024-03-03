@@ -176,7 +176,7 @@ require('typescript-tools').setup({
 	on_attach = function(client, bufnr)
 		on_attach(client, bufnr)
 
-		local options = { desc = '[ts-tools] organize imports' }
+		local options = { desc = '[ts-tools] organize imports', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
 
 		options = { desc = '[ts-tools] sort imports' }
