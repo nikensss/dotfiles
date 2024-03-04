@@ -48,6 +48,12 @@ vim.keymap.set('n', '<leader>-', '5<C-w><')
 vim.keymap.set('n', '<leader><leader>+', '<C-w>15+')
 vim.keymap.set('n', '<leader><leader>-', '<C-w>15-')
 
+-- tabs
+vim.keymap.set('n', '<leader>tn', vim.cmd.tabe)
+vim.keymap.set('n', '<leader>tc', vim.cmd.tabc)
+vim.keymap.set('n', ']t', vim.cmd.tabn)
+vim.keymap.set('n', '[t', vim.cmd.tabp)
+
 -- terminal mode
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
 

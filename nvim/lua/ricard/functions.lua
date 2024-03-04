@@ -10,12 +10,7 @@ function M.get_current_folder_name()
 end
 
 function M.get_branch_name()
-	local branch = vim.fn.system('git branch --show-current 2> /dev/null | tr -d \'\n\'')
-	if branch ~= '' then
-		return branch
-	else
-		return ''
-	end
+	return vim.fn.system('git branch --show-current 2> /dev/null | tr -d \'\n\'')
 end
 
 function M.get_session_path()
@@ -30,7 +25,7 @@ function M.get_buffers_in_tabs()
 	local tabs_buffers = {}
 	local tabs = vim.api.nvim_list_tabpages()
 
-	for tab_index, tab in ipairs(tabs) do
+	for _, tab in ipairs(tabs) do
 		local windows = vim.api.nvim_tabpage_list_wins(tab)
 		local buffer_names = {}
 
@@ -40,7 +35,7 @@ function M.get_buffers_in_tabs()
 			table.insert(buffer_names, name)
 		end
 
-		tabs_buffers[tab_index] = buffer_names
+		tabs_buffers[tab] = buffer_names
 	end
 
 	return tabs_buffers
