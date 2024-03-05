@@ -58,7 +58,7 @@ vim.keymap.set('n', '[t', vim.cmd.tabp)
 vim.keymap.set('t', '<ESC>', '<c-\\><c-n>')
 
 -- open terminal in vertical split
-vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR>a')
+vim.keymap.set('n', '<C-w><C-t>', '<C-w>v<C-w>l:terminal<CR><C-w>Ta')
 
 -- colorschemes
 local function theme_picker()
