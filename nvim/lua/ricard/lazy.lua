@@ -523,6 +523,9 @@ require('lazy').setup({
 		'LukasPietzschmann/telescope-tabs',
 		config = function()
 			require('telescope').load_extension('telescope-tabs')
+
+			vim.opt.sessionoptions = 'curdir,folds,globals,help,tabpages,terminal,winsize'
+
 			require('telescope-tabs').setup({
 				entry_formatter = function(tab_id, _, _, _, is_current)
 					local tab_name = require('tabby.feature.tab_name').get(tab_id)
@@ -532,6 +535,8 @@ require('lazy').setup({
 					return require('tabby.feature.tab_name').get(tab_id)
 				end,
 			})
+
+			require('tabby.tabline').use_preset('tab_only')
 		end,
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nanozuki/tabby.nvim' },
 	},

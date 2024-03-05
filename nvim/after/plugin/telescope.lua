@@ -61,6 +61,9 @@ vim.keymap.set('n', '<leader>sm', ':Telescope noice<CR>', options)
 options.desc = '[s]how ma[r]ks'
 vim.keymap.set('n', '<leader>sr', ':Telescope marks<CR>', options)
 
+options.desc = '[s]how [t]abs'
+vim.keymap.set('n', '<leader>st', ':Telescope telescope-tabs list_tabs<CR>', options)
+
 require('telescope').setup({
 	defaults = {
 		mappings = {
