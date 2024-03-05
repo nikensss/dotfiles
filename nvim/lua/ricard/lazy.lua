@@ -72,7 +72,6 @@ require('lazy').setup({
 				'antosha417/nvim-lsp-file-operations',
 				dependencies = {
 					'nvim-lua/plenary.nvim',
-					'nvim-neo-tree/neo-tree.nvim',
 				},
 				config = function()
 					require('lsp-file-operations').setup()
@@ -117,21 +116,6 @@ require('lazy').setup({
 		'mfussenegger/nvim-lint',
 		lazy = true,
 		event = { 'BufReadPre', 'BufNewFile' },
-	},
-	{
-		'nvim-neo-tree/neo-tree.nvim',
-		branch = 'v2.x',
-		dependencies = {
-			'nvim-lua/plenary.nvim',
-			'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-			'MunifTanjim/nui.nvim',
-		},
-		opts = {
-			filesystem = {
-				follow_current_file = true,
-				hijack_netrw_behavior = 'open_current',
-			},
-		},
 	},
 	{
 		'APZelos/blamer.nvim',
@@ -539,5 +523,9 @@ require('lazy').setup({
 			require('tabby.tabline').use_preset('tab_only')
 		end,
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nanozuki/tabby.nvim' },
+	},
+	{
+		'nvim-telescope/telescope-file-browser.nvim',
+		dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
 	},
 })

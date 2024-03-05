@@ -64,7 +64,17 @@ vim.keymap.set('n', '<leader>sr', ':Telescope marks<CR>', options)
 options.desc = '[s]how [t]abs'
 vim.keymap.set('n', '<leader>st', ':Telescope telescope-tabs list_tabs<CR>', options)
 
+options.desc = '[f]ile [s]ystem'
+vim.keymap.set('n', '<leader>fs', ':Telescope file_browser<CR>', options)
+
 require('telescope').setup({
+	extensions = {
+		file_browser = {
+			theme = 'ivy',
+			auto_depth = true,
+			hijack_netrw = true,
+		},
+	},
 	defaults = {
 		mappings = {
 			n = {
@@ -87,3 +97,4 @@ require('telescope').setup({
 
 require('telescope').load_extension('git_worktree')
 require('telescope').load_extension('noice')
+require('telescope').load_extension('file_browser')
