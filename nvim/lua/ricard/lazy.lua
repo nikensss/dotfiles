@@ -529,4 +529,5 @@ require('lazy').setup({
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
 	},
 	'segeljakt/vim-silicon',
+	'sindrets/diffview.nvim',
 })
