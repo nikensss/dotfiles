@@ -63,7 +63,7 @@ section "Updating and upgrading homebrew" "brew update && brew upgrade"
 section "Updating rust" "rustup update"
 section "Updating cargo packages" 'cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
 section "Updating global npm packages" "npm update -g"
-section "Updating Oh My zsh" "sh ~/.oh-my-zsh/tools/upgrade.sh"
+section "Updating Oh My zsh" "omz update"
 section "Updating powerlevel10k" "git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull"
 section "Updating tldr database" "tldr --update"
 section "Updating nvim plugins" "nvim -c \"lua require('lazy').sync({wait = true})\" c \"TSUpdateSync\" +qa"
