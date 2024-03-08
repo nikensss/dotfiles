@@ -16,23 +16,14 @@ vim.keymap.set('n', '<leader>sf', function()
 		file_ignore_patterns = { 'node%_modules/*', '%.git/*', '%.next/*' },
 		hidden = true,
 		no_ignore = true,
-		previewer = false,
 	})
 end, options)
 
 options.desc = '[s]earch in [p]roject'
-vim.keymap.set('n', '<leader>sp', function()
-	builtin.git_files({
-		previewer = false,
-	})
-end, options)
+vim.keymap.set('n', '<leader>sp', builtin.git_files, options)
 
 options.desc = '[s]how [b]uffers'
-vim.keymap.set('n', '<leader>sb', function()
-	builtin.buffers({
-		previewer = false,
-	})
-end, options)
+vim.keymap.set('n', '<leader>sb', builtin.buffers, options)
 
 options.desc = '[s]earch [h]elp'
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, options)
@@ -83,13 +74,12 @@ require('telescope').setup({
 			auto_depth = true,
 			hijack_netrw = true,
 			path = '%:p:h',
-			layout_strategy = 'vertical',
+			layout_strategy = 'horizontal',
 			layout_config = {
 				height = 0.8,
 				width = 0.8,
 				prompt_position = 'bottom',
 			},
-			previewer = false,
 			border = true,
 			borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
 		},
