@@ -111,3 +111,4 @@ lazy-lock.json
 env-variables
 
 *.session
+*.qf

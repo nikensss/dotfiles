@@ -4,6 +4,8 @@ local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 
 local get_session_path = require('ricard.functions').get_session_path
+local save_qf_list = require('ricard.functions').save_qf_list
+local load_qf_list = require('ricard.functions').load_qf_list
 
 vim.g.mapleader = ' '
 
@@ -169,6 +171,7 @@ local function pick_session()
 			local selection = action_state.get_selected_entry()
 			actions.close(prompt_bufnr)
 			vim.cmd('source ~/.config/nvim/' .. string.sub(selection.value, 3))
+			load_qf_list('~/.config/nvim/' .. string.gsub(string.sub(selection.value, 3), '.session$', '.qf'))
 		end)
 	end)
 end
@@ -177,6 +180,7 @@ vim.keymap.set('n', '<leader>ls', function()
 	local session_path = get_session_path()
 	if vim.fn.filereadable(vim.fn.expand(session_path)) == 1 then
 		vim.cmd('source ' .. session_path)
+		load_qf_list()
 		print('loaded session from ' .. session_path)
 	else
 		pick_session()
@@ -188,6 +192,7 @@ vim.keymap.set('n', '<leader>ps', pick_session, { silent = true, desc = '[p]ick 
 vim.keymap.set('n', '<leader>ms', function()
 	local session_path = get_session_path()
 	vim.cmd('mksession! ' .. session_path)
+	save_qf_list()
 	print('session saved to ' .. session_path)
 end, { silent = true, desc = '[m]ake [s]ession' })
 

@@ -16,9 +16,80 @@ end
 function M.get_session_path()
 	local fixed_branch_name = string.gsub(M.get_branch_name(), '/', '_')
 	local session_name = M.get_current_folder_name() .. '__' .. fixed_branch_name .. '.session'
-	local session_path = vim.fn.expand('~/.config/nvim/' .. session_name)
 
-	return session_path
+	return vim.fn.expand('~/.config/nvim/' .. session_name)
+end
+
+function M.get_qf_list_path()
+	local fixed_branch_name = string.gsub(M.get_branch_name(), '/', '_')
+	local qf_list_name = M.get_current_folder_name() .. '__' .. fixed_branch_name .. '.qf'
+
+	return vim.fn.expand('~/.config/nvim/' .. qf_list_name)
+end
+
+function M.save_qf_list()
+	local qf_list_path = M.get_qf_list_path()
+
+	local qf_list = vim.fn.getqflist()
+	for _, item in ipairs(qf_list) do
+		if item.bufnr then
+			item.filename = vim.api.nvim_buf_get_name(item.bufnr)
+			item.bufnr = nil
+		end
+	end
+
+	local json = vim.fn.json_encode(qf_list)
+
+	local file = io.open(qf_list_path, 'w')
+	if file then
+		file:write(json)
+		file:close()
+	else
+		print('error: could not open qf_list file for writing')
+	end
+end
+
+function M.load_qf_list(path)
+	local qf_list_path = M.get_qf_list_path()
+	if path ~= nil then
+		qf_list_path = vim.fn.expand(path)
+	end
+
+	local file = io.open(qf_list_path, 'r')
+	if file == nil then
+		print('error: could not open qf_list file for reading (' .. qf_list_path .. ')')
+		return
+	end
+
+	local json = file:read('*a')
+	file:close()
+
+	local qf_list = vim.fn.json_decode(json)
+	for _, item in ipairs(qf_list) do
+		if item.filename then
+			local bufnr = vim.fn.bufnr(item.filename)
+			if bufnr == -1 then
+				bufnr = vim.fn.bufadd(item.filename)
+			end
+			item.bufnr = bufnr
+			item.filename = nil
+		end
+	end
+
+	if #qf_list <= 0 then
+		return
+	end
+
+	vim.fn.setqflist({}, 'r', { items = qf_list })
+
+	local cursor_win = vim.api.nvim_get_current_win()
+	local cursor_pos = vim.api.nvim_win_get_cursor(cursor_win)
+
+	vim.cmd('copen')
+	vim.cmd('wincmd J')
+
+	vim.api.nvim_set_current_win(cursor_win)
+	vim.api.nvim_win_set_cursor(0, cursor_pos)
 end
 
 function M.get_buffers_in_tabs()
