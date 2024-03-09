@@ -72,7 +72,7 @@ require('telescope').setup({
 		file_browser = {
 			theme = 'ivy',
 			auto_depth = true,
-			hijack_netrw = true,
+			hijack_netrw = false,
 			path = '%:p:h',
 			layout_strategy = 'horizontal',
 			layout_config = {
