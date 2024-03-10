@@ -63,16 +63,15 @@ require('nvim-treesitter.configs').setup({
 
 			keymaps = {
 				-- You can use the capture groups defined in textobjects.scm
-				['a='] = { query = '@assignment.outer', desc = 'Select outer part of an assignment' },
+				['a='] = { query = '@lexical_declaration.outer', desc = 'Select a whole assignment' },
 				['i='] = { query = '@assignment.inner', desc = 'Select inner part of an assignment' },
-				['l='] = { query = '@assignment.lhs', desc = 'Select left hand side of an assignment' },
-				['r='] = { query = '@assignment.rhs', desc = 'Select right hand side of an assignment' },
 
-				-- works for javascript/typescript files (custom capture I created in after/queries/ecma/textobjects.scm)
+				-- works for javascript/typescript files (custom capture defined in after/queries/ecma/textobjects.scm)
 				['a:'] = { query = '@property.outer', desc = 'Select outer part of an object property' },
 				['i:'] = { query = '@property.inner', desc = 'Select inner part of an object property' },
-				['l:'] = { query = '@property.lhs', desc = 'Select left part of an object property' },
-				['r:'] = { query = '@property.rhs', desc = 'Select right part of an object property' },
+
+				['ak'] = { query = '@property.key', desc = 'Select left part of an object property' },
+				['av'] = { query = '@property.value', desc = 'Select right part of an object property' },
 
 				['aa'] = { query = '@parameter.outer', desc = 'Select outer part of a parameter/argument' },
 				['ia'] = { query = '@parameter.inner', desc = 'Select inner part of a parameter/argument' },
