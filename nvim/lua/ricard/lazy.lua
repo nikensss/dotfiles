@@ -521,6 +521,7 @@ require('lazy').setup({
 			})
 
 			require('tabby.tabline').use_preset('tab_only')
+			vim.keymap.set('n', '<leader>tr', [[ :TabRename ]])
 		end,
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nanozuki/tabby.nvim' },
 	},
