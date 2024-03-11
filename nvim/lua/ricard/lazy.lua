@@ -387,11 +387,11 @@ require('lazy').setup({
 				require('trouble').toggle('loclist')
 			end, { desc = '[trouble] toggle loclist' })
 
-			vim.keymap.set('n', '[e', function()
+			vim.keymap.set('n', '[x', function()
 				require('trouble').previous({ skip_groups = true, jump = true })
 			end, { desc = '[trouble] previous diagnostic' })
 
-			vim.keymap.set('n', ']e', function()
+			vim.keymap.set('n', ']x', function()
 				require('trouble').next({ skip_groups = true, jump = true })
 			end, { desc = '[trouble] next diagnostic' })
 		end,

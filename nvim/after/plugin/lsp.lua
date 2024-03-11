@@ -56,10 +56,10 @@ local on_attach = function(client, bufnr)
 	keymap.set('n', '<leader>ld', vim.diagnostic.open_float, opts) -- show diagnostics for line
 
 	opts.desc = 'Go to previous diagnostic'
-	keymap.set('n', '[d', vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+	keymap.set('n', '[e', vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
 
 	opts.desc = 'Go to next diagnostic'
-	keymap.set('n', ']d', vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+	keymap.set('n', ']e', vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
 	opts.desc = 'Show documentation for what is under cursor'
 	keymap.set('n', 'K', vim.lsp.buf.hover, opts) -- show documentation for what is under cursor

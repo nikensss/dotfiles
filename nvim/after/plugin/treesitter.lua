@@ -63,8 +63,8 @@ require('nvim-treesitter.configs').setup({
 
 			keymaps = {
 				-- You can use the capture groups defined in textobjects.scm
-				['a='] = { query = '@lexical_declaration.outer', desc = 'Select a whole assignment' },
-				['i='] = { query = '@assignment.inner', desc = 'Select inner part of an assignment' },
+				['ad'] = { query = '@lexical_declaration.outer', desc = 'Select a whole assignment' },
+				['id'] = { query = '@assignment.inner', desc = 'Select inner part of an assignment' },
 
 				-- works for javascript/typescript files (custom capture defined in after/queries/ecma/textobjects.scm)
 				['a:'] = { query = '@property.outer', desc = 'Select outer part of an object property' },
@@ -109,6 +109,7 @@ require('nvim-treesitter.configs').setup({
 			enable = true,
 			set_jumps = true, -- whether to set jumps in the jumplist
 			goto_next_start = {
+				[']d'] = { query = '@lexical_declaration.outer', desc = 'Next lexical declaration start' },
 				[']f'] = { query = '@call.outer', desc = 'Next function call start' },
 				[']m'] = { query = '@function.outer', desc = 'Next method/function def start' },
 				[']c'] = { query = '@class.outer', desc = 'Next class start' },
@@ -121,6 +122,7 @@ require('nvim-treesitter.configs').setup({
 				[']z'] = { query = '@fold', query_group = 'folds', desc = 'Next fold' },
 			},
 			goto_next_end = {
+				[']D'] = { query = '@lexical_declaration.outer', desc = 'Next lexical declaration end' },
 				[']F'] = { query = '@call.outer', desc = 'Next function call end' },
 				[']M'] = { query = '@function.outer', desc = 'Next method/function def end' },
 				[']C'] = { query = '@class.outer', desc = 'Next class end' },
@@ -128,6 +130,7 @@ require('nvim-treesitter.configs').setup({
 				[']L'] = { query = '@loop.outer', desc = 'Next loop end' },
 			},
 			goto_previous_start = {
+				['[d'] = { query = '@lexical_declaration.outer', desc = 'Prev lexical declaration start' },
 				['[f'] = { query = '@call.outer', desc = 'Prev function call start' },
 				['[m'] = { query = '@function.outer', desc = 'Prev method/function def start' },
 				['[c'] = { query = '@class.outer', desc = 'Prev class start' },
@@ -135,6 +138,7 @@ require('nvim-treesitter.configs').setup({
 				['[l'] = { query = '@loop.outer', desc = 'Prev loop start' },
 			},
 			goto_previous_end = {
+				['[D'] = { query = '@lexical_declaration.outer', desc = 'Prev lexical declaration end' },
 				['[F'] = { query = '@call.outer', desc = 'Prev function call end' },
 				['[M'] = { query = '@function.outer', desc = 'Prev method/function def end' },
 				['[C'] = { query = '@class.outer', desc = 'Prev class end' },
