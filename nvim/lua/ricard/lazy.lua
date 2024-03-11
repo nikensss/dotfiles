@@ -133,7 +133,7 @@ require('lazy').setup({
 	{ 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
 	'mg979/vim-visual-multi',
 	'nvim-lualine/lualine.nvim',
-	'phaazon/hop.nvim',
+	'smoka7/hop.nvim',
 	'rhysd/git-messenger.vim',
 	'tpope/vim-abolish',
 	'tpope/vim-commentary',
