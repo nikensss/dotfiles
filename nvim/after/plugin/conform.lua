@@ -3,6 +3,7 @@ local conform = require('conform')
 conform.setup({
 	formatters_by_ft = {
 		css = { { 'prettierd', 'prettier' } },
+		gleam = { 'gleam' },
 		graphql = { { 'prettierd', 'prettier' } },
 		html = { { 'prettierd', 'prettier' } },
 		javascript = { { 'prettierd', 'prettier' } },
@@ -24,6 +25,10 @@ conform.setup({
 	formatters = {
 		sleek = {
 			command = 'sleek',
+		},
+		gleam = {
+			command = 'gleam',
+			args = { 'format', '--stdin' },
 		},
 	},
 })

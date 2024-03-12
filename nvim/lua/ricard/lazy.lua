@@ -531,4 +531,5 @@ require('lazy').setup({
 	},
 	'segeljakt/vim-silicon',
 	'sindrets/diffview.nvim',
+	'gleam-lang/gleam.vim',
 })
