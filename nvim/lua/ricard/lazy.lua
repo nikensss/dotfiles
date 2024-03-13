@@ -526,8 +526,10 @@ require('lazy').setup({
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nanozuki/tabby.nvim' },
 	},
 	{
-		'nvim-telescope/telescope-file-browser.nvim',
-		dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim' },
+		'nvim-tree/nvim-tree.lua',
+		config = function()
+			require('nvim-tree').setup()
+		end,
 	},
 	'segeljakt/vim-silicon',
 	'sindrets/diffview.nvim',

@@ -28,9 +28,6 @@ vim.keymap.set('n', '<leader>sb', builtin.buffers, options)
 options.desc = '[s]earch [h]elp'
 vim.keymap.set('n', '<leader>sh', builtin.help_tags, options)
 
--- options.desc = '[s]how [d]iagnostics'
--- vim.keymap.set('n', '<leader>sd', builtin.diagnostics, options)
-
 options.desc = '[s]how [k]eymaps'
 vim.keymap.set('n', '<leader>sk', builtin.keymaps, options)
 
@@ -63,9 +60,6 @@ vim.keymap.set('n', '<leader>sr', ':Telescope marks<CR>', options)
 
 options.desc = '[s]how [t]abs'
 vim.keymap.set('n', '<leader>st', ':Telescope telescope-tabs list_tabs<CR>', options)
-
-options.desc = '[f]ile [s]ystem'
-vim.keymap.set('n', '<leader>fs', ':Telescope file_browser<CR>', options)
 
 require('telescope').setup({
 	extensions = {
@@ -106,4 +100,3 @@ require('telescope').setup({
 
 require('telescope').load_extension('git_worktree')
 require('telescope').load_extension('noice')
-require('telescope').load_extension('file_browser')
