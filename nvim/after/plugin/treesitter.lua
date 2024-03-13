@@ -69,6 +69,8 @@ require('nvim-treesitter.configs').setup({
 				['id'] = { query = '@assignment.inner', desc = 'Select inner part of an assignment' },
 
 				['ay'] = { query = '@type.outer', desc = 'Select type definition' },
+				['iy'] = { query = '@type.rhs', desc = 'Select type definition value' },
+				['oy'] = { query = '@type.lhs', desc = 'Select type definition name' },
 
 				-- works for javascript/typescript files (custom capture defined in after/queries/ecma/textobjects.scm)
 				['a:'] = { query = '@property.outer', desc = 'Select outer part of an object property' },

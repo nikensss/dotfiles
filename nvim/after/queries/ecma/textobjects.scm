@@ -6,4 +6,7 @@
 
 (lexical_declaration) @lexical_declaration.outer
 
-[(type_annotation) (type_alias_declaration)] @type.outer
+[ (type_annotation)
+  (type_alias_declaration
+  	name: (_) @type.lhs
+    value: (_) @type.rhs)] @type.outer
