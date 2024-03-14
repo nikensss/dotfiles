@@ -528,7 +528,9 @@ require('lazy').setup({
 	{
 		'nvim-tree/nvim-tree.lua',
 		config = function()
-			require('nvim-tree').setup()
+			require('nvim-tree').setup({
+				hijack_netrw = false,
+			})
 		end,
 	},
 	'segeljakt/vim-silicon',
