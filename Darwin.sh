@@ -35,7 +35,7 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx exa duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed pnpm fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed pnpm fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 LucasPickering/homebrew-tap/slumber
 brew tap oven-sh/bun 
 brew install bun
 brew upgrade
