@@ -100,6 +100,12 @@ lspconfig['prismals'].setup({
 	on_attach = on_attach,
 })
 
+-- configure zig language server
+lspconfig['zls'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
 -- configure tailwind css server
 lspconfig['tailwindcss'].setup({
 	capabilities = capabilities,

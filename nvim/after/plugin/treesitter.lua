@@ -29,6 +29,7 @@ require('nvim-treesitter.configs').setup({
 		'typescript',
 		'vim',
 		'yaml',
+		'zig',
 	},
 	sync_install = false,
 	auto_install = true,
