@@ -290,24 +290,6 @@ require('lazy').setup({
 			},
 		},
 	},
-	'ThePrimeagen/git-worktree.nvim',
-	{
-		'Wansmer/treesj',
-		dependencies = { 'nvim-treesitter/nvim-treesitter' },
-		keys = { '<leader>mm' },
-		config = function()
-			require('treesj').setup({
-				use_default_keymaps = false,
-			})
-
-			vim.keymap.set(
-				'n',
-				'<leader>mm',
-				require('treesj').toggle,
-				{ silent = true, noremap = true, desc = '[treesj] toogle one-lining' }
-			)
-		end,
-	},
 	{
 		'mbbill/undotree',
 		keys = { '<leader>ut' },
@@ -327,7 +309,6 @@ require('lazy').setup({
 		'stevearc/dressing.nvim',
 		opts = {},
 	},
-	-- lazy.nvim
 	{
 		'folke/noice.nvim',
 		event = 'VeryLazy',
@@ -405,12 +386,6 @@ require('lazy').setup({
 			'nvim-lua/plenary.nvim',
 			'mfussenegger/nvim-dap',
 		},
-	},
-	{
-		'chentoast/marks.nvim',
-		config = function()
-			require('marks').setup({})
-		end,
 	},
 	{
 		'pwntester/octo.nvim',
