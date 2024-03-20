@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-function does_not_have_session(){
+function tag(){
   session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs)
   while read -r line; do
     if ! echo "$session_basenames" | grep -q "$(basename "$line")"; then
@@ -11,7 +11,7 @@ function does_not_have_session(){
 
 function get_options() {
   tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq
-  fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort | uniq | does_not_have_session
+  fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort -u | awk 'NR == 1 {prev = $0; print $0; next} {if (index($0, prev) == 1) {print prev} else {print $0; prev = $0}}' | uniq | tag
 }
 
 if [[ $# -eq 1 ]]; then
