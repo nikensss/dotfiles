@@ -69,7 +69,7 @@ alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:
 # git
 alias gfp='git fetch origin --prune'
 alias gft='git tag -d $(git tag) && git fetch --tags --all'
-alias gcb='git for-each-ref --format "%(refname:short)" refs/heads | grep -v "master\|main\|dev\|develop" | xargs git branch -D'
+alias gcb='git for-each-ref --format "%(refname:short)" refs/heads | grep -v "master\|main\|dev\|develop\|$(gbn)" | xargs git branch -D'
 alias gbn='git branch --show-current'
 alias gpsu='git push --set-upstream origin $(git branch --show-current)'
 alias gdff='git difftool --tool=nvimdiff'

@@ -505,7 +505,7 @@ require('lazy').setup({
 		'nvim-tree/nvim-tree.lua',
 		config = function()
 			require('nvim-tree').setup({
-				hijack_netrw = false,
+				hijack_netrw = true,
 			})
 		end,
 	},
