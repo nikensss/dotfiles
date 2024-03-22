@@ -67,7 +67,9 @@ require('nvim-treesitter.configs').setup({
 			keymaps = {
 				-- You can use the capture groups defined in textobjects.scm
 				['ad'] = { query = '@lexical_declaration.outer', desc = 'Select a whole assignment' },
-				['id'] = { query = '@assignment.inner', desc = 'Select inner part of an assignment' },
+				['id'] = { query = '@lexical_declaration.inner', desc = 'Select inner part of an assignment' },
+				['vd'] = { query = '@lexical_declaration.value', desc = 'Select value (rhs) part of an assignment' },
+				['nd'] = { query = '@lexical_declaration.name', desc = 'Select name (lhs) part of an assignment' },
 
 				['ay'] = { query = '@type.outer', desc = 'Select type definition' },
 				['iy'] = { query = '@type.rhs', desc = 'Select type definition value' },
