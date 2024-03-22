@@ -40,6 +40,7 @@ require('lazy').setup({
 			'nvim-treesitter/nvim-treesitter-context',
 			'nvim-treesitter/nvim-treesitter-refactor',
 			'nvim-treesitter/nvim-treesitter-textobjects',
+			'windwp/nvim-ts-autotag',
 		},
 	},
 	{
@@ -48,7 +49,6 @@ require('lazy').setup({
 			'nvim-lua/plenary.nvim',
 		},
 	},
-	'tpope/vim-fugitive',
 	{
 		'hrsh7th/nvim-cmp',
 		dependencies = {
@@ -117,27 +117,16 @@ require('lazy').setup({
 		lazy = true,
 		event = { 'BufReadPre', 'BufNewFile' },
 	},
-	{
-		'APZelos/blamer.nvim',
-		init = function()
-			vim.g.blamer_enabled = 0
-			vim.g.blamer_delay = 700
-			vim.g.blamer_show_in_insert_modes = 1
-			vim.g.blamer_show_in_visual_modes = 0
-		end,
-	},
-
 	'lewis6991/gitsigns.nvim',
 	'christoomey/vim-sort-motion',
-	'junegunn/gv.vim',
 	{ 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
-	'mg979/vim-visual-multi',
 	'nvim-lualine/lualine.nvim',
 	'smoka7/hop.nvim',
 	'rhysd/git-messenger.vim',
-	'tpope/vim-abolish',
+	'tpope/vim-fugitive',
 	'tpope/vim-commentary',
 	'tpope/vim-repeat',
+	'tpope/vim-unimpaired',
 	{
 		'kylechui/nvim-surround',
 		version = '*', -- Use for stability; omit to use `main` branch for the latest features
@@ -150,7 +139,6 @@ require('lazy').setup({
 			})
 		end,
 	},
-	'tpope/vim-unimpaired',
 	'mfussenegger/nvim-dap',
 	'nvim-telescope/telescope-dap.nvim',
 	'rcarriga/nvim-dap-ui',
@@ -282,9 +270,11 @@ require('lazy').setup({
 			vim.g.db_ui_use_nerd_fonts = 1
 		end,
 	},
-	'folke/twilight.nvim',
 	{
 		'folke/zen-mode.nvim',
+		dependencies = {
+			'folke/twilight.nvim',
+		},
 		opts = {
 			window = {
 				width = 180,
@@ -389,39 +379,6 @@ require('lazy').setup({
 		},
 	},
 	{
-		'pwntester/octo.nvim',
-		config = function()
-			require('octo').setup({ enable_builtin = true })
-		end,
-		keys = {
-			{ '<leader>o', '<cmd>Octo<CR>', desc = 'Octo' },
-		},
-		dependencies = {
-			'nvim-lua/plenary.nvim',
-			'nvim-telescope/telescope.nvim',
-			'nvim-tree/nvim-web-devicons',
-		},
-	},
-	{
-		'kndndrj/nvim-dbee',
-		dependencies = {
-			'MunifTanjim/nui.nvim',
-		},
-		build = function()
-			require('dbee').install()
-		end,
-		config = function()
-			require('dbee').setup({
-				sources = {
-					require('dbee.sources').EnvSource:new('DBEE_CONNECTIONS'),
-				},
-			})
-		end,
-		keys = {
-			{ '<leader><leader>pg', '<cmd>lua require"dbee".toggle()<CR>', desc = '[dbee] toggle' },
-		},
-	},
-	{
 		'folke/which-key.nvim',
 		event = 'VeryLazy',
 		init = function()
@@ -429,12 +386,6 @@ require('lazy').setup({
 			vim.o.timeoutlen = 300
 		end,
 		opts = {},
-	},
-	{
-		'windwp/nvim-ts-autotag',
-		config = function()
-			require('nvim-ts-autotag').setup()
-		end,
 	},
 	{
 		'SmiteshP/nvim-navic',
