@@ -18,6 +18,7 @@ alias rmnm='rm -rf node_modules'
 alias i='npm ci'
 alias b='npm run build'
 alias s='npm start'
+alias d='npm run dev'
 alias t='npm test'
 alias bs='npm run build && npm run start'
 alias bt='npm run build && npm run test'
@@ -48,15 +49,6 @@ alias cal='gcal --starting-day=1'
 # cd
 alias repos='cd ~/repos'
 alias dotf='repos && cd dotfiles'
-alias weirwood='repos && cd weirwood'
-alias ww='weirwood'
-alias finten='ww && cd finten'
-alias webdev='repos && cd webdev'
-alias wd='webdev'
-alias js='repos && cd javascript'
-alias ts='repos && cd typescript'
-alias bf='repos && cd basic-fit/repos'
-alias vpl='cd ~/.local/share/nvim/plugged'
 
 # editing dotfiles
 alias vzsh='nvim ~/.zshrc'
@@ -74,21 +66,7 @@ alias gbn='git branch --show-current'
 alias gpsu='git push --set-upstream origin $(git branch --show-current)'
 alias gdff='git difftool --tool=nvimdiff'
 
-# firebase
-alias ffcg='firebase functions:config:get | json_pp'
-alias ffcs='firebase functions:config:set'
-alias fpl='firebase projects:list'
-
-# weirwood
-alias fintenlog='ssh meegan@rpi "tail -f ~/finten/logs/.log"'
-alias ratios='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.ratio" | sed "s/[\"%]//g" | nl -s", "'
-alias ratio='ratios | tail -n 1 | sed "s;^.*, \(.*\)$;\1;"'
-alias fpm='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.filingsPerMinute" | tail -n 1'
-alias filings='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.filingsCount" | tail -n 1'
-alias visited='ssh meegan@rpi "cat ~/finten-db-queries/summary.json" | jq ".[].statistics.visitedLinksCount" | tail -n 1'
-alias stats='echo "filings = $(filings)\nvisited links = $(visited)\nratio = $(ratio)%\nfilings per minute = $(fpm)"'
 
 # rust
-alias rav='rust-analyzer --version'
 alias c='cargo run'
 alias cr='cargo run --release'
