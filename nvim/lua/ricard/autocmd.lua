@@ -1,5 +1,3 @@
-local get_current_folder_name = require('ricard.functions').get_current_folder_name
-
 vim.api.nvim_create_autocmd('FileType', {
 	pattern = { 'gitcommit', 'markdown', 'txt' },
 	group = vim.api.nvim_create_augroup('prose_writting', { clear = true }),

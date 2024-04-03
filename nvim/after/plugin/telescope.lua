@@ -62,22 +62,6 @@ options.desc = '[s]how [t]abs'
 vim.keymap.set('n', '<leader>st', ':Telescope telescope-tabs list_tabs<CR>', options)
 
 require('telescope').setup({
-	extensions = {
-		file_browser = {
-			theme = 'ivy',
-			auto_depth = true,
-			hijack_netrw = false,
-			path = '%:p:h',
-			layout_strategy = 'horizontal',
-			layout_config = {
-				height = 0.8,
-				width = 0.8,
-				prompt_position = 'bottom',
-			},
-			border = true,
-			borderchars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-		},
-	},
 	defaults = {
 		mappings = {
 			n = {
