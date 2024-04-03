@@ -181,6 +181,140 @@ _EOF_
   npm run test:js
 }
 
+cbp(){
+  if [ -z "$1" ]
+    then
+      echo "Project name not provided"
+      return 1
+  fi
+
+  mkdir $1
+  cd $1
+  git init
+
+  echo "node_modules\n.DS_Store\n.env*\ndist" > .gitignore
+  touch .env
+
+  bun init --yes
+  rm *.ts
+  cat << _EOF_ >> bunfig.toml
+[install]
+exact = true
+_EOF_
+
+  bun add -D rimraf typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @total-typescript/ts-reset cross-os jest @types/jest ts-jest @types/bun
+  bun add zod
+
+  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/strict-type-checked" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
+  echo 'reset.d.ts' > .eslintignore
+  echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
+  echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
+
+  cat << _EOF_ >> ts-jest.config.json
+{
+  "preset": "ts-jest",
+  "testEnvironment": "node",
+  "roots": ["<rootDir>/test"],
+}
+_EOF_
+
+
+  mkdir test
+  touch test/index.test.ts
+  cat << _EOF_ >> test/index.test.ts
+describe('index', () => {
+  it('should pass', () => {
+    expect(true).toBe(true);
+  });
+});
+_EOF_
+
+  cat tsconfig.json | perl -pe 's/(\/\*.*\*\/)//;s/\/\/.*$//' | jq '.include = ["src","test"] | .compilerOptions.esModuleInterop = true' > tsconfig.test.json
+  cp tsconfig.test.json tsconfig.json
+  echo '{ "extends": "./tsconfig.json" }' > tsconfig.test.json
+
+  mkdir src
+  touch src/env.ts
+  touch src/index.ts
+  cat << _EOF_ >> src/env.ts
+import { z } from 'zod';
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('production')
+});
+
+export const env = envSchema.parse(process.env);
+_EOF_
+
+  cat << _EOF_ >> src/index.ts
+import { env } from './env'; 
+import { setTimeout as wait } from 'timers/promises';
+
+async function main(): Promise<void> {
+  await wait(100);
+
+  console.log('Hello, World!', { env });
+};
+
+main()
+  .then(() => {
+    console.log('Done!')
+  })
+  .catch((error: unknown) => {
+    console.error('Error:', error);
+  });
+_EOF_
+
+  echo "import '@total-typescript/ts-reset';" > reset.d.ts
+
+  npm pkg set version="0.1.0"
+  npm pkg set main="./src/index.ts"
+  npm pkg set scripts.test="jest --config ts-jest.config.json"
+  npm pkg set scripts.start="bun ./src/index.ts"
+  npm pkg set scripts.pretty="cross-os pretty"
+  npm pkg set scripts.pretty:check="cross-os pretty:check"
+  npm pkg set scripts.lint="cross-os lint"
+  npm pkg set cross-os.lint.darwin="eslint './src/**/*.ts'"
+  npm pkg set cross-os.lint.win32="eslint ./src/**/*.ts"
+  npm pkg set cross-os.pretty:check.darwin="prettier --check './src/**/*.ts'"
+  npm pkg set cross-os.pretty:check.win32="prettier --check ./src/**/*.ts"
+  npm pkg set cross-os.pretty.darwin="prettier --write './src/**/*.ts'"
+  npm pkg set cross-os.pretty.win32="prettier --write ./src/**/*.ts"
+
+  bunx husky init
+
+  echo "bun run pretty:check && bun run lint" > .husky/pre-commit
+  echo 'bunx --no -- commitlint --edit $1'     > .husky/commit-msg
+  echo ""                                     > .husky/pre-push  
+
+  cat << _EOF_ >> .husky/pre-push
+STATUS=\$(git status --porcelain | wc -l | xargs)
+FILES=\$(git status --porcelain | sed -n "s;^.. \(.*\)\$;\\\\\t\\\\\t\1\\\\\n;p")
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NO_COLOR='\033[0m'
+
+if [ \$STATUS -ne 0 ]; then
+  echo \$RED'✖ Make sure all changes are staged and committed before pushing'\$NO_COLOR
+  echo \$RED'\tDetected changes in:'\$NO_COLOR
+  echo \$RED\$FILES\$NO_COLOR
+  exit 1
+fi
+
+echo \$GREEN'✓ No changes left to commit'\$NO_COLOR
+
+_EOF_
+
+  bunx prettier --write './**/*.{json,ts}'
+
+  git add --all
+  git commit -am "chore: initial commit"
+
+  bun run start
+  bun run test
+}
+
 md2pdf(){
   npx --yes markdown-pdf $1
 }
