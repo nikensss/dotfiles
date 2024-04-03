@@ -49,10 +49,10 @@ ctp(){
   echo 'save-exact=true' > .npmrc
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
-  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier eslint-config-prettier eslint-plugin-prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
+  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
   npm i dotenv zod
 
-  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/recommended","plugin:prettier/recommended","prettier" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
+  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/strict-type-checked" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
 
@@ -84,7 +84,7 @@ describe('index', () => {
 });
 _EOF_
 
-  npx tsc --init --target ES2021 --outDir './dist' 
+  npx tsc --init --target ES2022 --outDir './dist' 
   # we can't pipe from one file to itself, so we use that chance to build the tsconfig.test.json
   cat tsconfig.json | perl -pe 's/(\/\*.*\*\/)//;s/\/\/.*$//' | jq '.include = ["src","test"]' > tsconfig.test.json
   cp tsconfig.test.json tsconfig.json
@@ -105,19 +105,27 @@ _EOF_
 
   cat << _EOF_ >> src/index.ts
 import { env } from './env'; 
+import { setTimeout as wait } from 'timers/promises';
 
 async function main(): Promise<void> {
+  await wait(100);
+
   console.log('Hello, World!', { env });
 };
 
 main()
-  .then(() => console.log('Done!'))
-  .catch(console.error);
+  .then(() => {
+    console.log('Done!')
+  })
+  .catch((error: unknown) => {
+    console.error('Error:', error);
+  });
 _EOF_
 
   echo "import '@total-typescript/ts-reset';" > reset.d.ts
 
   npm pkg set version="0.1.0"
+  npm pkg set main="dist/src/index.js"
   npm pkg set scripts.build="rimraf ./dist && tsc -p tsconfig.json"
   npm pkg set scripts.build:test:js="rimraf ./dist && tsc -p tsconfig.test.json"
   npm pkg set scripts.test:js="npm run build:test:js && jest --config jest.config.json"
@@ -128,7 +136,6 @@ _EOF_
   npm pkg set scripts.pretty="cross-os pretty"
   npm pkg set scripts.pretty:check="cross-os pretty:check"
   npm pkg set scripts.lint="cross-os lint"
-  npm pkg set scripts.prepare="husky install"
   npm pkg set cross-os.lint.darwin="eslint 'src/**/*.ts'"
   npm pkg set cross-os.lint.win32="eslint src/**/*.ts"
   npm pkg set cross-os.pretty:check.darwin="prettier --check 'src/**/*.ts'"
@@ -136,11 +143,11 @@ _EOF_
   npm pkg set cross-os.pretty.darwin="prettier --write 'src/**/*.ts'"
   npm pkg set cross-os.pretty.win32="prettier --write src/**/*.ts"
 
-  npm run prepare
+  npx husky init
 
-  npx --yes husky add .husky/pre-commit "npm run pretty:check && npm run lint"
-  npx --yes husky add .husky/commit-msg 'npx --no -- commitlint --edit $1'
-  npx --yes husky add .husky/pre-push ""
+  echo "npm run pretty:check && npm run lint" > .husky/pre-commit
+  echo 'npx --no -- commitlint --edit $1'     > .husky/commit-msg
+  echo ""                                     > .husky/pre-push  
 
   cat << _EOF_ >> .husky/pre-push
 STATUS=\$(git status --porcelain | wc -l | xargs)
