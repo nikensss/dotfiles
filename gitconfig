@@ -8,6 +8,7 @@
 [user]
 	name = Ricard Mallafre
 	email = rikitzzz@gmail.com
+	signingkey = /Users/ricard/.ssh/id_rsa.pub
 [push]
 	default = simple
 [color]
@@ -25,3 +26,5 @@
 	defaultBranch = main
 [pull]
 	ff = only
+[gpg]
+	format = ssh
