@@ -132,7 +132,7 @@ _EOF_
   npm pkg set scripts.test:ts="jest --config ts-jest.config.json"
   npm pkg set scripts.test="npm run test:ts"
   npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
-  npm pkg set scripts.start:dev="ts-node -r dotenv/config ./src/index.ts"
+  npm pkg set scripts.dev="ts-node -r dotenv/config ./src/index.ts"
   npm pkg set scripts.pretty="cross-os pretty"
   npm pkg set scripts.pretty:check="cross-os pretty:check"
   npm pkg set scripts.lint="cross-os lint"
@@ -173,7 +173,7 @@ _EOF_
   git add --all
   git commit -am "chore: initial commit"
 
-  npm run start:dev
+  npm run dev
   npm run test:ts
 
   npm run build
