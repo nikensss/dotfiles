@@ -6,14 +6,6 @@ local navic = require('nvim-navic')
 local keymap = vim.keymap -- for conciseness
 local opts = { noremap = true, silent = true }
 
-local function is_deno_project()
-	-- Check for deno.json or deno.jsonc in the current directory and upwards
-	local filepath = vim.fn.expand('%:p:h') -- Get the full path of the current file's directory
-	local deno_file_found = vim.fn.findfile('deno.json', filepath .. ';') ~= ''
-		or vim.fn.findfile('deno.jsonc', filepath .. ';') ~= ''
-	return deno_file_found
-end
-
 local on_attach = function(client, bufnr)
 	opts.buffer = bufnr
 
