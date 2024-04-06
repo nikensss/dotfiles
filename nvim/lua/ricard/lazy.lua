@@ -42,6 +42,9 @@ require('lazy').setup({
 			'nvim-treesitter/nvim-treesitter-textobjects',
 			'windwp/nvim-ts-autotag',
 		},
+		config = function()
+			vim.keymap.set('n', '<leader>fq', '<cmd>NvimTreeClose<cr>', { desc = '[nvim-tree] close', silent = true })
+		end,
 	},
 	{
 		'ThePrimeagen/harpoon',
@@ -66,6 +69,12 @@ require('lazy').setup({
 		'neovim/nvim-lspconfig',
 		event = { 'BufReadPre', 'BufNewFile' },
 		dependencies = {
+			{
+				'folke/neoconf.nvim',
+				config = function()
+					require('neoconf').setup()
+				end,
+			},
 			'hrsh7th/cmp-nvim-lsp',
 			'hrsh7th/nvim-cmp',
 			{
@@ -478,4 +487,5 @@ require('lazy').setup({
 			'nvim-tree/nvim-web-devicons',
 		},
 	},
+	'sigmasd/deno-nvim',
 })

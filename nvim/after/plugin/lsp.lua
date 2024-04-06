@@ -6,6 +6,14 @@ local navic = require('nvim-navic')
 local keymap = vim.keymap -- for conciseness
 local opts = { noremap = true, silent = true }
 
+local function is_deno_project()
+	-- Check for deno.json or deno.jsonc in the current directory and upwards
+	local filepath = vim.fn.expand('%:p:h') -- Get the full path of the current file's directory
+	local deno_file_found = vim.fn.findfile('deno.json', filepath .. ';') ~= ''
+		or vim.fn.findfile('deno.jsonc', filepath .. ';') ~= ''
+	return deno_file_found
+end
+
 local on_attach = function(client, bufnr)
 	opts.buffer = bufnr
 
@@ -14,7 +22,9 @@ local on_attach = function(client, bufnr)
 
 	if client.server_capabilities.documentSymbolProvider then
 		navbuddy.attach(client, bufnr)
-		navic.attach(client, bufnr)
+		if not navic.is_available(bufnr) then
+			navic.attach(client, bufnr)
+		end
 	end
 
 	-- set keybinds
@@ -81,6 +91,12 @@ for type, icon in pairs(signs) do
 	local hl = 'DiagnosticSign' .. type
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = '' })
 end
+
+-- configure jsonls server
+lspconfig['jsonls'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
 
 -- configure html server
 lspconfig['html'].setup({
@@ -219,6 +235,37 @@ require('typescript-tools').setup({
 			includeInlayPropertyDeclarationTypeHints = true,
 			includeInlayFunctionLikeReturnTypeHints = true,
 			includeInlayEnumMemberValueHints = true,
+		},
+	},
+})
+
+require('deno-nvim').setup({
+	server = {
+		on_attach = on_attach,
+		capabilites = capabilities,
+		settings = {
+			deno = {
+				inlayHints = {
+					parameterNames = {
+						enabled = 'all',
+					},
+					parameterTypes = {
+						enabled = true,
+					},
+					variableTypes = {
+						enabled = true,
+					},
+					propertyDeclarationTypes = {
+						enabled = true,
+					},
+					functionLikeReturnTypes = {
+						enabled = true,
+					},
+					enumMemberValues = {
+						enabled = true,
+					},
+				},
+			},
 		},
 	},
 })

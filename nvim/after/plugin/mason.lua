@@ -21,11 +21,13 @@ mason_lspconfig.setup({
 	ensure_installed = {
 		'bashls',
 		'cssls',
+		'denols',
 		'emmet_language_server',
 		'eslint',
 		'gopls',
 		'graphql',
 		'html',
+		'jsonls',
 		'lua_ls',
 		'prismals',
 		'pyright',
