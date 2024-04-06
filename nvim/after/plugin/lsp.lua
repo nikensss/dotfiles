@@ -1,3 +1,5 @@
+local is_deno_project = require('ricard.functions').is_deno_project
+
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local navbuddy = require('nvim-navbuddy')
@@ -192,75 +194,77 @@ lspconfig['lua_ls'].setup({
 })
 
 -- typescript-tools
-require('typescript-tools').setup({
-	on_attach = function(client, bufnr)
-		on_attach(client, bufnr)
-
-		local options = { desc = '[ts-tools] organize imports', buffer = bufnr }
-		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
-
-		options = { desc = '[ts-tools] sort imports' }
-		vim.keymap.set('n', '<leader>tsi', vim.cmd.TSToolsSortImports, options)
-
-		options = { desc = '[ts-tools] remove unused statements' }
-		vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsRemoveUnused, options)
-
-		options = { desc = '[ts-tools] remove unused imports' }
-		vim.keymap.set('n', '<leader>tsu', vim.cmd.TSToolsRemoveUnusedImports, options)
-
-		options = { desc = '[ts-tools] add missing imports' }
-		vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, options)
-
-		options = { desc = '[ts-tools] re-attach lsp' }
-		vim.keymap.set('n', '<leader>tsk', function()
-			on_attach(client, vim.api.nvim_get_current_buf())
-		end, options)
-	end,
-	settings = {
-		tsserver_file_preferences = {
-			importModuleSpecifierPreference = 'non-relative',
-			includeInlayParameterNameHints = 'all',
-			includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-			includeInlayFunctionParameterTypeHints = true,
-			includeInlayVariableTypeHints = true,
-			includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-			includeInlayPropertyDeclarationTypeHints = true,
-			includeInlayFunctionLikeReturnTypeHints = true,
-			includeInlayEnumMemberValueHints = true,
-		},
-	},
-})
-
-require('deno-nvim').setup({
-	server = {
-		on_attach = on_attach,
-		capabilites = capabilities,
-		settings = {
-			deno = {
-				inlayHints = {
-					parameterNames = {
-						enabled = 'all',
-					},
-					parameterTypes = {
-						enabled = true,
-					},
-					variableTypes = {
-						enabled = true,
-					},
-					propertyDeclarationTypes = {
-						enabled = true,
-					},
-					functionLikeReturnTypes = {
-						enabled = true,
-					},
-					enumMemberValues = {
-						enabled = true,
+if is_deno_project() then
+	require('deno-nvim').setup({
+		server = {
+			on_attach = on_attach,
+			capabilites = capabilities,
+			settings = {
+				deno = {
+					inlayHints = {
+						parameterNames = {
+							enabled = 'all',
+						},
+						parameterTypes = {
+							enabled = true,
+						},
+						variableTypes = {
+							enabled = true,
+						},
+						propertyDeclarationTypes = {
+							enabled = true,
+						},
+						functionLikeReturnTypes = {
+							enabled = true,
+						},
+						enumMemberValues = {
+							enabled = true,
+						},
 					},
 				},
 			},
 		},
-	},
-})
+	})
+else
+	require('typescript-tools').setup({
+		on_attach = function(client, bufnr)
+			on_attach(client, bufnr)
+
+			local options = { desc = '[ts-tools] organize imports', buffer = bufnr }
+			vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
+
+			options = { desc = '[ts-tools] sort imports' }
+			vim.keymap.set('n', '<leader>tsi', vim.cmd.TSToolsSortImports, options)
+
+			options = { desc = '[ts-tools] remove unused statements' }
+			vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsRemoveUnused, options)
+
+			options = { desc = '[ts-tools] remove unused imports' }
+			vim.keymap.set('n', '<leader>tsu', vim.cmd.TSToolsRemoveUnusedImports, options)
+
+			options = { desc = '[ts-tools] add missing imports' }
+			vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, options)
+
+			options = { desc = '[ts-tools] re-attach lsp' }
+			vim.keymap.set('n', '<leader>tsk', function()
+				on_attach(client, vim.api.nvim_get_current_buf())
+			end, options)
+		end,
+		settings = {
+			tsserver_file_preferences = {
+				importModuleSpecifierPreference = 'non-relative',
+				includeInlayParameterNameHints = 'all',
+				includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+				includeInlayFunctionParameterTypeHints = true,
+				includeInlayVariableTypeHints = true,
+				includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+				includeInlayPropertyDeclarationTypeHints = true,
+				includeInlayFunctionLikeReturnTypeHints = true,
+				includeInlayEnumMemberValueHints = true,
+			},
+		},
+	})
+end
 
 local format_diagnostic_message = function(diagnostic)
 	local severity = vim.diagnostic.severity[diagnostic.severity]
