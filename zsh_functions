@@ -49,10 +49,30 @@ ctp(){
   echo 'save-exact=true' > .npmrc
 
   NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
-  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset cross-os jest @types/jest ts-jest
+  npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset jest @types/jest ts-jest
   npm i dotenv zod
 
-  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/strict-type-checked" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
+  cat << _EOF_ >> eslint.config.js
+const typescriptParser = require('@typescript-eslint/parser');
+const tsEslintPlugin = require('@typescript-eslint/eslint-plugin');
+
+module.exports = [
+  tsEslintPlugin.configs['recommended-type-checked'],
+  {
+    languageOptions: { parser: typescriptParser, parserOptions: { project: './tsconfig.json' } },
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: ['reset.d.ts'],
+    rules: {
+      'consistent-return': 1,
+      eqeqeq: 1,
+      'no-param-reassign': 1,
+      '@typescript-eslint/no-floating-promises': 2,
+      '@typescript-eslint/explicit-function-return-type': 2,
+      '@typescript-eslint/explicit-module-boundary-types': 2
+    }
+  }
+];
+_EOF_
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
 
@@ -133,15 +153,9 @@ _EOF_
   npm pkg set scripts.test="npm run test:ts"
   npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
   npm pkg set scripts.dev="ts-node -r dotenv/config ./src/index.ts"
-  npm pkg set scripts.pretty="cross-os pretty"
-  npm pkg set scripts.pretty:check="cross-os pretty:check"
-  npm pkg set scripts.lint="cross-os lint"
-  npm pkg set cross-os.lint.darwin="eslint 'src/**/*.ts'"
-  npm pkg set cross-os.lint.win32="eslint src/**/*.ts"
-  npm pkg set cross-os.pretty:check.darwin="prettier --check 'src/**/*.ts'"
-  npm pkg set cross-os.pretty:check.win32="prettier --check src/**/*.ts"
-  npm pkg set cross-os.pretty.darwin="prettier --write 'src/**/*.ts'"
-  npm pkg set cross-os.pretty.win32="prettier --write src/**/*.ts"
+  npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
+  npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
+  npm pkg set scripts.lint="eslint"
 
   npx husky init
 
@@ -168,7 +182,7 @@ echo \$GREEN'✓ No changes left to commit'\$NO_COLOR
 
 _EOF_
 
-  npx prettier --write './**/*.{json,ts}'
+  npx prettier --write './**/*.{js,json,ts}'
 
   git add --all
   git commit -am "chore: initial commit"
@@ -202,11 +216,30 @@ cbp(){
 exact = true
 _EOF_
 
-  bun add -D rimraf typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @total-typescript/ts-reset cross-os jest @types/jest ts-jest @types/bun
+  bun add -D rimraf typescript eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @total-typescript/ts-reset jest @types/jest ts-jest @types/bun
   bun add zod
 
-  echo '{ "parser": "@typescript-eslint/parser", "parserOptions": { "project":"./tsconfig.json" }, "extends": [ "plugin:@typescript-eslint/strict-type-checked" ], "rules": { "consistent-return": 1, "eqeqeq": 1, "no-param-reassign": 1, "@typescript-eslint/no-floating-promises": 2, "@typescript-eslint/explicit-function-return-type": 2, "@typescript-eslint/explicit-module-boundary-types": 2} }' > .eslintrc.json
-  echo 'reset.d.ts' > .eslintignore
+  cat << _EOF_ >> eslint.config.js
+import typescriptParser from '@typescript-eslint/parser';
+import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
+
+export default [
+  tsEslintPlugin.configs['recommended-type-checked'],
+  {
+    languageOptions: { parser: typescriptParser, parserOptions: { project: './tsconfig.json' } },
+    files: ['src/**/*.ts', 'src/**/*.tsx'],
+    ignores: ['reset.d.ts'],
+    rules: {
+      'consistent-return': 1,
+      eqeqeq: 1,
+      'no-param-reassign': 1,
+      '@typescript-eslint/no-floating-promises': 2,
+      '@typescript-eslint/explicit-function-return-type': 2,
+      '@typescript-eslint/explicit-module-boundary-types': 2
+    }
+  }
+];
+_EOF_
   echo '{ "printWidth": 120, "tabWidth": 2, "useTabs": false, "semi": true, "singleQuote": true, "trailingComma": "none", "arrowParens": "avoid" }' > .prettierrc.json
   echo '{ "extends": ["@commitlint/config-conventional"] }' > .commitlintrc.json
 
@@ -271,15 +304,9 @@ _EOF_
   npm pkg set main="./src/index.ts"
   npm pkg set scripts.test="jest --config ts-jest.config.json"
   npm pkg set scripts.start="bun ./src/index.ts"
-  npm pkg set scripts.pretty="cross-os pretty"
-  npm pkg set scripts.pretty:check="cross-os pretty:check"
-  npm pkg set scripts.lint="cross-os lint"
-  npm pkg set cross-os.lint.darwin="eslint './src/**/*.ts'"
-  npm pkg set cross-os.lint.win32="eslint ./src/**/*.ts"
-  npm pkg set cross-os.pretty:check.darwin="prettier --check './src/**/*.ts'"
-  npm pkg set cross-os.pretty:check.win32="prettier --check ./src/**/*.ts"
-  npm pkg set cross-os.pretty.darwin="prettier --write './src/**/*.ts'"
-  npm pkg set cross-os.pretty.win32="prettier --write ./src/**/*.ts"
+  npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
+  npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
+  npm pkg set scripts.lint="eslint"
 
   bunx husky init
 
@@ -306,7 +333,7 @@ echo \$GREEN'✓ No changes left to commit'\$NO_COLOR
 
 _EOF_
 
-  bunx prettier --write './**/*.{json,ts}'
+  bunx prettier --write './**/*.{js,json,ts}'
 
   git add --all
   git commit -am "chore: initial commit"
