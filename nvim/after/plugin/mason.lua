@@ -32,6 +32,7 @@ mason_lspconfig.setup({
 		'pyright',
 		'rust_analyzer',
 		'tailwindcss',
+		'taplo',
 		-- 'codelldb'
 	},
 	-- auto-install configured servers (with lspconfig)

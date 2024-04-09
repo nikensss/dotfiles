@@ -98,6 +98,12 @@ lspconfig['jsonls'].setup({
 	on_attach = on_attach,
 })
 
+-- configure taplo server
+lspconfig['taplo'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
 -- configure html server
 lspconfig['html'].setup({
 	capabilities = capabilities,
