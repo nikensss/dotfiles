@@ -1,13 +1,4 @@
-local is_deno_project = require('ricard.functions').is_deno_project
 local conform = require('conform')
-
-local function formatters_checked_with_deno()
-	if is_deno_project() then
-		return { 'deno_fmt' }
-	else
-		return { 'prettierd', 'prettier' }
-	end
-end
 
 conform.setup({
 	formatters_by_ft = {
@@ -15,16 +6,16 @@ conform.setup({
 		gleam = { 'gleam' },
 		graphql = { { 'prettierd', 'prettier' } },
 		html = { { 'prettierd', 'prettier' } },
-		javascript = formatters_checked_with_deno,
-		javascriptreact = formatters_checked_with_deno,
-		json = formatters_checked_with_deno,
-		jsonc = formatters_checked_with_deno,
+		javascript = { 'prettierd', 'prettier' },
+		javascriptreact = { 'prettierd', 'prettier' },
+		json = { 'prettierd', 'prettier' },
+		jsonc = { 'prettierd', 'prettier' },
 		lua = { 'stylua' },
-		markdown = formatters_checked_with_deno,
+		markdown = { 'prettierd', 'prettier' },
 		python = { 'isort', 'black' },
 		sql = { 'sleek' },
-		typescript = formatters_checked_with_deno,
-		typescriptreact = formatters_checked_with_deno,
+		typescript = { 'prettierd', 'prettier' },
+		typescriptreact = { 'prettierd', 'prettier' },
 		yaml = { { 'prettierd', 'prettier' } },
 	},
 	format_on_save = {
