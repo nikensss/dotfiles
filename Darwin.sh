@@ -35,14 +35,14 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks
 brew tap oven-sh/bun 
 brew install bun
 brew upgrade
 
 fnm install --lts
 fnm use --lts
-npm i -g livedown
+npm i -g livedown neovim @nikensss/sauna
 
 echo "${GREEN}tmux plugin manager and themes${RESET}"
 if [ ! -d ~/.tmux/plugins/tpm ]; then
