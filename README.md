@@ -129,3 +129,14 @@ FROM
 ## Scrolling up in tmux/ssh/screen:
 
 `ctrl-a`+`[`
+
+## Vim
+
+### Project wide search and replace
+
+First find all occurrences with telescope and send to quickfix list (<C-q>).
+Then:
+
+```bash
+cfdo %s/stringOne/stringTwo/g | update | bd
+```
