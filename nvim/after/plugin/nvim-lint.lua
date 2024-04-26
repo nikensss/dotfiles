@@ -25,6 +25,8 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
 				svelte = { 'deno' },
 				python = { 'pylint' },
 			}
+			lint.try_lint()
+			return
 		end
 
 		lint.try_lint()
