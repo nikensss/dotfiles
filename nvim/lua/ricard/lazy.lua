@@ -449,7 +449,6 @@ require('lazy').setup({
 			'nvim-tree/nvim-web-devicons',
 		},
 	},
-	'sigmasd/deno-nvim',
 	{
 		'kndndrj/nvim-dbee',
 		dependencies = {
