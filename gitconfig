@@ -8,7 +8,7 @@
 [user]
 	name = Ricard Mallafre
 	email = rikitzzz@gmail.com
-	signingkey = /Users/ricard/.ssh/id_rsa.pub
+	signingkey = /Users/ricard/.ssh/id_ed25519.pub
 [push]
 	default = simple
 [color]
