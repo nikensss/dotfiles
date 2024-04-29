@@ -28,3 +28,5 @@
 	ff = only
 [gpg]
 	format = ssh
+[commit]
+	gpgsign = true
