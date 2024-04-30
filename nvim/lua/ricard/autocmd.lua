@@ -66,3 +66,18 @@ vim.api.nvim_create_autocmd('FileType', {
 -- 		end
 -- 	end,
 -- })
+
+-- Use an augroup to clear previous autocmds of the same group and avoid duplicates
+vim.api.nvim_create_augroup('UnfoldDboutFiles', { clear = true })
+
+-- Create the autocmd
+vim.api.nvim_create_autocmd('FileType', {
+	-- Specify the filetype
+	pattern = 'dbout',
+	-- Specify the command to run: 'set foldlevel=99' opens all folds
+	callback = function()
+		vim.cmd('normal! zR')
+	end,
+	-- Specify the group to use, so this autocmd is managed under 'UnfoldDboutFiles'
+	group = 'UnfoldDboutFiles',
+})
