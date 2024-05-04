@@ -279,15 +279,11 @@ vim.diagnostic.config({
 
 -- rustacean.nvim
 
-HOME_PATH = os.getenv('HOME') .. '/'
-MASON_PATH = HOME_PATH .. '.local/share/nvim/mason/packages/'
-local codelldb_path = MASON_PATH .. 'codelldb/extension/adapter/codelldb'
-local liblldb_path = MASON_PATH .. 'codelldb/extension/lldb/lib/liblldb.dylib'
-
 vim.g.rustaceanvim = function()
 	local cfg = require('rustaceanvim.config')
 	return {
 		tools = {
+			enable_nextest = false,
 			hover_actions = {
 				auto_focus = true,
 			},
@@ -296,13 +292,21 @@ vim.g.rustaceanvim = function()
 			on_attach = function(client, bufnr)
 				on_attach(client, bufnr)
 
+				vim.keymap.set('n', '<leader>rt', function()
+					vim.cmd.RustLsp('testables')
+				end, { desc = '[rustaceanvim] rust testables' })
+
+				vim.keymap.set('n', '<leader>rr', function()
+					vim.cmd.RustLsp({ 'testables', bang = true })
+				end, { desc = '[rustaceanvim] rust testables' })
+
 				vim.keymap.set('n', '<leader>rb', function()
 					vim.cmd.RustLsp('debuggables')
 				end, { desc = '[rustaceanvim] rust debuggables' })
 
 				vim.keymap.set('n', '<leader>rl', function()
 					vim.cmd.RustLsp({ 'debuggables', bang = true })
-				end, { desc = '[rustaceanvim] rust test nearest' })
+				end, { desc = '[rustaceanvim] rust debug last' })
 
 				vim.keymap.set('n', '<leader>ra', function()
 					vim.cmd.RustLsp('codeAction')
@@ -320,10 +324,6 @@ vim.g.rustaceanvim = function()
 					vim.cmd.RustLsp('renderDiagnostic')
 				end, { silent = true, desc = '[rustaceanvim] render diagnostics' })
 			end,
-		},
-		-- DAP configuration
-		dap = {
-			adapter = cfg.get_codelldb_adapter(codelldb_path, liblldb_path),
 		},
 	}
 end
