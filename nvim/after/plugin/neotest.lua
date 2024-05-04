@@ -5,8 +5,8 @@ neotest.setup({
 			recursive_run = true,
 		}),
 		require('neotest-jest')({
-			jestConfigFile = function()
-				local file = vim.fn.expand('%:p')
+			jestConfigFile = function(test_file_path)
+				local file = test_file_path or vim.fn.expand('%:p')
 
 				local configFiles = {
 					'ts-jest.config.js',
@@ -31,8 +31,8 @@ neotest.setup({
 					end
 				end
 			end,
-			cwd = function()
-				local file = vim.fn.expand('%:p')
+			cwd = function(test_file_path)
+				local file = test_file_path or vim.fn.expand('%:p')
 
 				if string.find(file, '/packages/') then
 					return string.match(file, '(.-/[^/]+/)src')
