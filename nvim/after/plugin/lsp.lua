@@ -280,10 +280,8 @@ vim.diagnostic.config({
 -- rustacean.nvim
 
 vim.g.rustaceanvim = function()
-	local cfg = require('rustaceanvim.config')
 	return {
 		tools = {
-			enable_nextest = false,
 			hover_actions = {
 				auto_focus = true,
 			},
