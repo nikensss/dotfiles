@@ -1,6 +1,7 @@
 local lint = require('lint')
 
 lint.linters_by_ft = {
+	css = { 'css-lsp' },
 	javascript = { 'eslint' },
 	typescript = { 'eslint' },
 	javascriptreact = { 'eslint' },

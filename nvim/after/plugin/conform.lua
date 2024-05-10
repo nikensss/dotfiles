@@ -2,8 +2,11 @@ local conform = require('conform')
 
 conform.setup({
 	formatters_by_ft = {
+		cpp = { 'clang-format' },
 		css = { { 'prettierd', 'prettier' } },
 		gleam = { 'gleam' },
+		go = { 'goimports' },
+		gomod = { 'goimports' },
 		graphql = { { 'prettierd', 'prettier' } },
 		html = { { 'prettierd', 'prettier' } },
 		javascript = { 'prettierd', 'prettier' },
@@ -12,6 +15,7 @@ conform.setup({
 		jsonc = { 'prettierd', 'prettier' },
 		lua = { 'stylua' },
 		markdown = { 'prettierd', 'prettier' },
+		prisma = { 'prismals' },
 		python = { 'isort', 'black' },
 		sql = { 'sleek' },
 		typescript = { 'prettierd', 'prettier' },
