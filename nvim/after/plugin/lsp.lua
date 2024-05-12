@@ -177,6 +177,12 @@ lspconfig['gleam'].setup({
 	on_attach = on_attach,
 })
 
+-- configure gleam server
+lspconfig['gleam'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
 -- configure python server
 lspconfig['pyright'].setup({
 	capabilities = capabilities,
