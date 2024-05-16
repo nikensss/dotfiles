@@ -35,7 +35,7 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks pyenv pyenv-virtualenv
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks pyenv pyenv-virtualenv cmake exiftool asdf
 brew tap oven-sh/bun 
 brew install bun
 brew upgrade
@@ -62,7 +62,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 echo "${BLUE}adding rustfmt component${RESET}"
 rustup component add rustfmt
 rustup component add clippy
-cargo install sleek
+cargo install sleek silicon
 
 cd ~
 mkdir repos

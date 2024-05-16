@@ -157,11 +157,13 @@ if command -v ngrok &>/dev/null; then
     eval "$(ngrok completion)"
 fi
 
-source ~/.zsh_aliases
-source ~/.zsh_functions
+. /opt/homebrew/opt/asdf/libexec/asdf.sh
 
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
 export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
 
 export PATH="$PATH:/usr/local/go/bin"
+
+source ~/.zsh_aliases
+source ~/.zsh_functions

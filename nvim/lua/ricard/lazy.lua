@@ -427,7 +427,7 @@ require('lazy').setup({
 		'nvim-tree/nvim-tree.lua',
 		config = function()
 			require('nvim-tree').setup({
-				hijack_netrw = false,
+				hijack_netrw = true,
 				actions = {
 					open_file = {
 						resize_window = false,
@@ -470,6 +470,17 @@ require('lazy').setup({
 		end,
 		keys = {
 			{ '<leader><leader>pg', '<cmd>lua require"dbee".toggle()<CR>', desc = '[dbee] toggle' },
+		},
+	},
+	{
+		'elixir-tools/elixir-tools.nvim',
+		version = '*',
+		event = { 'BufReadPre', 'BufNewFile' },
+		config = function()
+			require('elixir').setup()
+		end,
+		dependencies = {
+			'nvim-lua/plenary.nvim',
 		},
 	},
 })
