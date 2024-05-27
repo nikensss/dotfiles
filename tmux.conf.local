@@ -4,19 +4,16 @@
 #         without any warranty.
 #         Copyright 2012— Gregory Pakosz (@gpakosz).
 
-bind -r H resize-pane -L 5
-bind -r J resize-pane -D 5
-bind -r K resize-pane -U 5
-bind -r L resize-pane -R 5
-
 bind-key -n C-S-Left swap-window -t -1\; select-window -t -1
 bind-key -n C-S-Right swap-window -t +1\; select-window -t +1
 
 # tmux-sessionizer
 bind-key -r f run-shell "tmux neww ~/bin/tmux-sessionizer"
 bind-key -r C-f run-shell "tmux neww ~/bin/tmux-sessionizer"
-
 bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
+
+# alternate between last two sessions
+bind-key C-p switch-client -l
 
 # -- navigation ----------------------------------------------------------------
 
