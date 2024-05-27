@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+clang-format -style=google -dump-config > .clang-format
+
+cat ".clang-format" | perl -pe 's/ColumnLimit:\s+80/ColumnLimit: 120/g;s/AllowShortEnumsOnASingleLine:\s+true/AllowShortEnumsOnASingleLine: false/g' > .clang-format.temp
+mv .clang-format.temp .clang-format
+
+echo -e "CompileFlags:\n  Add: [-std=c++17, -Wall, -Wextra, -Werror]" > .clangd
+
+cmake --version
+cmake -E capabilities
+cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=/usr/bin/clang -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/clang++ -S$(pwd) -B$(pwd)/build -G "Unix Makefiles"
+
