@@ -3,7 +3,6 @@ local is_deno_project = require('ricard.functions').is_deno_project
 local lint = require('lint')
 
 lint.linters_by_ft = {
-	css = { 'css-lsp' },
 	javascript = { 'eslint' },
 	typescript = { 'eslint' },
 	javascriptreact = { 'eslint' },
@@ -30,7 +29,6 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
 			return
 		else
 			lint.linters_by_ft = {
-				css = { 'css-lsp' },
 				javascript = { 'eslint' },
 				typescript = { 'eslint' },
 				javascriptreact = { 'eslint' },
