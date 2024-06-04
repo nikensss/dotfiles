@@ -39,7 +39,6 @@ require('lazy').setup({
 			'nvim-treesitter/nvim-treesitter-context',
 			'nvim-treesitter/nvim-treesitter-refactor',
 			'nvim-treesitter/nvim-treesitter-textobjects',
-			'windwp/nvim-ts-autotag',
 		},
 		config = function()
 			vim.keymap.set('n', '<leader>fq', '<cmd>NvimTreeClose<cr>', { desc = '[nvim-tree] close', silent = true })
