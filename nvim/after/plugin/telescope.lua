@@ -1,6 +1,5 @@
 local builtin = require('telescope.builtin')
 local actions = require('telescope.actions')
-local trouble = require('trouble.providers.telescope')
 
 local options = { noremap = true, silent = true }
 
@@ -69,14 +68,14 @@ require('telescope').setup({
 				['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
 				['<C-f>'] = actions.preview_scrolling_down,
 				['<C-b>'] = actions.preview_scrolling_up,
-				['<C-t>'] = trouble.open_with_trouble,
+				['<C-t>'] = require('trouble.sources.telescope').open,
 			},
 			i = {
 				['<C-d>'] = actions.delete_buffer,
 				['<C-s>'] = actions.toggle_selection + actions.move_selection_worse,
 				['<C-f>'] = actions.preview_scrolling_down,
 				['<C-b>'] = actions.preview_scrolling_up,
-				['<C-t>'] = trouble.open_with_trouble,
+				['<C-t>'] = require('trouble.sources.telescope').open,
 			},
 		},
 	},
