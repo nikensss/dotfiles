@@ -309,7 +309,7 @@ require('lazy').setup({
 		opts = {},
 		config = function()
 			vim.keymap.set('n', '<leader>ee', function()
-				require('trouble').toggle()
+				require('trouble').toggle('diagnostics')
 			end, { desc = '[trouble] toggle' })
 
 			vim.keymap.set('n', '<leader>ew', function()
