@@ -75,9 +75,9 @@ require('nvim-treesitter.configs').setup({
 				['vd'] = { query = '@lexical_declaration.value', desc = 'Select value (rhs) part of an assignment' },
 				['nd'] = { query = '@lexical_declaration.name', desc = 'Select name (lhs) part of an assignment' },
 
-				['ay'] = { query = '@type.outer', desc = 'Select type definition' },
-				['iy'] = { query = '@type.rhs', desc = 'Select type definition value' },
-				['oy'] = { query = '@type.lhs', desc = 'Select type definition name' },
+				['at'] = { query = '@ts_type.full', desc = 'Select type definition' },
+				['vt'] = { query = '@ts_type.value', desc = 'Select type definition value' },
+				['nt'] = { query = '@ts_type.name', desc = 'Select type definition name' },
 
 				-- works for javascript/typescript files (custom capture defined in after/queries/ecma/textobjects.scm)
 				['a:'] = { query = '@property.outer', desc = 'Select outer part of an object property' },
@@ -128,7 +128,7 @@ require('nvim-treesitter.configs').setup({
 				[']c'] = { query = '@class.outer', desc = 'Next class start' },
 				[']i'] = { query = '@conditional.outer', desc = 'Next conditional start' },
 				[']l'] = { query = '@loop.outer', desc = 'Next loop start' },
-				[']y'] = { query = '@type.outer', desc = 'Next type start' },
+				[']t'] = { query = '@ts_type.full', desc = 'Next type start' },
 
 				-- You can pass a query group to use query from `queries/<lang>/<query_group>.scm file in your runtime path.
 				-- Below example nvim-treesitter's `locals.scm` and `folds.scm`. They also provide highlights.scm and indent.scm.
@@ -142,7 +142,7 @@ require('nvim-treesitter.configs').setup({
 				[']C'] = { query = '@class.outer', desc = 'Next class end' },
 				[']I'] = { query = '@conditional.outer', desc = 'Next conditional end' },
 				[']L'] = { query = '@loop.outer', desc = 'Next loop end' },
-				[']Y'] = { query = '@type.outer', desc = 'Next type end' },
+				[']T'] = { query = '@ts_type.type', desc = 'Next type end' },
 			},
 			goto_previous_start = {
 				['[d'] = { query = '@lexical_declaration.outer', desc = 'Prev lexical declaration start' },
@@ -151,7 +151,7 @@ require('nvim-treesitter.configs').setup({
 				['[c'] = { query = '@class.outer', desc = 'Prev class start' },
 				['[i'] = { query = '@conditional.outer', desc = 'Prev conditional start' },
 				['[l'] = { query = '@loop.outer', desc = 'Prev loop start' },
-				['[y'] = { query = '@type.outer', desc = 'Prev type start' },
+				['[t'] = { query = '@ts_type.type', desc = 'Prev type start' },
 			},
 			goto_previous_end = {
 				['[D'] = { query = '@lexical_declaration.outer', desc = 'Prev lexical declaration end' },
@@ -160,7 +160,7 @@ require('nvim-treesitter.configs').setup({
 				['[C'] = { query = '@class.outer', desc = 'Prev class end' },
 				['[I'] = { query = '@conditional.outer', desc = 'Prev conditional end' },
 				['[L'] = { query = '@loop.outer', desc = 'Prev loop end' },
-				['[Y'] = { query = '@type.outer', desc = 'Prev type end' },
+				['[T'] = { query = '@ts_type.type', desc = 'Prev type end' },
 			},
 		},
 	},
