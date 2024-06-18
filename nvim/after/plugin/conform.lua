@@ -24,7 +24,6 @@ conform.setup({
 		jsonc = formatters_checked_with_deno,
 		lua = { 'stylua' },
 		markdown = formatters_checked_with_deno,
-		prisma = { 'prismals' },
 		python = { 'isort', 'black' },
 		sql = { 'sleek' },
 		typescript = formatters_checked_with_deno,
