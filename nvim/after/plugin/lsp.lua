@@ -39,10 +39,10 @@ local on_attach = function(client, bufnr)
 	keymap.set('n', 'gi', '<cmd>Telescope lsp_implementations<CR>', opts) -- show lsp implementations
 
 	opts.desc = 'Show incoming calls'
-	keymap.set('n', 'gj', '<cmd>Telescope lsp_incoming_calls<CR>', opts) -- show outline
+	keymap.set('n', 'gj', '<cmd>Telescope lsp_incoming_calls<CR>', opts) -- show incoming calls
 
 	opts.desc = 'Show outgoing calls'
-	keymap.set('n', 'gk', '<cmd>Telescope lsp_outgoing_calls<CR>', opts) -- show outline
+	keymap.set('n', 'gk', '<cmd>Telescope lsp_outgoing_calls<CR>', opts) -- show outgoing calls
 
 	-- opts.desc = 'See available code actions'
 	-- keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
