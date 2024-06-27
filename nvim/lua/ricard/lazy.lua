@@ -201,28 +201,6 @@ require('lazy').setup({
 		priority = 1000,
 	},
 	{
-		'rest-nvim/rest.nvim',
-		ft = { 'http' },
-		dependencies = { 'luarocks.nvim' },
-		config = function()
-			require('rest-nvim').setup()
-
-			vim.keymap.set(
-				'n',
-				'<leader>rr',
-				'<cmd>Rest run<cr>',
-				{ desc = '[rest.nvim] send request under cursor', silent = true }
-			)
-
-			vim.keymap.set(
-				'n',
-				'<leader>rl',
-				'<cmd>Rest run last<cr>',
-				{ desc = '[rest.nvim] send last request', silent = true }
-			)
-		end,
-	},
-	{
 		'kristijanhusak/vim-dadbod-ui',
 		dependencies = {
 			'tpope/vim-dadbod',
