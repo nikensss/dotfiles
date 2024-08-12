@@ -21,9 +21,7 @@ function M.get_session_path()
 end
 
 function M.get_qf_list_path()
-	local fixed_branch_name = string.gsub(M.get_branch_name(), '/', '_')
-	local qf_list_name = M.get_current_folder_name() .. '__' .. fixed_branch_name .. '.qf'
-
+	local qf_list_name = string.gsub(M.get_session_path(), '.session$', '.qf')
 	return vim.fn.expand('~/.config/nvim/' .. qf_list_name)
 end
 

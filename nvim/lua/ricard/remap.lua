@@ -149,6 +149,13 @@ end
 
 vim.keymap.set('n', '<leader><leader>tp', theme_picker, { silent = true, desc = '[t]heme [p]icker' })
 
+local function load_session_file(session_file)
+	vim.cmd('source ' .. session_file)
+	load_qf_list(string.gsub(session_file, '.session$', '.qf'))
+	vim.cmd('NvimTreeClose')
+	print('loaded session from ' .. session_file)
+end
+
 local function show_available_sessions(on_selection)
 	telescope_builtin.find_files({
 		prompt_title = 'Available sessions',
@@ -170,8 +177,8 @@ local function pick_session()
 		map({ 'i', 'n' }, '<CR>', function()
 			local selection = action_state.get_selected_entry()
 			actions.close(prompt_bufnr)
-			vim.cmd('source ~/.config/nvim/' .. string.sub(selection.value, 3))
-			load_qf_list('~/.config/nvim/' .. string.gsub(string.sub(selection.value, 3), '.session$', '.qf'))
+			local session_path = '~/.config/nvim/' .. string.sub(selection.value, 3)
+			load_session_file(vim.fn.expand(session_path))
 		end)
 	end)
 end
@@ -179,9 +186,7 @@ end
 vim.keymap.set('n', '<leader>ls', function()
 	local session_path = get_session_path()
 	if vim.fn.filereadable(vim.fn.expand(session_path)) == 1 then
-		vim.cmd('source ' .. session_path)
-		load_qf_list()
-		print('loaded session from ' .. session_path)
+		load_session_file(session_path)
 	else
 		pick_session()
 	end
