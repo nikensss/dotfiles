@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+while read -r BRANCH_NAME; do
+  git rev-parse --abbrev-ref $BRANCH_NAME@{upstream} &> /dev/null 2>&1
+  if [[ $? == 0 ]]; then
+    git branch -D $BRANCH_NAME
+  fi
+done < <(git branch --format='%(refname:short)')
