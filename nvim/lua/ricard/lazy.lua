@@ -491,6 +491,6 @@ require('lazy').setup({
 		end,
 	},
 	{
-		'BlackLight/nvim-http',
+		'rest-nvim/rest.nvim',
 	},
 })
