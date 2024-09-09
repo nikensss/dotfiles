@@ -48,27 +48,37 @@ ctp(){
   npm init --yes
   echo 'save-exact=true' > .npmrc
 
-  NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1.\2/')
+  NODE_VERSION=$(node -v | sed 's/^v\([^\.]*\).\([^\.]*\)\..*$/\1/')
   npm i -D rimraf typescript ts-node eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin prettier @commitlint/cli @commitlint/config-conventional husky @types/node@$NODE_VERSION @total-typescript/ts-reset jest @types/jest ts-jest
   npm i dotenv zod
 
-  cat << _EOF_ >> eslint.config.js
-const typescriptParser = require('@typescript-eslint/parser');
-const tsEslintPlugin = require('@typescript-eslint/eslint-plugin');
+  cat << _EOF_ >> eslint.config.mjs
+import typescriptParser from '@typescript-eslint/parser';
+import tsEslintPlugin from '@typescript-eslint/eslint-plugin';
 
-module.exports = [
-  tsEslintPlugin.configs['recommended-type-checked'],
+export default [
   {
-    languageOptions: { parser: typescriptParser, parserOptions: { project: './tsconfig.json' } },
     files: ['src/**/*.ts', 'src/**/*.tsx'],
     ignores: ['reset.d.ts'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        project: './tsconfig.json',
+        ecmaVersion: 'latest',
+        sourceType: 'module'
+      }
+    },
+    plugins: {
+      '@typescript-eslint': tsEslintPlugin
+    },
     rules: {
-      'consistent-return': 1,
-      eqeqeq: 1,
-      'no-param-reassign': 1,
-      '@typescript-eslint/no-floating-promises': 2,
-      '@typescript-eslint/explicit-function-return-type': 2,
-      '@typescript-eslint/explicit-module-boundary-types': 2
+      ...tsEslintPlugin.configs['recommended-type-checked'].rules,
+      'consistent-return': 'warn',
+      eqeqeq: 'warn',
+      'no-param-reassign': 'warn',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/explicit-function-return-type': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'error'
     }
   }
 ];
@@ -106,7 +116,7 @@ _EOF_
 
   npx tsc --init --target ES2022 --outDir './dist' 
   # we can't pipe from one file to itself, so we use that chance to build the tsconfig.test.json
-  cat tsconfig.json | perl -pe 's/(\/\*.*\*\/)//;s/\/\/.*$//' | jq '.include = ["src","test"]' > tsconfig.test.json
+  cat tsconfig.json | perl -pe 's/(\/\*.*\*\/)//;s/\/\/.*$//' | jq '.include = ["src","test"] | .compilerOptions.strict = true | .compilerOptions.sourceMap = true' > tsconfig.test.json
   cp tsconfig.test.json tsconfig.json
   echo '{ "extends": "./tsconfig.json" }' > tsconfig.test.json
 

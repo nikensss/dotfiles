@@ -12,12 +12,12 @@ end
 conform.setup({
 	formatters_by_ft = {
 		cpp = { 'clang-format' },
-		css = { { 'prettierd', 'prettier' } },
+		css = { 'prettierd', 'prettier' },
 		gleam = { 'gleam' },
 		go = { 'goimports' },
 		gomod = { 'goimports' },
-		graphql = { { 'prettierd', 'prettier' } },
-		html = { { 'prettierd', 'prettier' } },
+		graphql = { 'prettierd', 'prettier' },
+		html = { 'prettierd', 'prettier' },
 		javascript = formatters_checked_with_deno,
 		javascriptreact = formatters_checked_with_deno,
 		json = formatters_checked_with_deno,
@@ -28,7 +28,7 @@ conform.setup({
 		sql = { 'sleek' },
 		typescript = formatters_checked_with_deno,
 		typescriptreact = formatters_checked_with_deno,
-		yaml = { { 'prettierd', 'prettier' } },
+		yaml = { 'prettierd', 'prettier' },
 	},
 	format_on_save = {
 		lsp_fallback = true,
