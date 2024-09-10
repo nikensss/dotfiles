@@ -30,11 +30,6 @@ conform.setup({
 		typescriptreact = formatters_checked_with_deno,
 		yaml = { 'prettierd', 'prettier' },
 	},
-	format_on_save = {
-		lsp_fallback = true,
-		async = false,
-		timeout_ms = 3000,
-	},
 	formatters = {
 		sleek = {
 			command = 'sleek',
@@ -45,6 +40,16 @@ conform.setup({
 		},
 	},
 })
+
+vim.keymap.set('n', '<leader>w', function()
+	conform.format({
+		lsp_fallback = true,
+		async = false,
+		timeout_ms = 3000,
+	}, function()
+		vim.cmd.write()
+	end)
+end, { desc = 'Format file' })
 
 vim.keymap.set({ 'n', 'v' }, '<leader>mp', function()
 	conform.format({
