@@ -5,7 +5,9 @@ require('luasnip.loaders.from_vscode').lazy_load()
 
 local ls = require('luasnip')
 ls.add_snippets('all', {
-	ls.parser.parse_snippet({ trig = 'co', wordTrig = true }, 'console.log({ ${1:name} })'),
+	ls.parser.parse_snippet({ trig = 'co' }, 'console.log({ ${1:name} });'),
+	ls.parser.parse_snippet({ trig = 'cl' }, 'console.log(${1});'),
+	ls.parser.parse_snippet({ trig = 'str' }, 'JSON.stringify(${1}, null, 2)'),
 })
 
 cmp.setup({
@@ -42,8 +44,8 @@ cmp.setup({
 	}),
 	-- sources for autocompletion
 	sources = cmp.config.sources({
-		{ name = 'nvim_lsp' },
-		{ name = 'luasnip' }, -- snippets
+		{ name = 'luasnip', priority = 1000 }, -- snippets with high priority
+		{ name = 'nvim_lsp', priority = 750 },
 	}, {
 		{ name = 'buffer' }, -- text within current buffer
 		{ name = 'path' }, -- file system paths
