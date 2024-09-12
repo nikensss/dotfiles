@@ -493,6 +493,9 @@ require('lazy').setup({
 				sources = {
 					require('dbee.sources').EnvSource:new('DBEE_CONNECTIONS'),
 				},
+				result = {
+					page_size = 100000,
+				},
 			})
 		end,
 		keys = {
