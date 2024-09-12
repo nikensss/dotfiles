@@ -42,7 +42,7 @@ brew upgrade
 
 fnm install --lts
 fnm use --lts
-npm i -g livedown neovim @nikensss/sauna
+npm i -g neovim @nikensss/sauna
 
 echo "${GREEN}tmux plugin manager and themes${RESET}"
 if [ ! -d ~/.tmux/plugins/tpm ]; then
