@@ -46,12 +46,15 @@ cd LuaJIT
 make
 make install
 
-echo "${BLUE}installing and building node debugger${RESET}"
-cd ~/repos && mkdir javascript && cd javascript
-git clone https://github.com/microsoft/vscode-node-debug2.git
-cd vscode-node-debug2
-npm ci
-NODE_OPTIONS=--no-experimental-fetch npm run build
+if [ ! -d ~/repos/vscode-js-debug ]; then
+  echo "${GREEN}installing vscode-js-debug${RESET}"
+  cd ~/repos
+  git clone git@github.com:microsoft/vscode-js-debug.git
+  cd vscode-js-debug
+  npm install --legacy-peer-deps
+  npx gulp vsDebugServerBundle
+  mv dist out
+fi
 
 echo "${BLUE}installing and building neovim${RESET}"
 git clone https://github.com/neovim/neovim.git

@@ -67,13 +67,16 @@ cargo install sleek silicon
 cd ~
 mkdir repos
 
-if [ ! -d ~/repos/vscode-node-debug2 ]; then
-  echo "${GREEN}installing node-debug2${RESET}"
+if [ ! -d ~/repos/vscode-js-debug ]; then
+  echo "${GREEN}installing vscode-js-debug${RESET}"
   cd ~/repos
-  git clone https://github.com/microsoft/vscode-node-debug2.git
-  cd vscode-node-debug2
-  npm ci
-  NODE_OPTIONS=--no-experimental-fetch npm run build
+  git clone git@github.com:microsoft/vscode-js-debug.git
+  cd -
+  cd ~/repos/vscode-js-debug
+  npm install --legacy-peer-deps
+  npx gulp vsDebugServerBundle
+  mv dist out
+  cd -
 fi
 
 if [ ! -d ~/.oh-my-zsh ]; then

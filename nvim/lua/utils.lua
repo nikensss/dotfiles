@@ -19,9 +19,9 @@ local function attachDebugger()
 	local port = vim.fn.input('Attach to port: ', '9229')
 
 	dap.run({
-		type = 'node2',
+		type = 'pwa-node',
 		request = 'attach',
-		name = 'Attach Program (Node2 with ts-node)',
+		name = 'Attach',
 		cwd = vim.fn.getcwd(),
 		sourceMaps = true,
 		protocol = 'inspector',

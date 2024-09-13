@@ -72,3 +72,11 @@ end, { desc = 'neotest panel' })
 vim.keymap.set('n', '<leader>tv', function()
 	neotest.output.open({ enter = true })
 end, { desc = 'neotest view output' })
+
+vim.keymap.set('n', '<leader>tot', function()
+	neotest.output_panel.toggle()
+end, { desc = 'neotest view output' })
+
+vim.keymap.set('n', '<leader>toc', function()
+	neotest.output_panel.clear()
+end, { desc = 'neotest view output' })

@@ -151,6 +151,10 @@ require('lazy').setup({
 	'rcarriga/nvim-dap-ui',
 	'theHamsta/nvim-dap-virtual-text',
 	{
+		'mxsdev/nvim-dap-vscode-js',
+		dependencies = { 'mfussenegger/nvim-dap' },
+	},
+	{
 		'folke/lazydev.nvim',
 		ft = 'lua', -- only load on lua files
 		opts = {
