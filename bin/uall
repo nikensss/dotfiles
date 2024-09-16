@@ -64,7 +64,7 @@ section "Updating rust" "rustup update"
 section "Updating cargo packages" 'cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
 section "Updating global npm packages" "npm update -g"
 section "Updating Oh My zsh" "$ZSH/tools/upgrade.sh"
-section "Updating vscode-js-debug" "cd ~/repos/vscode-js-debug && rm -rf node_modules out && npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out && cd -"
+# section "Updating vscode-js-debug" "cd ~/repos/vscode-js-debug && git reset origin/main --hard && git pull && rm -rf node_modules out && npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out && cd -"
 section "Updating powerlevel10k" "git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull"
 section "Updating tldr database" "tldr --update"
 section "Updating nvim plugins" "nvim -c \"lua require('lazy').sync({wait = true})\" c \"TSUpdateSync\" +qa"
