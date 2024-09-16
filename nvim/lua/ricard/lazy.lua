@@ -427,17 +427,25 @@ require('lazy').setup({
 		dependencies = { 'nvim-telescope/telescope.nvim', 'nanozuki/tabby.nvim' },
 	},
 	{
-		'nvim-tree/nvim-tree.lua',
-		config = function()
-			require('nvim-tree').setup({
-				hijack_netrw = true,
-				actions = {
-					open_file = {
-						resize_window = false,
-					},
+		'nvim-neo-tree/neo-tree.nvim',
+		branch = 'v3.x',
+		dependencies = {
+			'nvim-lua/plenary.nvim',
+			'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+			'MunifTanjim/nui.nvim',
+			-- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
+		},
+		opts = {
+			filesystem = {
+				follow_current_file = {
+					enabled = true,
 				},
-			})
-		end,
+				hijack_netrw_behaviour = 'open_current',
+			},
+			window = {
+				position = 'float',
+			},
+		},
 	},
 	'segeljakt/vim-silicon',
 	{
