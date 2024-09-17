@@ -21,9 +21,7 @@ cmp.setup({
 		documentation = cmp.config.window.bordered(),
 	},
 	mapping = cmp.mapping.preset.insert({
-		['<C-b>'] = cmp.mapping.scroll_docs(-4),
 		['<C-e>'] = cmp.mapping.close(),
-		['<C-f>'] = cmp.mapping.scroll_docs(4),
 		['<C-l>'] = cmp.mapping.complete(),
 		['<C-n>'] = cmp.mapping(function()
 			if cmp.visible() then
