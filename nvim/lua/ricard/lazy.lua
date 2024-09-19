@@ -124,16 +124,38 @@ require('lazy').setup({
 		lazy = true,
 		event = { 'BufReadPre', 'BufNewFile' },
 	},
-	'lewis6991/gitsigns.nvim',
-	'christoomey/vim-sort-motion',
-	{ 'lukas-reineke/indent-blankline.nvim', main = 'ibl', opts = {} },
-	'nvim-lualine/lualine.nvim',
-	'smoka7/hop.nvim',
-	'rhysd/git-messenger.vim',
-	'tpope/vim-fugitive',
-	'tpope/vim-commentary',
-	'tpope/vim-repeat',
-	'tpope/vim-unimpaired',
+	{
+		'lewis6991/gitsigns.nvim',
+	},
+	{
+		'christoomey/vim-sort-motion',
+	},
+	{
+		'lukas-reineke/indent-blankline.nvim',
+		main = 'ibl',
+		opts = {},
+	},
+	{
+		'nvim-lualine/lualine.nvim',
+	},
+	{
+		'smoka7/hop.nvim',
+	},
+	{
+		'rhysd/git-messenger.vim',
+	},
+	{
+		'tpope/vim-fugitive',
+	},
+	{
+		'tpope/vim-commentary',
+	},
+	{
+		'tpope/vim-repeat',
+	},
+	{
+		'tpope/vim-unimpaired',
+	},
 	{
 		'kylechui/nvim-surround',
 		version = '*', -- Use for stability; omit to use `main` branch for the latest features
@@ -146,10 +168,18 @@ require('lazy').setup({
 			})
 		end,
 	},
-	'mfussenegger/nvim-dap',
-	'nvim-telescope/telescope-dap.nvim',
-	'rcarriga/nvim-dap-ui',
-	'theHamsta/nvim-dap-virtual-text',
+	{
+		'mfussenegger/nvim-dap',
+	},
+	{
+		'nvim-telescope/telescope-dap.nvim',
+	},
+	{
+		'rcarriga/nvim-dap-ui',
+	},
+	{
+		'theHamsta/nvim-dap-virtual-text',
+	},
 	{
 		'mxsdev/nvim-dap-vscode-js',
 		dependencies = { 'mfussenegger/nvim-dap' },
@@ -192,12 +222,16 @@ require('lazy').setup({
 			'nvim-neotest/neotest-go',
 		},
 	},
-	'jiangmiao/auto-pairs',
+	{
+		'jiangmiao/auto-pairs',
+	},
 	{
 		'catppuccin/nvim',
 		name = 'catppuccin',
 	},
-	'github/copilot.vim',
+	{
+		'github/copilot.vim',
+	},
 	{
 		'cameron-wags/rainbow_csv.nvim',
 		config = true,
@@ -217,7 +251,9 @@ require('lazy').setup({
 			'RainbowMultiDelim',
 		},
 	},
-	'numToStr/FTerm.nvim',
+	{
+		'numToStr/FTerm.nvim',
+	},
 	{
 		'pmizio/typescript-tools.nvim',
 		dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
@@ -447,7 +483,9 @@ require('lazy').setup({
 			},
 		},
 	},
-	'segeljakt/vim-silicon',
+	{
+		'segeljakt/vim-silicon',
+	},
 	{
 		'sindrets/diffview.nvim',
 		config = function()
@@ -475,7 +513,9 @@ require('lazy').setup({
 			})
 		end,
 	},
-	'ziglang/zig.vim',
+	{
+		'ziglang/zig.vim',
+	},
 	{
 		'pwntester/octo.nvim',
 		config = function()
@@ -490,7 +530,9 @@ require('lazy').setup({
 			'nvim-tree/nvim-web-devicons',
 		},
 	},
-	'sigmasd/deno-nvim',
+	{
+		'sigmasd/deno-nvim',
+	},
 	{
 		'kndndrj/nvim-dbee',
 		dependencies = {
