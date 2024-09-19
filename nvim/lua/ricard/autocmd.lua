@@ -84,5 +84,15 @@ vim.api.nvim_create_autocmd('FileType', {
 
 vim.api.nvim_create_autocmd('VimEnter', {
 	group = vim.api.nvim_create_augroup('telescope_fzf_on_start', { clear = true }),
-	callback = require('telescope.builtin').git_files,
+	callback = function()
+		local function starts_with(str, start)
+			return str:sub(1, #start) == start
+		end
+
+		if starts_with(vim.bo.filetype, 'git') then
+			return
+		end
+
+		require('telescope.builtin').git_files()
+	end,
 })
