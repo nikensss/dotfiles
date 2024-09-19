@@ -81,3 +81,8 @@ vim.api.nvim_create_autocmd('FileType', {
 	-- Specify the group to use, so this autocmd is managed under 'UnfoldDboutFiles'
 	group = 'UnfoldDboutFiles',
 })
+
+vim.api.nvim_create_autocmd('VimEnter', {
+	group = vim.api.nvim_create_augroup('telescope_fzf_on_start', { clear = true }),
+	callback = require('telescope.builtin').git_files,
+})
