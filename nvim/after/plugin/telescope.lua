@@ -37,10 +37,10 @@ options.desc = 'fuzzy find current buffer'
 vim.keymap.set('n', '<leader>/', builtin.current_buffer_fuzzy_find, options)
 
 options.desc = 'fuzzy find symbols current buffer'
-vim.keymap.set('n', '<leader>?', builtin.lsp_document_symbols, options)
+vim.keymap.set('n', '<leader><leader>/', builtin.lsp_document_symbols, options)
 
 options.desc = 'find symbols workspace'
-vim.keymap.set('n', '<leader><leader>/', builtin.lsp_dynamic_workspace_symbols, options)
+vim.keymap.set('n', '<leader>?', builtin.lsp_dynamic_workspace_symbols, options)
 
 options.desc = 'fuzzy find symbols in workspace'
 vim.keymap.set('n', '<leader><leader>?', builtin.lsp_workspace_symbols, options)
