@@ -35,6 +35,7 @@ require('nvim-treesitter.configs').setup({
 		'yaml',
 		'zig',
 	},
+	ignore_install = {},
 	sync_install = false,
 	auto_install = true,
 	incremental_selection = {
@@ -51,6 +52,7 @@ require('nvim-treesitter.configs').setup({
 		additional_vim_regex_highlighting = false,
 	},
 	refactor = {
+		enable = true,
 		highlight_definitions = { enable = true },
 		highlight_current_scope = { enable = false },
 		navigation = {
@@ -62,6 +64,7 @@ require('nvim-treesitter.configs').setup({
 		},
 	},
 	textobjects = {
+		enable = true,
 		select = {
 			enable = true,
 

@@ -119,6 +119,12 @@ local function theme_picker()
 				vim.cmd.colorscheme('tokyonight-day')
 			end,
 		},
+		{
+			name = 'obscure',
+			activate = function()
+				vim.cmd.colorscheme('obscure')
+			end,
+		},
 	}
 
 	local names = {}
