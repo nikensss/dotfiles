@@ -15,6 +15,9 @@ bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 # alternate between last two sessions
 bind-key C-p switch-client -l
 
+# move to last active window
+bind-key -r C-w last-window        
+
 # -- navigation ----------------------------------------------------------------
 
 # if you're running tmux within iTerm2
