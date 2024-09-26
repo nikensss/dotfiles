@@ -160,7 +160,6 @@ vim.keymap.set('n', '<leader><leader>tp', theme_picker, { silent = true, desc = 
 local function load_session_file(session_file)
 	vim.cmd('source ' .. session_file)
 	load_qf_list(string.gsub(session_file, '.session$', '.qf'))
-	vim.cmd('NvimTreeClose')
 	print('loaded session from ' .. session_file)
 end
 
