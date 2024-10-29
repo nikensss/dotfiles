@@ -2,7 +2,7 @@ if [[ -f ~/.env ]]; then
   source ~/.env
 fi
 
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 
 
 # If you come from bash you might have to change your $PATH.
