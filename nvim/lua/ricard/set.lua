@@ -28,7 +28,7 @@ vim.opt.updatetime = 50
 
 vim.opt.cursorline = true
 vim.opt.colorcolumn = '80,100,120'
-vim.cmd([[hi ColorColumn guibg='#113A57' blend=20]])
+vim.cmd([[hi ColorColumn guibg='#2D2352' blend=80]])
 
 vim.o.completeopt = 'menuone,noselect'
 
