@@ -35,7 +35,7 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks pyenv pyenv-virtualenv cmake exiftool asdf llvm boost
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks pyenv pyenv-virtualenv cmake exiftool asdf llvm boost xcode-build-server
 brew tap oven-sh/bun 
 brew install bun
 brew upgrade
