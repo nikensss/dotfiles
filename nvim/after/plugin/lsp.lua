@@ -158,6 +158,13 @@ lspconfig['sqlls'].setup({
 lspconfig['clangd'].setup({
 	capabilities = capabilities,
 	on_attach = on_attach,
+	cmd = {
+		'clangd',
+		'--background-index',
+		'--suggest-missing-includes',
+		'--clang-tidy',
+		'--header-insertion=iwyu',
+	},
 })
 
 -- configure go server
