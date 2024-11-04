@@ -128,6 +128,17 @@ lspconfig['prismals'].setup({
 	on_attach = on_attach,
 })
 
+lspconfig['sourcekit'].setup({
+	capabilities = vim.tbl_deep_extend('force', capabilities, {
+		workspace = {
+			didChangeWatchedFiles = {
+				dynamicRegistration = true,
+			},
+		},
+	}),
+	on_attach = on_attach,
+})
+
 -- configure zig language server
 lspconfig['zls'].setup({
 	capabilities = capabilities,
