@@ -31,6 +31,7 @@ alias rmci='rm -rf node_modules && npm ci'
 alias ribs='rm -rf node_modules && npm ci && npm run build && npm run start'
 alias ribd='rm -rf node_modules && npm ci && npm run build && npm run start:dev'
 alias ribb='rm -rf node_modules && npm ci && npm run build && npm run start:debug'
+alias p='pnpm'
 
 # development
 alias qka='cd ~/repos/javascript/quokkasandbox'
