@@ -128,21 +128,35 @@ lspconfig['prismals'].setup({
 	on_attach = on_attach,
 })
 
-lspconfig['sourcekit'].setup({
-	capabilities = vim.tbl_deep_extend('force', capabilities, {
-		workspace = {
-			didChangeWatchedFiles = {
-				dynamicRegistration = true,
-			},
-		},
-	}),
-	on_attach = on_attach,
-})
-
 -- configure zig language server
 lspconfig['zls'].setup({
 	capabilities = capabilities,
 	on_attach = on_attach,
+})
+
+-- configure omnisharp
+local pid = vim.fn.getpid()
+
+local sep = package.config:sub(1, 1)
+local home = os.getenv('HOME') or os.getenv('USERPROFILE')
+local omnisharp_bin = home
+	.. sep
+	.. '.local'
+	.. sep
+	.. 'share'
+	.. sep
+	.. 'nvim'
+	.. sep
+	.. 'mason'
+	.. sep
+	.. 'bin'
+	.. sep
+	.. 'omnisharp'
+
+lspconfig['omnisharp'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	cmd = { omnisharp_bin, '--languageserver', '--hostPID', tostring(pid) },
 })
 
 -- configure tailwind css server
