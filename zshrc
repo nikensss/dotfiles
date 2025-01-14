@@ -165,6 +165,7 @@ export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
 
 export PATH="$PATH:/usr/local/go/bin"
+export PATH="$PATH:/Users/ricard/.dotnet/tools"
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
