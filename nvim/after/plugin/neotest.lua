@@ -51,32 +51,32 @@ neotest.setup({
 
 vim.keymap.set('n', '<leader>tt', function()
 	neotest.run.run()
-end, { desc = 'run nearest' })
+end, { desc = '[neotest] run nearest' })
 
 vim.keymap.set('n', '<leader>tl', function()
 	neotest.run.run_last()
-end, { desc = 'run nearest' })
+end, { desc = '[neotest] run last' })
 
 vim.keymap.set('n', '<leader>td', function()
 	neotest.run.run({ strategy = 'dap' })
-end, { desc = 'debug nearest' })
+end, { desc = '[neotest] debug nearest' })
 
 vim.keymap.set('n', '<leader>tf', function()
 	neotest.run.run(vim.fn.expand('%'))
-end, { desc = 'run file' })
+end, { desc = '[neotest] run file' })
 
 vim.keymap.set('n', '<leader>tp', function()
 	neotest.summary.toggle()
-end, { desc = 'neotest panel' })
+end, { desc = '[neotest] open panel' })
 
 vim.keymap.set('n', '<leader>tv', function()
 	neotest.output.open({ enter = true })
-end, { desc = 'neotest view output' })
+end, { desc = '[neotest] open output' })
 
 vim.keymap.set('n', '<leader>tot', function()
 	neotest.output_panel.toggle()
-end, { desc = 'neotest view output' })
+end, { desc = '[neotest] toggle output panel' })
 
 vim.keymap.set('n', '<leader>toc', function()
 	neotest.output_panel.clear()
-end, { desc = 'neotest view output' })
+end, { desc = '[neotest] clear output panel' })
