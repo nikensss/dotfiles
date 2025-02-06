@@ -158,8 +158,6 @@ if command -v ngrok &>/dev/null; then
     eval "$(ngrok completion)"
 fi
 
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
 export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
 export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
