@@ -10,6 +10,18 @@ return {
 					['<s-tab>'] = false,
 					{
 						'n',
+						'<c-e>',
+						actions.scroll_view(1),
+						{ desc = 'Scroll the diff 5 lines down' },
+					},
+					{
+						'n',
+						'<c-y>',
+						actions.scroll_view(-1),
+						{ desc = 'Scroll the diff 5 lines down' },
+					},
+					{
+						'n',
 						'<c-d>',
 						actions.scroll_view(5),
 						{ desc = 'Scroll the diff 5 lines down' },
