@@ -8,5 +8,7 @@ while read -r BRANCH_NAME; do
   git rev-parse --abbrev-ref $BRANCH_NAME@{upstream} &> /dev/null 2>&1
   if [[ $? == 0 ]]; then
     git branch -D $BRANCH_NAME
+  else 
+    echo "Branch $BRANCH_NAME has no upstream branch, not deleting"
   fi
 done < <(git branch --format='%(refname:short)')
