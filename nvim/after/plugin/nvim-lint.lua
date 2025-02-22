@@ -7,6 +7,7 @@ lint.linters_by_ft = {
 	javascriptreact = { 'eslint' },
 	python = { 'pylint' },
 	svelte = { 'eslint' },
+	swift = { 'swiftlint' },
 	typescript = { 'eslint' },
 	typescriptreact = { 'eslint' },
 }
@@ -17,25 +18,19 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
 	group = lint_augroup,
 	callback = function()
 		if is_deno_project() then
-			lint.linters_by_ft = {
-				javascript = { 'deno' },
-				typescript = { 'deno' },
-				javascriptreact = { 'deno' },
-				typescriptreact = { 'deno' },
-				svelte = { 'deno' },
-				python = { 'pylint' },
-			}
+			lint.linters_by_ft.javascript = { 'deno' }
+			lint.linters_by_ft.typescript = { 'deno' }
+			lint.linters_by_ft.javascriptreact = { 'deno' }
+			lint.linters_by_ft.typescriptreact = { 'deno' }
+			lint.linters_by_ft.svelte = { 'deno' }
 			lint.try_lint()
 			return
 		else
-			lint.linters_by_ft = {
-				javascript = { 'eslint' },
-				typescript = { 'eslint' },
-				javascriptreact = { 'eslint' },
-				typescriptreact = { 'eslint' },
-				svelte = { 'eslint' },
-				python = { 'pylint' },
-			}
+			lint.linters_by_ft.javascript = { 'eslint' }
+			lint.linters_by_ft.typescript = { 'eslint' }
+			lint.linters_by_ft.javascriptreact = { 'eslint' }
+			lint.linters_by_ft.typescriptreact = { 'eslint' }
+			lint.linters_by_ft.svelte = { 'eslint' }
 		end
 
 		lint.try_lint()

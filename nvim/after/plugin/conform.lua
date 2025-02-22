@@ -26,6 +26,7 @@ conform.setup({
 		markdown = formatters_checked_with_deno,
 		python = { 'isort', 'black' },
 		sql = { 'sleek' },
+		swift = { 'swiftformat' },
 		typescript = formatters_checked_with_deno,
 		typescriptreact = formatters_checked_with_deno,
 		yaml = { 'prettierd', 'prettier' },

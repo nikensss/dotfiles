@@ -128,6 +128,12 @@ lspconfig['prismals'].setup({
 	on_attach = on_attach,
 })
 
+-- configure bashls server
+lspconfig['sourcekit'].setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
 -- configure zig language server
 lspconfig['zls'].setup({
 	capabilities = capabilities,
