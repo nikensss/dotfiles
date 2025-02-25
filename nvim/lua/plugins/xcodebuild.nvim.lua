@@ -3,6 +3,7 @@ return {
 	dependencies = {
 		'nvim-telescope/telescope.nvim',
 		'MunifTanjim/nui.nvim',
+		'folke/snacks.nvim',
 	},
 	config = function()
 		require('xcodebuild').setup({
