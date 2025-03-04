@@ -42,6 +42,7 @@ brew upgrade
 
 # cd ~/.local/share/nvim/lazy/xcodebuild.nvim
 # sudo make install
+# sudo gem install --quiet xcodeproj
 # cd -
 
 fnm install --lts
