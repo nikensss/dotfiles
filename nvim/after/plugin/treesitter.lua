@@ -34,6 +34,7 @@ require('nvim-treesitter.configs').setup({
 		'xml',
 		'yaml',
 		'zig',
+		'diff',
 	},
 	ignore_install = {},
 	sync_install = false,
