@@ -79,8 +79,7 @@ if [ ! -d ~/repos/vscode-js-debug ]; then
   cd -
   cd ~/repos/vscode-js-debug
   npm install --legacy-peer-deps
-  npx gulp vsDebugServerBundle
-  mv dist out
+  npx gulp dapDebugServer
   cd -
 fi
 
