@@ -60,6 +60,9 @@ vim.keymap.set('n', '<leader>sr', ':Telescope marks<CR>', options)
 options.desc = '[s]how [t]abs'
 vim.keymap.set('n', '<leader>st', ':Telescope telescope-tabs list_tabs<CR>', options)
 
+options.desc = '[g]it [b]ranches'
+vim.keymap.set('n', '<leader>sj', builtin.git_branches, options)
+
 require('telescope').setup({
 	defaults = {
 		mappings = {
