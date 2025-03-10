@@ -31,8 +31,4 @@ return {
 		'MunifTanjim/nui.nvim',
 		'rcarriga/nvim-notify',
 	},
-	config = function()
-		local options = { silent = true, noremap = true, desc = '[noice] dismiss' }
-		vim.keymap.set('n', '<leader>nd', '<cmd>Noice dismiss<cr>', options)
-	end,
 }
