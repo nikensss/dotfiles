@@ -11,9 +11,6 @@ local opts = { noremap = true, silent = true }
 local on_attach = function(client, bufnr)
 	opts.buffer = bufnr
 
-	require('lsp-inlayhints').on_attach(client, bufnr)
-	require('lsp-inlayhints').show()
-
 	if client.server_capabilities.documentSymbolProvider then
 		navbuddy.attach(client, bufnr)
 		if not navic.is_available(bufnr) then
