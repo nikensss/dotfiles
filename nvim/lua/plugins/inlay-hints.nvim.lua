@@ -3,6 +3,6 @@ return {
 	event = 'LspAttach',
 	dependencies = { 'neovim/nvim-lspconfig' },
 	config = function()
-		require('inlay-hints').setup()
+		-- require('inlay-hints').setup()
 	end,
 }
