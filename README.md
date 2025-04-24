@@ -140,3 +140,11 @@ Then:
 ```bash
 cfdo %s/stringOne/stringTwo/g | update | bd
 ```
+
+## Redis
+
+### Get all values of keys matching a pattern
+
+```lua
+EVAL "local keys = redis.call('KEYS', 'ratelimit:*'); local values = {}; for i, key in ipairs(keys) do values[i] = {key, redis.call('GET', key)}; end; return values;" 0
+```
