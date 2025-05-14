@@ -141,6 +141,12 @@ Then:
 cfdo %s/stringOne/stringTwo/g | update | bd
 ```
 
+### Convert camelCase to snake_case
+
+```vim
+s/\(\l\)\(\u\)/\1_\l\2/g
+```
+
 ## Redis
 
 ### Get all values of keys matching a pattern
