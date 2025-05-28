@@ -167,3 +167,6 @@ export PATH="$PATH:/Users/ricard/.dotnet/tools"
 
 source ~/.zsh_aliases
 source ~/.zsh_functions
+
+# Added by Windsurf
+export PATH="/Users/ricard/.codeium/windsurf/bin:$PATH"
