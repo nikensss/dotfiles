@@ -314,14 +314,14 @@ else
 		settings = {
 			tsserver_file_preferences = {
 				importModuleSpecifierPreference = 'non-relative',
-				includeInlayParameterNameHints = 'all',
-				includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-				includeInlayFunctionParameterTypeHints = true,
-				includeInlayVariableTypeHints = true,
-				includeInlayVariableTypeHintsWhenTypeMatchesName = false,
-				includeInlayPropertyDeclarationTypeHints = true,
-				includeInlayFunctionLikeReturnTypeHints = true,
-				includeInlayEnumMemberValueHints = true,
+				-- includeInlayParameterNameHints = 'all',
+				-- includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+				-- includeInlayFunctionParameterTypeHints = true,
+				-- includeInlayVariableTypeHints = true,
+				-- includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+				-- includeInlayPropertyDeclarationTypeHints = true,
+				-- includeInlayFunctionLikeReturnTypeHints = true,
+				-- includeInlayEnumMemberValueHints = true,
 			},
 		},
 	})
