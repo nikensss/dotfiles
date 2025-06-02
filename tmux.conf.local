@@ -16,7 +16,7 @@ bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 bind-key C-p switch-client -l
 
 # move to last active window
-bind-key -r C-w last-window        
+bind-key -r C-a last-window        
 
 # -- navigation ----------------------------------------------------------------
 
