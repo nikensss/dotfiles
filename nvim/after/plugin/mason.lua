@@ -31,7 +31,6 @@ mason_lspconfig.setup({
 		'lua_ls',
 		'prismals',
 		'pyright',
-		'rust_analyzer',
 		'tailwindcss',
 		'taplo',
 		-- 'codelldb'
