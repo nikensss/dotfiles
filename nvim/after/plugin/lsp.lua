@@ -83,90 +83,33 @@ for type, icon in pairs(signs) do
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = '' })
 end
 
--- configure astro server
-lspconfig['astro'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
+-- create an array of server to configure
+local servers = {
+	'bashls',
+	'cssls',
+	'emmet_language_server',
+	'eslint',
+	'html',
+	'jsonls',
+	'prismals',
+	'pyright',
+	'sourcekit',
+	'tailwindcss',
+	'taplo',
+	'zls',
+}
 
--- configure bashls server
-lspconfig['bashls'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure jsonls server
-lspconfig['jsonls'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure taplo server
-lspconfig['taplo'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure html server
-lspconfig['html'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure css server
-lspconfig['cssls'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure prisma orm server
-lspconfig['prismals'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure bashls server
-lspconfig['sourcekit'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure zig language server
-lspconfig['zls'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure omnisharp
-local pid = vim.fn.getpid()
-
-local sep = package.config:sub(1, 1)
-local home = os.getenv('HOME') or os.getenv('USERPROFILE')
-local omnisharp_bin = home
-	.. sep
-	.. '.local'
-	.. sep
-	.. 'share'
-	.. sep
-	.. 'nvim'
-	.. sep
-	.. 'mason'
-	.. sep
-	.. 'bin'
-	.. sep
-	.. 'omnisharp'
-
-lspconfig['omnisharp'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-	cmd = { omnisharp_bin, '--languageserver', '--hostPID', tostring(pid) },
-})
-
--- configure tailwind css server
-lspconfig['tailwindcss'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
+-- loop over the array and call setup for each server
+for _, server in ipairs(servers) do
+	if lspconfig[server] then
+		lspconfig[server].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
+	else
+		print('LSP server ' .. server .. ' is not available in lspconfig')
+	end
+end
 
 -- configure graphql language server
 lspconfig['graphql'].setup({
@@ -219,18 +162,6 @@ lspconfig['gleam'].setup({
 	capabilities = capabilities,
 	on_attach = on_attach,
 	cmd = { 'gleam', 'lsp' },
-})
-
--- configure python server
-lspconfig['pyright'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
-})
-
--- configure emmet server
-lspconfig['emmet_language_server'].setup({
-	capabilities = capabilities,
-	on_attach = on_attach,
 })
 
 -- configure lua server (with special settings)
@@ -360,8 +291,6 @@ vim.diagnostic.config({
 		format = format_diagnostic_message,
 	},
 })
-
--- rustacean.nvim
 
 vim.g.rustaceanvim = function()
 	return {

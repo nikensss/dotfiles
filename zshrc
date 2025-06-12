@@ -170,3 +170,5 @@ source ~/.zsh_functions
 
 # Added by Windsurf
 export PATH="/Users/ricard/.codeium/windsurf/bin:$PATH"
+
+export PATH="/Users/ricard/.local/share/nvim/mason/bin:$PATH"
