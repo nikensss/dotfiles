@@ -163,6 +163,7 @@ _EOF_
   npm pkg set scripts.test="npm run test:ts"
   npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
   npm pkg set scripts.dev="ts-node -r dotenv/config ./src/index.ts"
+  npm pkg set scripts.dev:debug="node --inspect-brk -r ts-node/register -r dotenv/config ./src/index.ts" 
   npm pkg set scripts.pretty="prettier --write 'src/**/*.ts'"
   npm pkg set scripts.pretty:check="prettier --check 'src/**/*.ts'"
   npm pkg set scripts.lint="eslint"
