@@ -23,7 +23,6 @@ mason_lspconfig.setup({
 		'clangd',
 		'cssls',
 		'emmet_language_server',
-		'eslint',
 		'gopls',
 		'graphql',
 		'html',
@@ -44,7 +43,6 @@ mason_tool_installer.setup({
 	ensure_installed = {
 		'black', -- python formatter
 		'clang-format', -- c/c++ formatter
-		'eslint', -- js linter
 		'goimports',
 		'isort', -- python formatter
 		'prettier', -- prettier formatter
