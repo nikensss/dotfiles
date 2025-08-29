@@ -114,9 +114,12 @@ describe('index', () => {
 });
 _EOF_
 
-  npx tsc --init --target ES2022 --outDir './dist' 
+  npx tsc --init --target esnext --outDir './dist' 
+  npx prettier tsconfig.json --write
   # we can't pipe from one file to itself, so we use that chance to build the tsconfig.test.json
-  cat tsconfig.json | perl -pe 's/(\/\*.*\*\/)//;s/\/\/.*$//' | jq '.include = ["src","test"] | .compilerOptions.strict = true | .compilerOptions.sourceMap = true' > tsconfig.test.json
+  cat tsconfig.json | perl -pe 's/(\/\/.*\*\/)//;s/\/\/.*$//' \
+    | jq '.include = ["src","test"] | .compilerOptions.strict = true | .compilerOptions.sourceMap = true | .compilerOptions.esModuleInterop = true | .compilerOptions.module = "commonjs" | .compilerOptions.verbatimModuleSyntax = false | del(.compilerOptions.types) ' \
+    > tsconfig.test.json
   cp tsconfig.test.json tsconfig.json
   echo '{ "extends": "./tsconfig.json" }' > tsconfig.test.json
 
