@@ -1,6 +1,5 @@
 local is_deno_project = require('ricard.functions').is_deno_project
 
-local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local navbuddy = require('nvim-navbuddy')
 local navic = require('nvim-navic')
@@ -100,32 +99,28 @@ local servers = {
 
 -- loop over the array and call setup for each server
 for _, server in ipairs(servers) do
-	if lspconfig[server] then
-		lspconfig[server].setup({
-			capabilities = capabilities,
-			on_attach = on_attach,
-		})
-	else
-		print('LSP server ' .. server .. ' is not available in lspconfig')
-	end
+	vim.lsp.config(server, {
+		capabilities = capabilities,
+		on_attach = on_attach,
+	})
 end
 
 -- configure graphql language server
-lspconfig['graphql'].setup({
+vim.lsp.config('graphql', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	filetypes = { 'graphql', 'gql', 'svelte', 'typescriptreact', 'javascriptreact' },
 })
 
 -- configure sql language server
-lspconfig['sqlls'].setup({
+vim.lsp.config('sqlls', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	filetypes = { 'sql' },
 })
 
 -- configure clangd server
-lspconfig['clangd'].setup({
+vim.lsp.config('clangd', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	cmd = {
@@ -138,7 +133,7 @@ lspconfig['clangd'].setup({
 })
 
 -- configure go server
-lspconfig['gopls'].setup({
+vim.lsp.config('gopls', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	settings = {
@@ -157,14 +152,14 @@ lspconfig['gopls'].setup({
 })
 
 -- configure gleam server
-lspconfig['gleam'].setup({
+vim.lsp.config('gleam', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	cmd = { 'gleam', 'lsp' },
 })
 
 -- configure lua server (with special settings)
-lspconfig['lua_ls'].setup({
+vim.lsp.config('lua_ls', {
 	capabilities = capabilities,
 	on_attach = on_attach,
 	settings = { -- custom settings for lua
