@@ -2,8 +2,6 @@ if [[ -f ~/.env ]]; then
   source ~/.env
 fi
 
-source <(fzf --zsh)
-
 setopt EXTENDED_HISTORY
 
 # If you come from bash you might have to change your $PATH.
@@ -23,13 +21,19 @@ export PATH="$PNPM_HOME:$PATH"
 # pnpm end
 
 # fnm
+FNM_PATH="$HOME/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "`fnm env --use-on-cd --shell zsh`"
+fi
+
 if [[ -d "$HOME/.fnm" ]]; then
-  export PATH=/home/meegan/.fnm:$PATH
-  eval "`fnm env`"
+  export PATH='$HOME.fnm:$PATH'
+  eval "`fnm env --use-on-cd --shell zsh`"
 fi
 
 if [[ -x "$(command -v fnm)" ]];then
-  eval "$(fnm env --use-on-cd)"
+  eval "$(fnm env --use-on-cd --shell zsh)"
 fi
 
 export PS4='$LINENO > '
@@ -172,3 +176,12 @@ source ~/.zsh_functions
 export PATH="/Users/ricard/.codeium/windsurf/bin:$PATH"
 
 export PATH="/Users/ricard/.local/share/nvim/mason/bin:$PATH"
+
+# fnm
+
+if [[ $(cat /etc/*-release | head -1 | grep -i ubuntu | wc -l) == "1" ]]; then
+  export GOROOT=/usr/local/go
+  export GOPATH=$HOME/go
+  export PATH=$PATH:$GOROOT/bin:$GOPATH/bini
+  export PATH="$HOME/neovim/bin:$PATH"
+fi

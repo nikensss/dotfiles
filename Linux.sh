@@ -22,20 +22,40 @@ setup_colors() {
 }
 setup_colors
 
+dir=$(pwd)
+
 echo "${BLUE}installing zsh, curl, wget, git, and more...${RESET}"
 apt-get update
-apt-get install -y curl wget zsh git ripgrep tree-sitter lua fd
+apt-get install -y curl wget zsh git ripgrep tree-sitter lua fd luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit fnm tmux luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 cmake exiftool asdf llvm boost pyenv pyenv-virtualenv
 
-# cargo
+echo "${GREEN}tmux plugin manager and themes${RESET}"
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+else 
+  echo "${LBLUE}tpm already installed${RESET}"
+fi
+
+if [ ! -d ~/.tmux-themepack ]; then
+  git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+else
+  echo "${LBLUE}tmux-themepack already installed${RESET}"
+fi
+
+# rust and cargo
+echo "${GREEN}installing rust${RESET}"
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 echo "${BLUE}installing cargo${RESET}"
 curl https://sh.rustup.rs -sSf | sh
 rustup component add rustfmt
 rustup component add clippy
+cargo install sleek silicon
 
 # install fnm
 echo "${BLUE}installing fnm${RESET}"
 cargo install fnm
 fnm install --lts
+fnm use --lts
+npm i -g neovim
 
 mkdir repos && cd repos
 
@@ -55,12 +75,6 @@ if [ ! -d ~/repos/vscode-js-debug ]; then
   npx gulp vsDebugServerBundle
   mv dist out
 fi
-
-echo "${BLUE}installing and building neovim${RESET}"
-git clone https://github.com/neovim/neovim.git
-cd neovim
-make CMAKE_EXTRA_FLAGS="-DUSE_LUAJIT=ON" CMAKE_BUILD_TYPE=Release
-make install
 
 echo "${BLUE}installing oh-my-zsh${RESET}"
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" "" --unattended
@@ -115,7 +129,5 @@ else
 fi
 
 cd $HOME
-
 echo "${GREEN}We are done! 🥳${RESET}"
 exec zsh -l
-
