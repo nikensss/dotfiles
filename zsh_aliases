@@ -72,3 +72,6 @@ alias gdff='git difftool --tool=nvimdiff'
 # rust
 alias c='cargo run'
 alias cr='cargo run --release'
+
+# tmux
+alias tms='tmux a -t "$(tmux ls | perl -pe 's/^(.*?):.*$/\1/' | fzf)"                                                                                                                                                                    Ω─╯'
