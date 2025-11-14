@@ -8,31 +8,37 @@ setopt EXTENDED_HISTORY
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
-# For c and c++ stuff
-export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
+# For c and c++ stuff (macOS specific)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
+fi
 
+# Homebrew setup (macOS specific)
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -f "/usr/local/bin/brew" ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
 fi
 
 # pnpm
-export PNPM_HOME="/Users/ricard/Library/pnpm"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+else
+  export PNPM_HOME="$HOME/.local/share/pnpm"
+fi
 export PATH="$PNPM_HOME:$PATH"
 # pnpm end
 
-# fnm
-FNM_PATH="$HOME/.local/share/fnm"
-if [ -d "$FNM_PATH" ]; then
-  export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env --use-on-cd --shell zsh`"
-fi
-
-if [[ -d "$HOME/.fnm" ]]; then
-  export PATH='$HOME.fnm:$PATH'
-  eval "`fnm env --use-on-cd --shell zsh`"
-fi
-
-if [[ -x "$(command -v fnm)" ]];then
+# fnm - check multiple possible installation locations
+if [[ -d "$HOME/.local/share/fnm" ]]; then
+  export PATH="$HOME/.local/share/fnm:$PATH"
+  eval "$(fnm env --use-on-cd --shell zsh)"
+elif [[ -d "$HOME/.fnm" ]]; then
+  export PATH="$HOME/.fnm:$PATH"
+  eval "$(fnm env --use-on-cd --shell zsh)"
+elif [[ -d "$HOME/.cargo/bin" ]] && [[ -x "$HOME/.cargo/bin/fnm" ]]; then
+  eval "$(fnm env --use-on-cd --shell zsh)"
+elif command -v fnm &>/dev/null; then
   eval "$(fnm env --use-on-cd --shell zsh)"
 fi
 
@@ -162,26 +168,77 @@ if command -v ngrok &>/dev/null; then
     eval "$(ngrok completion)"
 fi
 
-export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
-export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
-export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
+# PostgreSQL paths (macOS Homebrew specific)
+if [[ "$OSTYPE" == "darwin"* ]] && [[ -d "/opt/homebrew/opt/postgresql@16" ]]; then
+  export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"
+  export LDFLAGS="-L/opt/homebrew/opt/postgresql@16/lib"
+  export CPPFLAGS="-I/opt/homebrew/opt/postgresql@16/include"
+fi
 
+# Go paths
 export PATH="$PATH:/usr/local/go/bin"
-export PATH="$PATH:/Users/ricard/.dotnet/tools"
+if [[ -d "$HOME/go/bin" ]]; then
+  export GOPATH="$HOME/go"
+  export PATH="$PATH:$GOPATH/bin"
+fi
 
-source ~/.zsh_aliases
-source ~/.zsh_functions
+# .NET tools
+if [[ -d "$HOME/.dotnet/tools" ]]; then
+  export PATH="$PATH:$HOME/.dotnet/tools"
+fi
 
-# Added by Windsurf
-export PATH="/Users/ricard/.codeium/windsurf/bin:$PATH"
+# Source aliases and functions
+[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
+[[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
 
-export PATH="/Users/ricard/.local/share/nvim/mason/bin:$PATH"
+# Windsurf (Codeium)
+if [[ -d "$HOME/.codeium/windsurf/bin" ]]; then
+  export PATH="$HOME/.codeium/windsurf/bin:$PATH"
+fi
 
-# fnm
+# Mason binaries (Neovim LSP, formatters, etc.)
+if [[ -d "$HOME/.local/share/nvim/mason/bin" ]]; then
+  export PATH="$HOME/.local/share/nvim/mason/bin:$PATH"
+fi
 
-if [[ $(cat /etc/*-release | head -1 | grep -i ubuntu | wc -l) == "1" ]]; then
-  export GOROOT=/usr/local/go
-  export GOPATH=$HOME/go
-  export PATH=$PATH:$GOROOT/bin:$GOPATH/bini
-  export PATH="$HOME/neovim/bin:$PATH"
+# Ubuntu/Linux-specific setup
+if [[ "$OSTYPE" == "linux-gnu"* ]] || [[ -f "/etc/os-release" && $(grep -i ubuntu /etc/os-release 2>/dev/null) ]]; then
+  # Deno
+  if [[ -d "$HOME/.deno" ]]; then
+    export DENO_INSTALL="$HOME/.deno"
+    export PATH="$DENO_INSTALL/bin:$PATH"
+  fi
+
+  # Bun
+  if [[ -d "$HOME/.bun" ]]; then
+    export BUN_INSTALL="$HOME/.bun"
+    export PATH="$BUN_INSTALL/bin:$PATH"
+  fi
+
+  # Cargo/Rust
+  if [[ -d "$HOME/.cargo" ]]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+    source "$HOME/.cargo/env" 2>/dev/null || true
+  fi
+
+  # asdf
+  if [[ -f "$HOME/.asdf/asdf.sh" ]]; then
+    source "$HOME/.asdf/asdf.sh"
+  fi
+
+  # fd symlink (Ubuntu uses fd-find)
+  if command -v fdfind &>/dev/null && ! command -v fd &>/dev/null; then
+    alias fd='fdfind'
+  fi
+
+  # bat alternative name in Ubuntu
+  if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    alias bat='batcat'
+  fi
+fi
+
+# macOS-specific setup
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # Add any macOS-specific paths here
+  :
 fi
