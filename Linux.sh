@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# Ubuntu Setup Script
+# This script installs all development tools and packages from Darwin.sh, adapted for Ubuntu
+#
+# Package Installation Sources:
+# - APT (Ubuntu repos): git, curl, wget, zsh, ripgrep, jq, hexedit, tmux, fzf, cmake,
+#   exiftool, erlang, rebar3, llvm, boost, gcal, duff, luarocks, tidy, lua, fd-find, bat
+# - APT (Official repos): neovim (PPA), httpie, postgresql-16, ngrok
+# - NPM: diff-so-fancy, fx, tree-sitter-cli, neovim, @nikensss/sauna, supabase, @railway/cli
+# - Cargo: silicon, fnm, hexyl, cargo-nextest, tailspin, nixpacks
+# - Snap: sleek
+# - Install scripts: Rust, Deno, Bun, pyenv
+# - Manual downloads: Go, Gleam
+# - Skipped (macOS only): iterm2, xcode-build-server, swiftformat
+
 # Check if running on Ubuntu
 if ! grep -qi ubuntu /etc/os-release 2>/dev/null; then
   echo "Error: This script is designed for Ubuntu only."
@@ -36,26 +50,47 @@ dir=$(pwd)
 
 # Add necessary PPAs and repositories
 echo "${BLUE}Adding repositories...${RESET}"
+
+# Neovim PPA for latest version
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 
-# PostgreSQL repository
+# HTTPie official repository
+curl -SsL https://packages.httpie.io/deb/KEY.gpg | sudo gpg --dearmor -o /usr/share/keyrings/httpie.gpg 2>/dev/null || true
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/httpie.gpg] https://packages.httpie.io/deb ./" | sudo tee /etc/apt/sources.list.d/httpie.list > /dev/null
+
+# PostgreSQL official repository
 sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+# ngrok official repository
+curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
 
 echo "${BLUE}Updating package lists...${RESET}"
 sudo apt-get update
 
-echo "${BLUE}Installing packages via apt...${RESET}"
+echo "${BLUE}Installing core packages via apt...${RESET}"
 sudo apt-get install -y \
-  curl wget zsh git ripgrep lua5.4 liblua5.4-dev luajit libluajit-5.1-dev \
-  httpie jq bat tldr librsvg2-bin duff diff-so-fancy hexedit tmux luarocks \
-  sed fd-find fzf tidy cmake exiftool erlang rebar3 llvm libboost-all-dev \
+  curl wget zsh git neovim ripgrep jq hexedit tmux fzf cmake exiftool \
+  erlang rebar3 llvm libboost-all-dev gcal duff luarocks tidy \
+  lua5.4 liblua5.4-dev luajit libluajit-5.1-dev \
+  librsvg2-bin fd-find bat httpie ngrok postgresql-16 \
   build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \
   libsqlite3-dev libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev \
-  libffi-dev liblzma-dev unzip gcal postgresql-16 ninja-build gettext pkg-config
+  libffi-dev liblzma-dev unzip ninja-build gettext pkg-config \
+  software-properties-common
 
-# Create symlinks for fd (fd-find on Ubuntu)
+# Optional: install hexyl and tailspin via apt if Ubuntu 19.10+/24.04+
+# Uncomment if you prefer apt over cargo for these tools
+# sudo apt-get install -y hexyl 2>/dev/null || echo "hexyl not available via apt, will install via cargo"
+# sudo apt-get install -y tailspin 2>/dev/null || echo "tailspin not available via apt, will install via cargo"
+
+# Install tldr (available on Ubuntu 20.04+)
+sudo apt-get install -y tldr 2>/dev/null || echo "${YELLOW}tldr not available via apt, will install via npm${RESET}"
+
+# Create symlinks for fd and bat (Ubuntu renames them)
 sudo ln -sf $(which fdfind) /usr/local/bin/fd 2>/dev/null || true
+sudo ln -sf $(which batcat) /usr/local/bin/bat 2>/dev/null || true
 
 # Install pyenv
 echo "${BLUE}Installing pyenv...${RESET}"
@@ -76,16 +111,19 @@ fi
 
 rustup component add rustfmt clippy
 
-# Install Rust-based tools
-echo "${BLUE}Installing Rust packages...${RESET}"
-cargo install \
-  sleek \
+# Install Rust-based tools via Cargo
+echo "${BLUE}Installing Rust packages via Cargo...${RESET}"
+cargo install --locked \
   silicon \
   fnm \
   hexyl \
   cargo-nextest \
   tailspin \
   nixpacks
+
+# Note: sleek is better installed via snap
+echo "${BLUE}Installing sleek via snap...${RESET}"
+sudo snap install sleek 2>/dev/null || echo "${YELLOW}Snap not available, skipping sleek${RESET}"
 
 # Install Go (for delve and other tools)
 echo "${BLUE}Installing Go...${RESET}"
@@ -147,51 +185,21 @@ fnm install --lts
 fnm use lts-latest
 eval "$(fnm env --use-on-cd --shell bash)"
 
-# Install npm global packages
+# Install npm global packages (all in one command for efficiency)
 echo "${BLUE}Installing npm global packages...${RESET}"
-npm i -g neovim @nikensss/sauna
+npm i -g \
+  neovim \
+  @nikensss/sauna \
+  diff-so-fancy \
+  fx \
+  tree-sitter-cli \
+  supabase \
+  @railway/cli
 
-# Install ngrok
-echo "${BLUE}Installing ngrok...${RESET}"
-if ! command -v ngrok &> /dev/null; then
-  curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-  echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-  sudo apt-get update
-  sudo apt-get install -y ngrok
-else
-  echo "${LBLUE}ngrok already installed${RESET}"
-fi
-
-# Install Supabase CLI
-echo "${BLUE}Installing Supabase CLI...${RESET}"
-if ! command -v supabase &> /dev/null; then
-  npm install -g supabase
-else
-  echo "${LBLUE}Supabase already installed${RESET}"
-fi
-
-# Install Railway CLI
-echo "${BLUE}Installing Railway CLI...${RESET}"
-if ! command -v railway &> /dev/null; then
-  npm install -g @railway/cli
-else
-  echo "${LBLUE}Railway already installed${RESET}"
-fi
-
-# Install tree-sitter CLI
-echo "${BLUE}Installing tree-sitter CLI...${RESET}"
-if ! command -v tree-sitter &> /dev/null; then
-  npm install -g tree-sitter-cli
-else
-  echo "${LBLUE}tree-sitter already installed${RESET}"
-fi
-
-# Install fx
-echo "${BLUE}Installing fx...${RESET}"
-if ! command -v fx &> /dev/null; then
-  npm install -g fx
-else
-  echo "${LBLUE}fx already installed${RESET}"
+# Install tldr via npm if apt version wasn't available
+if ! command -v tldr &> /dev/null; then
+  echo "${BLUE}Installing tldr via npm...${RESET}"
+  npm i -g tldr
 fi
 
 echo "${GREEN}tmux plugin manager and themes${RESET}"

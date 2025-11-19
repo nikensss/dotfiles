@@ -163,6 +163,7 @@ _EOF_
   npm pkg set scripts.build:test:js="rimraf ./dist && tsc -p tsconfig.test.json"
   npm pkg set scripts.test:js="npm run build:test:js && jest --config jest.config.json"
   npm pkg set scripts.test:ts="jest --config ts-jest.config.json"
+  npm pkg set scripts.test:all="npm run test:js && npm run test:ts"
   npm pkg set scripts.test="npm run test:ts"
   npm pkg set scripts.start="node -r dotenv/config ./dist/src/index.js"
   npm pkg set scripts.dev="ts-node -r dotenv/config ./src/index.ts"
