@@ -1,3 +1,5 @@
 return {
-		'jiangmiao/auto-pairs',
-	}
+	'windwp/nvim-autopairs',
+	event = 'InsertEnter',
+	config = true,
+}
