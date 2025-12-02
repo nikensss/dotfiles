@@ -26,6 +26,7 @@ mason_lspconfig.setup({
 		'gopls',
 		'graphql',
 		'html',
+		'jdtls',
 		'jsonls',
 		'lua_ls',
 		'prismals',

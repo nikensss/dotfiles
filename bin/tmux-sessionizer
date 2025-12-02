@@ -10,8 +10,19 @@ function tag(){
 }
 
 function get_options() {
-  tmux list-sessions -F '#S' 2> /dev/null | xargs -I _ echo \(session\) _ | sort | uniq
-  fd -t d -HI --search-path ~/repos '.git' -E 'node_modules' -x dirname | sort -u | awk 'NR == 1 {prev = $0; print $0; next} {if (index($0, prev) == 1) {print prev} else {print $0; prev = $0}}' | uniq | tag
+  # List active tmux sessions
+  tmux list-sessions -F '(session) #S' 2> /dev/null | sort | uniq
+
+  # Use fdfind on Ubuntu/Debian, fd on macOS
+  local fd_cmd="fd"
+  if command -v fdfind > /dev/null 2>&1; then
+    fd_cmd="fdfind"
+  fi
+
+  # Find all git repos at ~/repos/ level only (no nested repos)
+  $fd_cmd -t d -HI --max-depth 2 --search-path ~/repos '.git' -E 'node_modules' -x dirname | \
+    sort -u | \
+    tag
 }
 
 if [[ $# -eq 1 ]]; then
