@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(nvim:*)",
+      "Bash(git --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(ls:*)",
+      "Bash(curl -I https://github.com)",
+      "Bash(timeout 30 git clone:*)",
+      "Bash(echo:*)",
+      "Bash(ping:*)"
+    ]
+  }
+}

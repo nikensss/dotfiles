@@ -52,18 +52,6 @@ require('nvim-treesitter.configs').setup({
 		enable = true,
 		additional_vim_regex_highlighting = false,
 	},
-	refactor = {
-		enable = true,
-		highlight_definitions = { enable = true },
-		highlight_current_scope = { enable = false },
-		navigation = {
-			enable = true,
-			keymaps = {
-				goto_previous_usage = '[r',
-				goto_next_usage = ']r',
-			},
-		},
-	},
 	textobjects = {
 		enable = true,
 		select = {

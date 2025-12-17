@@ -63,6 +63,16 @@ local on_attach = function(client, bufnr)
 		vim.diagnostic.jump({ count = 1, float = true })
 	end, opts) -- jump to next diagnostic in buffer
 
+	opts.desc = 'Go to previous reference'
+	keymap.set('n', '[r', function()
+		require('snacks').words.jump(-1, true)
+	end, opts)
+
+	opts.desc = 'Go to next reference'
+	keymap.set('n', ']r', function()
+		require('snacks').words.jump(1, true)
+	end, opts)
+
 	opts.desc = 'Show documentation for what is under cursor'
 	keymap.set('n', 'K', vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
