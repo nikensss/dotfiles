@@ -55,14 +55,6 @@ require('lualine').setup({
 		lualine_b = { 'branch', 'diff', 'diagnostics' },
 		lualine_c = {
 			{ 'filename', file_status = true, path = 1 },
-			{
-				function()
-					return navic.get_location()
-				end,
-				cond = function()
-					return navic.is_available()
-				end,
-			},
 		},
 		lualine_x = {
 			'encoding',
@@ -77,14 +69,6 @@ require('lualine').setup({
 		lualine_b = { 'branch', 'diff', 'diagnostics' },
 		lualine_c = {
 			{ 'filename', file_status = true, path = 1 },
-			{
-				function()
-					return navic.get_location()
-				end,
-				cond = function()
-					return navic.is_available()
-				end,
-			},
 		},
 	},
 	extensions = { 'fugitive' },
