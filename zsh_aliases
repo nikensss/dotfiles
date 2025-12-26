@@ -7,12 +7,6 @@ alias py='python'
 alias cve='python -m venv --system-site-packages ./venv'
 alias ave='source venv/bin/activate'
 
-# cherry
-alias show-cherry='ps aux | grep "cherry.*src/app/start" | grep -v "grep"'
-alias sc='show-cherry'
-alias kill-cherry='show-cherry | perl -pe "s/ricard *(\d*) .*$/\1/" | xargs -I {} kill -9 {}'
-alias kc='kill-cherry'
-
 # node.js
 alias rmnm='rm -rf node_modules'
 alias i='npm ci'
@@ -33,15 +27,12 @@ alias ribs='rm -rf node_modules && npm ci && npm run build && npm run start'
 alias ribd='rm -rf node_modules && npm ci && npm run build && npm run start:dev'
 alias ribb='rm -rf node_modules && npm ci && npm run build && npm run start:debug'
 alias p='pnpm'
+alias rand="node -e \"const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';console.log(Array.from(crypto.randomBytes(64),b=>c[b%64]).join(''))\" | pbcopy"
 
 # development
-alias qka='cd ~/repos/javascript/quokkasandbox'
-alias sassw='sass --watch --no-source-map scss/style.scss css/style.css'
-alias postcssw='postcss css/style.css -o css/output.css --no-map -u autoprefixer -w'
 alias vsc='code .'
 
 # system
-alias please='sudo'
 alias slogin='/usr/local/bin/zsh --login'
 alias caff='caffeinate -i'
 alias st='networkQuality -v'
@@ -53,9 +44,8 @@ alias repos='cd ~/repos'
 alias dotf='repos && cd dotfiles'
 
 # editing dotfiles
-alias vzsh='nvim ~/.zshrc'
 alias szsh='source ~/.zshrc'
-alias vnvi='nvim ~/.config/nvim/init.vim'
+alias nvi='nvim ~/.config/nvim/init.vim'
 
 # updating packages
 alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
@@ -67,11 +57,6 @@ alias gbn='git branch --show-current'
 alias gcos='git branch --format="%(refname:short)" | fzf | xargs git checkout'
 alias gpsu='git push --set-upstream origin $(git branch --show-current)'
 alias gdff='git difftool --tool=nvimdiff'
-
-
-# rust
-alias c='cargo run'
-alias cr='cargo run --release'
 
 # tmux
 alias tms='tmux a -t "$(tmux ls | perl -pe "s/^(.*?):.*$/\1/" | fzf)"'
