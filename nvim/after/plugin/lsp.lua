@@ -200,19 +200,19 @@ require('typescript-tools').setup({
 		local options = { desc = '[ts-tools] organize imports', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tso', vim.cmd.TSToolsOrganizeImports, options)
 
-		options = { desc = '[ts-tools] sort imports' }
+		options = { desc = '[ts-tools] sort imports', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tsi', vim.cmd.TSToolsSortImports, options)
 
-		options = { desc = '[ts-tools] remove unused statements' }
+		options = { desc = '[ts-tools] remove unused statements', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tss', vim.cmd.TSToolsRemoveUnused, options)
 
-		options = { desc = '[ts-tools] remove unused imports' }
+		options = { desc = '[ts-tools] remove unused imports', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tsu', vim.cmd.TSToolsRemoveUnusedImports, options)
 
-		options = { desc = '[ts-tools] add missing imports' }
+		options = { desc = '[ts-tools] add missing imports', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tsa', vim.cmd.TSToolsAddMissingImports, options)
 
-		options = { desc = '[ts-tools] re-attach lsp' }
+		options = { desc = '[ts-tools] re-attach lsp', buffer = bufnr }
 		vim.keymap.set('n', '<leader>tsk', function()
 			on_attach(client, vim.api.nvim_get_current_buf())
 		end, options)
