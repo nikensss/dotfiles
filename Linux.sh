@@ -125,6 +125,24 @@ cargo install --locked \
 echo "${BLUE}Installing sleek via snap...${RESET}"
 sudo snap install sleek 2>/dev/null || echo "${YELLOW}Snap not available, skipping sleek${RESET}"
 
+# Install Java 21 (OpenJDK)
+echo "${BLUE}Installing Java 21...${RESET}"
+if ! java -version 2>&1 | grep -q "version \"21"; then
+  sudo apt-get install -y openjdk-21-jdk
+  sudo update-alternatives --set java /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+  sudo update-alternatives --set javac /usr/lib/jvm/java-21-openjdk-amd64/bin/javac
+else
+  echo "${LBLUE}Java 21 already installed${RESET}"
+fi
+
+# Install Maven
+echo "${BLUE}Installing Maven...${RESET}"
+if ! command -v mvn &> /dev/null; then
+  sudo apt-get install -y maven
+else
+  echo "${LBLUE}Maven already installed${RESET}"
+fi
+
 # Install Go (for delve and other tools)
 echo "${BLUE}Installing Go...${RESET}"
 if ! command -v go &> /dev/null; then
