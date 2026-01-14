@@ -2,6 +2,27 @@ local is_deno_project = require('ricard.functions').is_deno_project
 
 local lint = require('lint')
 
+-- Configure eslint to prefer local node_modules, fallback to eslint_d from Mason
+-- Using a function so it's evaluated per-buffer (handles switching between projects)
+lint.linters.eslint = vim.tbl_deep_extend('force', lint.linters.eslint or {}, {
+	cmd = function()
+		-- First, try local node_modules eslint (relative to current buffer's directory)
+		local local_eslint = vim.fn.fnamemodify('node_modules/.bin/eslint', ':p')
+		if vim.fn.executable(local_eslint) == 1 then
+			return local_eslint
+		end
+
+		-- Try from project root
+		local root_eslint = vim.fn.findfile('node_modules/.bin/eslint', '.;')
+		if root_eslint ~= '' and vim.fn.executable(root_eslint) == 1 then
+			return vim.fn.fnamemodify(root_eslint, ':p')
+		end
+
+		-- Fallback to eslint_d (installed via Mason)
+		return 'eslint_d'
+	end,
+})
+
 lint.linters_by_ft = {
 	javascript = { 'eslint' },
 	javascriptreact = { 'eslint' },

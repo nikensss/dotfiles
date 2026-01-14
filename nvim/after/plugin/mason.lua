@@ -44,6 +44,7 @@ mason_tool_installer.setup({
 	ensure_installed = {
 		'black', -- python formatter
 		'clang-format', -- c/c++ formatter
+		'eslint_d', -- fast eslint daemon (used by nvim-lint)
 		'goimports',
 		'isort', -- python formatter
 		'prettier', -- prettier formatter
