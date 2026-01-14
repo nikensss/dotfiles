@@ -23,6 +23,19 @@ lint.linters.eslint = vim.tbl_deep_extend('force', lint.linters.eslint or {}, {
 	end,
 })
 
+-- Find the nearest eslint config directory (for monorepo support)
+local function get_eslint_cwd()
+	-- Look for eslint flat config files first (ESLint 9+)
+	local config_files = { 'eslint.config.mjs', 'eslint.config.js', '.eslintrc.js', '.eslintrc.json' }
+	for _, config_file in ipairs(config_files) do
+		local found = vim.fn.findfile(config_file, '.;')
+		if found ~= '' then
+			return vim.fn.fnamemodify(found, ':p:h')
+		end
+	end
+	return nil
+end
+
 lint.linters_by_ft = {
 	javascript = { 'eslint' },
 	javascriptreact = { 'eslint' },
@@ -54,6 +67,12 @@ vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
 			lint.linters_by_ft.svelte = { 'eslint' }
 		end
 
-		lint.try_lint()
+		-- Pass cwd for monorepo support (finds nearest eslint config)
+		local cwd = get_eslint_cwd()
+		if cwd then
+			lint.try_lint(nil, { cwd = cwd })
+		else
+			lint.try_lint()
+		end
 	end,
 })
