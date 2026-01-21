@@ -59,7 +59,22 @@ function section(){
   fi
 }
 
-section "Updating and upgrading homebrew" "brew update && brew upgrade"
+# System package managers
+if command -v brew &> /dev/null; then
+  section "Updating and upgrading homebrew" "brew update && brew upgrade"
+fi
+
+if command -v apt-get &> /dev/null; then
+  section "Updating and upgrading apt packages" "sudo apt-get update && sudo apt-get upgrade -y"
+fi
+
+if command -v snap &> /dev/null; then
+  section "Updating snap packages" "sudo snap refresh"
+fi
+
+if command -v flatpak &> /dev/null; then
+  section "Updating flatpak packages" "flatpak update -y"
+fi
 section "Updating rust" "rustup update"
 section "Updating cargo packages" 'cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:$" | cut -f1 -d" ")'
 section "Updating global npm packages" "npm update -g"
