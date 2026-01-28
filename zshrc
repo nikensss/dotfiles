@@ -242,3 +242,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   # Add any macOS-specific paths here
   :
 fi
+
+export PATH="$HOME/.local/bin:$PATH"
