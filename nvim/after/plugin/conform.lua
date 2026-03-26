@@ -1,5 +1,10 @@
 local is_deno_project = require('ricard.functions').is_deno_project
 local conform = require('conform')
+local default_prettier_cwd = require('conform.formatters.prettierd').cwd
+
+local function package_cwd(self, ctx)
+	return vim.fs.root(ctx.dirname, { 'package.json' }) or default_prettier_cwd(self, ctx)
+end
 
 local function formatters_checked_with_deno()
 	if is_deno_project() then
@@ -32,6 +37,12 @@ conform.setup({
 		yaml = { 'prettierd', 'prettier' },
 	},
 	formatters = {
+		prettier = {
+			cwd = package_cwd,
+		},
+		prettierd = {
+			cwd = package_cwd,
+		},
 		sleek = {
 			command = 'sleek',
 		},
