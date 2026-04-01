@@ -35,7 +35,11 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit gcalcli fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool asdf llvm boost
+
+brew install git neovim ripgrep tree-sitter tree-sitter-cli lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit gcalcli fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool asdf llvm boost
+
+brew install --cask iterm2 ngrok
+
 brew upgrade
 
 fnm install --lts
