@@ -145,25 +145,6 @@ vim.lsp.config('clangd', {
 	},
 })
 
--- configure go server
-vim.lsp.config('gopls', {
-	capabilities = capabilities,
-	on_attach = on_attach,
-	settings = {
-		gopls = {
-			hints = {
-				assignVariableTypes = true,
-				compositeLiteralFields = true,
-				compositeLiteralTypes = true,
-				constantValues = true,
-				functionTypeParameters = true,
-				parameterNames = true,
-				rangeVariableTypes = true,
-			},
-		},
-	},
-})
-
 -- configure gleam server
 vim.lsp.config('gleam', {
 	capabilities = capabilities,

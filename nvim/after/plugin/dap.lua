@@ -1,5 +1,4 @@
 local dap = require('dap')
-require('dap-go').setup()
 
 for _, language in ipairs({ 'typescript', 'javascript' }) do
 	dap.configurations[language] = {

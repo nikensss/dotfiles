@@ -35,15 +35,8 @@ else
 fi
 
 brew update
-brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexyl hexedit gcal fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin delve gleam erlang rebar3 supabase/tap/supabase deno railway railwayapp/tap/nixpacks pyenv pyenv-virtualenv cmake exiftool asdf llvm boost xcode-build-server swiftformat
-brew tap oven-sh/bun 
-brew install bun
+brew install git iterm2 neovim ngrok ripgrep tree-sitter lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit gcalcli fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool asdf llvm boost
 brew upgrade
-
-# cd ~/.local/share/nvim/lazy/xcodebuild.nvim
-# sudo make install
-# sudo gem install --quiet xcodeproj
-# cd -
 
 fnm install --lts
 fnm use --lts

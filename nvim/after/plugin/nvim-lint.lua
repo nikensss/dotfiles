@@ -41,7 +41,6 @@ lint.linters_by_ft = {
 	javascriptreact = { 'eslint' },
 	python = { 'pylint' },
 	svelte = { 'eslint' },
-	swift = { 'swiftlint' },
 	typescript = { 'eslint' },
 	typescriptreact = { 'eslint' },
 }
