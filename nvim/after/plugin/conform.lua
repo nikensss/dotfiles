@@ -1,4 +1,3 @@
-local is_deno_project = require('ricard.functions').is_deno_project
 local conform = require('conform')
 local default_prettier_cwd = require('conform.formatters.prettierd').cwd
 
@@ -6,32 +5,25 @@ local function package_cwd(self, ctx)
 	return vim.fs.root(ctx.dirname, { 'package.json' }) or default_prettier_cwd(self, ctx)
 end
 
-local function formatters_checked_with_deno()
-	if is_deno_project() then
-		return { 'deno_fmt' }
-	else
-		return { 'prettierd', 'prettier' }
-	end
-end
+local prettier = { 'prettierd', 'prettier' }
 
 conform.setup({
 	formatters_by_ft = {
 		cpp = { 'clang-format' },
-		css = { 'prettierd', 'prettier' },
+		css = prettier,
 		gleam = { 'gleam' },
-		graphql = { 'prettierd', 'prettier' },
-		html = { 'prettierd', 'prettier' },
-		javascript = formatters_checked_with_deno,
-		javascriptreact = formatters_checked_with_deno,
-		json = formatters_checked_with_deno,
-		jsonc = formatters_checked_with_deno,
+		graphql = prettier,
+		html = prettier,
+		javascript = prettier,
+		javascriptreact = prettier,
+		json = prettier,
+		jsonc = prettier,
 		lua = { 'stylua' },
-		markdown = formatters_checked_with_deno,
-		python = { 'isort', 'black' },
+		markdown = prettier,
 		sql = { 'sleek' },
-		typescript = formatters_checked_with_deno,
-		typescriptreact = formatters_checked_with_deno,
-		yaml = { 'prettierd', 'prettier' },
+		typescript = prettier,
+		typescriptreact = prettier,
+		yaml = prettier,
 	},
 	formatters = {
 		prettier = {

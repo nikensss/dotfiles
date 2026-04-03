@@ -25,11 +25,9 @@ mason_lspconfig.setup({
 		'emmet_language_server',
 		'graphql',
 		'html',
-		'jdtls',
 		'jsonls',
 		'lua_ls',
 		'prismals',
-		'pyright',
 		'tailwindcss',
 		'taplo',
 		'zls',
@@ -41,12 +39,9 @@ mason_lspconfig.setup({
 
 mason_tool_installer.setup({
 	ensure_installed = {
-		'black', -- python formatter
 		'clang-format', -- c/c++ formatter
 		'eslint_d', -- fast eslint daemon (used by nvim-lint)
-		'isort', -- python formatter
 		'prettier', -- prettier formatter
-		'pylint', -- python linter
 		'stylua', -- lua formatter
 	},
 })

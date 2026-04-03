@@ -10,7 +10,10 @@
       "Bash(curl -I https://github.com)",
       "Bash(timeout 30 git clone:*)",
       "Bash(echo:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(tree-sitter --version)",
+      "Bash(brew list:*)",
+      "Bash(deno --version)"
     ]
   }
 }

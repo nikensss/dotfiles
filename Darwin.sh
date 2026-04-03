@@ -36,9 +36,9 @@ fi
 
 brew update
 
-brew install git neovim ripgrep tree-sitter tree-sitter-cli lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit gcalcli fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool asdf llvm boost
+brew install git gh neovim ripgrep tree-sitter-cli lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit hexyl fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool llvm boost btop tree wget curl nmap imagemagick pngcheck gcal p7zip parallel freeimage gtk+3 oven-sh/bun/bun zig stripe/stripe-cli/stripe silicon
 
-brew install --cask iterm2 ngrok
+brew install --cask iterm2 ghostty ngrok bruno gcloud-cli
 
 brew upgrade
 
@@ -64,7 +64,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 echo "${BLUE}adding rustfmt component${RESET}"
 rustup component add rustfmt
 rustup component add clippy
-cargo install sleek silicon
+cargo install sleek
 
 cd ~
 mkdir repos
