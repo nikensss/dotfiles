@@ -36,7 +36,7 @@ fi
 
 brew update
 
-brew install git gh neovim ripgrep tree-sitter-cli lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit hexyl fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool llvm boost btop tree wget curl nmap imagemagick pngcheck gcal p7zip parallel freeimage gtk+3 oven-sh/bun/bun zig stripe/stripe-cli/stripe silicon
+brew install git gh neovim ripgrep tree-sitter-cli lua luajit httpie jq bat tldr librsvg fx duff diff-so-fancy hexedit hexyl fnm tmux postgresql@16 luarocks gnu-sed fd fzf tidy-html5 cargo-nextest tailspin gleam erlang rebar3 pyenv pyenv-virtualenv cmake exiftool llvm boost btop tree wget curl nmap imagemagick pngcheck gcal p7zip parallel freeimage gtk+3 oven-sh/bun/bun zig stripe/stripe-cli/stripe silicon openjdk
 
 brew install --cask iterm2 ghostty ngrok bruno gcloud-cli
 

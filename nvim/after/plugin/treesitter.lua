@@ -8,6 +8,7 @@ require('nvim-treesitter').install({
 	'eex',
 	'elixir',
 	'erlang',
+	'gitcommit',
 	'gitignore',
 	'gleam',
 	'graphql',
