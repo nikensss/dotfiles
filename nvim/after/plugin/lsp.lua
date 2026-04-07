@@ -175,6 +175,11 @@ vim.lsp.config('lua_ls', {
 
 -- typescript-tools
 require('typescript-tools').setup({
+	root_dir = function(bufnr, on_dir)
+		local fname = vim.api.nvim_buf_get_name(bufnr)
+		local git_root = vim.fs.root(fname, '.git')
+		on_dir(git_root or vim.fn.getcwd())
+	end,
 	on_attach = function(client, bufnr)
 		on_attach(client, bufnr)
 
