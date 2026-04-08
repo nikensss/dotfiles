@@ -5,10 +5,17 @@ while read -r BRANCH_NAME; do
     continue
   fi
 
-  git rev-parse --abbrev-ref $BRANCH_NAME@{upstream} &> /dev/null 2>&1
-  if [[ $? == 0 ]]; then
-    git branch -D $BRANCH_NAME
-  else 
-    echo "Branch $BRANCH_NAME has no upstream branch, not deleting"
+  git rev-parse --abbrev-ref "$BRANCH_NAME@{upstream}" &> /dev/null 2>&1
+  if [[ $? != 0 ]]; then
+    echo "Branch $BRANCH_NAME has no upstream, skipping"
+    continue
   fi
+
+  unpushed=$(git log --oneline "$BRANCH_NAME@{upstream}..$BRANCH_NAME" 2>/dev/null)
+  if [[ -n $unpushed ]]; then
+    echo "Branch $BRANCH_NAME has unpushed commits, skipping"
+    continue
+  fi
+
+  git branch -D "$BRANCH_NAME"
 done < <(git branch --format='%(refname:short)')
