@@ -4,5 +4,6 @@ return {
 		lazy = false,
 		dependencies = {
 			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope-live-grep-args.nvim',
 		},
 	}
