@@ -5,27 +5,36 @@ local function package_cwd(self, ctx)
 	return vim.fs.root(ctx.dirname, { 'package.json' }) or default_prettier_cwd(self, ctx)
 end
 
-local prettier = { 'prettierd', 'prettier' }
+local prettier = { 'prettierd', 'prettier', stop_after_first = true }
+local biome_or_prettier = { 'biome', 'prettierd', 'prettier', stop_after_first = true }
 
 conform.setup({
 	formatters_by_ft = {
 		cpp = { 'clang-format' },
-		css = prettier,
+		css = biome_or_prettier,
 		gleam = { 'gleam' },
 		graphql = prettier,
 		html = prettier,
-		javascript = prettier,
-		javascriptreact = prettier,
-		json = prettier,
-		jsonc = prettier,
+		javascript = biome_or_prettier,
+		javascriptreact = biome_or_prettier,
+		json = biome_or_prettier,
+		jsonc = biome_or_prettier,
 		lua = { 'stylua' },
 		markdown = prettier,
 		sql = { 'sleek' },
-		typescript = prettier,
-		typescriptreact = prettier,
+		typescript = biome_or_prettier,
+		typescriptreact = biome_or_prettier,
 		yaml = prettier,
 	},
 	formatters = {
+		biome = {
+			condition = function(self, ctx)
+				return vim.fs.find(
+					{ 'biome.json', 'biome.jsonc' },
+					{ path = ctx.filename, upward = true }
+				)[1] ~= nil
+			end,
+		},
 		prettier = {
 			cwd = package_cwd,
 		},
