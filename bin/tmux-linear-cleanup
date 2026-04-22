@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# List ticket clones under ~/repos/wm-* and let you pick ones to delete.
+# Kills the corresponding tmux session and removes the directory.
+
+clones=$(find ~/repos -maxdepth 1 -type d -iname 'wm-*' 2>/dev/null | sort | xargs -I{} basename {} 2>/dev/null | tr '[:upper:]' '[:lower:]')
+
+if [[ -z "$clones" ]]; then
+    tmux display-message "tmux-linear-cleanup: no ticket clones found"
+    exit 0
+fi
+
+options=$(while IFS= read -r name; do
+    if tmux has-session -t="$name" 2>/dev/null; then
+        printf "%s\t[session active]\n" "$name"
+    else
+        printf "%s\t[no session]\n" "$name"
+    fi
+done <<< "$clones")
+
+selected=$(echo "$options" | column -t -s $'\t' | fzf \
+    --prompt="  Cleanup > " \
+    --height=100% \
+    --multi)
+
+if [[ -z "$selected" ]]; then
+    exit 0
+fi
+
+while IFS= read -r line; do
+    name=$(echo "$line" | awk '{print $1}')
+    repo_dir="$HOME/repos/$name"
+
+    if tmux has-session -t="$name" 2>/dev/null; then
+        echo "Killing session $name..."
+        tmux kill-session -t "$name"
+    fi
+
+    if [[ "$repo_dir" == "$HOME/repos/wm-"* && -d "$repo_dir" ]]; then
+        echo "Removing $repo_dir..."
+        rm -rf "$repo_dir"
+    fi
+
+    echo "Done: $name"
+done <<< "$selected"

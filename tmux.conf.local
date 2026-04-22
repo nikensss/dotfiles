@@ -15,6 +15,7 @@ bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 # tmux-linear-ticket: switch to or create a window for a Linear ticket
 bind-key t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
 bind-key C-t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
+bind-key T run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-cleanup"
 
 # enter copy mode without releasing ctrl
 bind-key C-[ copy-mode

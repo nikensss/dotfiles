@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Select a Linear ticket assigned to you, clone workmate for it (if needed),
-# and switch to (or create) a tmux session named after the ticket ID.
+# Select a Linear ticket assigned to you.
+# - Dev Scoping tickets: open a window in the shared "workmate" session
+# - All other tickets: clone workmate, set up env files, create a dedicated session
 
 [[ -z "$LINEAR_API_KEY" && -f ~/.env ]] && source ~/.env
 LINEAR_API_KEY="${LINEAR_API_KEY:-$(cat ~/.config/linear/token 2>/dev/null)}"
@@ -11,7 +12,7 @@ if [[ -z "$LINEAR_API_KEY" ]]; then
     exit 1
 fi
 
-QUERY='{"query":"{ viewer { assignedIssues(filter: { completedAt: { null: true } }) { nodes { identifier title state { name } } } } }"}'
+QUERY='{"query":"{ viewer { assignedIssues(filter: { completedAt: { null: true } }) { nodes { identifier title state { name } branchName } } } }"}'
 
 response=$(curl -sf -X POST https://api.linear.app/graphql \
     -H "Authorization: $LINEAR_API_KEY" \
@@ -23,16 +24,15 @@ if [[ -z "$response" ]]; then
     exit 1
 fi
 
-issues=$(echo "$response" | jq -r '.data.viewer.assignedIssues.nodes[] | "\(.identifier)\t[\(.state.name)]\t\(.title)"' 2>/dev/null)
+issues=$(echo "$response" | jq -r '.data.viewer.assignedIssues.nodes[] | "\(.identifier)\t[\(.state.name)]\t\(.title)\t\(.branchName)"' 2>/dev/null)
 
 if [[ -z "$issues" ]]; then
     tmux display-message "tmux-linear-ticket: no assigned issues found"
     exit 1
 fi
 
-selected=$(echo "$issues" | column -t -s $'\t' | fzf \
+selected=$(echo "$issues" | cut -f1-3 | column -t -s $'\t' | fzf \
     --prompt="  Linear > " \
-    --reverse \
     --height=100% \
     --no-sort)
 
@@ -41,27 +41,62 @@ if [[ -z "$selected" ]]; then
 fi
 
 ticket_id=$(echo "$selected" | awk '{print $1}')
-repo_dir="$HOME/repos/$ticket_id"
+ticket_id_lower="${ticket_id,,}"
+ticket_status=$(echo "$issues" | awk -F'\t' -v id="$ticket_id" '$1 == id { gsub(/^\[|\]$/, "", $2); print $2 }')
+branch_name=$(echo "$issues" | awk -F'\t' -v id="$ticket_id" '$1 == id { print $4 }')
+
 workmate_dir="$HOME/repos/workmate"
+workmate_remote="git@github.com:Teifi-Digital/workmate.git"
 
-if [[ ! -d "$repo_dir" ]]; then
-    git clone "$(git -C "$workmate_dir" remote get-url origin)" "$repo_dir"
+if [[ "$ticket_status" == "Dev Scoping" ]]; then
+    if [[ ! -d "$workmate_dir" ]]; then
+        git clone "$workmate_remote" "$workmate_dir"
+    fi
 
-    cp "$workmate_dir/.env" "$repo_dir/.env"
-    cp "$workmate_dir/shopify.app.toml" "$repo_dir/shopify.app.toml"
+    if ! tmux has-session -t="workmate" 2>/dev/null; then
+        tmux new-session -ds "workmate" -c "$workmate_dir" -n "workmate"
+        tmux send-keys -t "workmate:workmate" "pnpm :ci && pnpm :build" Enter
+    fi
 
-    # web/.env and web/frontend/.env are symlinks to ../.env in the source repo
-    ln -s ../.env "$repo_dir/web/.env"
-    ln -s ../.env "$repo_dir/web/frontend/.env"
+    current_session=$(tmux display-message -p '#S')
+
+    if [[ "$current_session" == "workmate" ]]; then
+        picker_window=$(tmux display-message -p '#{window_index}')
+        if ! tmux list-windows -t "workmate" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
+            tmux new-window -d -t "workmate:" -n "$ticket_id_lower" -c "$workmate_dir"
+        fi
+        tmux select-window -t "workmate:=$ticket_id_lower"
+        tmux kill-window -t "workmate:$picker_window"
+    else
+        if ! tmux list-windows -t "workmate" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
+            tmux new-window -t "workmate" -n "$ticket_id_lower" -c "$workmate_dir"
+        fi
+        tmux switch-client -t "workmate"
+        tmux select-window -t "workmate:$ticket_id_lower"
+    fi
+else
+    repo_dir="$HOME/repos/$ticket_id_lower"
+
+    if [[ ! -d "$repo_dir" ]]; then
+        git clone "$workmate_remote" "$repo_dir"
+
+        cp "$workmate_dir/.env" "$repo_dir/.env"
+        cp "$workmate_dir/shopify.app.toml" "$repo_dir/shopify.app.toml"
+
+        ln -s ../.env "$repo_dir/web/.env"
+        ln -s ../.env "$repo_dir/web/frontend/.env"
+
+        git -C "$repo_dir" checkout "$branch_name" 2>/dev/null || git -C "$repo_dir" checkout -b "$branch_name"
+    fi
+
+    if ! tmux has-session -t="$ticket_id_lower" 2>/dev/null; then
+        tmux new-session -ds "$ticket_id_lower" -c "$repo_dir" -n "code"
+        tmux new-window -t "$ticket_id_lower" -n "claude" -c "$repo_dir"
+        tmux new-window -t "$ticket_id_lower" -n "watch" -c "$repo_dir"
+        tmux new-window -t "$ticket_id_lower" -n "funnel" -c "$repo_dir"
+        tmux select-window -t "$ticket_id_lower:code"
+        tmux send-keys -t "$ticket_id_lower:code" "pnpm :ci && pnpm :build" Enter
+    fi
+
+    tmux switch-client -t "$ticket_id_lower"
 fi
-
-if ! tmux has-session -t="$ticket_id" 2>/dev/null; then
-    tmux new-session -ds "$ticket_id" -c "$repo_dir" -n "code"
-    tmux new-window -t "$ticket_id" -n "claude" -c "$repo_dir"
-    tmux new-window -t "$ticket_id" -n "watch" -c "$repo_dir"
-    tmux new-window -t "$ticket_id" -n "funnel" -c "$repo_dir"
-    tmux select-window -t "$ticket_id:code"
-    tmux send-keys -t "$ticket_id:code" "pnpm :ci && pnpm :build" Enter
-fi
-
-tmux switch-client -t "$ticket_id"
