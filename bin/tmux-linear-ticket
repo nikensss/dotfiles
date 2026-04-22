@@ -1,12 +1,7 @@
 #!/usr/bin/env bash
 
-# Switch to or create a tmux window named after a Linear ticket assigned to you.
-# Requires LINEAR_API_KEY in env or saved in ~/.config/linear/token
-
-if [[ -z "$TMUX" ]]; then
-    echo "Error: must run inside a tmux session" >&2
-    exit 1
-fi
+# Select a Linear ticket assigned to you, clone workmate for it (if needed),
+# and switch to (or create) a tmux session named after the ticket ID.
 
 [[ -z "$LINEAR_API_KEY" && -f ~/.env ]] && source ~/.env
 LINEAR_API_KEY="${LINEAR_API_KEY:-$(cat ~/.config/linear/token 2>/dev/null)}"
@@ -46,11 +41,27 @@ if [[ -z "$selected" ]]; then
 fi
 
 ticket_id=$(echo "$selected" | awk '{print $1}')
+repo_dir="$HOME/repos/$ticket_id"
+workmate_dir="$HOME/repos/workmate"
 
-existing_window=$(tmux list-windows -F '#{window_index}:#{window_name}' | grep ":${ticket_id}$" | cut -d: -f1)
+if [[ ! -d "$repo_dir" ]]; then
+    git clone "$(git -C "$workmate_dir" remote get-url origin)" "$repo_dir"
 
-if [[ -n "$existing_window" ]]; then
-    tmux select-window -t "$existing_window"
-else
-    tmux new-window -n "$ticket_id"
+    cp "$workmate_dir/.env" "$repo_dir/.env"
+    cp "$workmate_dir/shopify.app.toml" "$repo_dir/shopify.app.toml"
+
+    # web/.env and web/frontend/.env are symlinks to ../.env in the source repo
+    ln -s ../.env "$repo_dir/web/.env"
+    ln -s ../.env "$repo_dir/web/frontend/.env"
 fi
+
+if ! tmux has-session -t="$ticket_id" 2>/dev/null; then
+    tmux new-session -ds "$ticket_id" -c "$repo_dir" -n "code"
+    tmux new-window -t "$ticket_id" -n "claude" -c "$repo_dir"
+    tmux new-window -t "$ticket_id" -n "watch" -c "$repo_dir"
+    tmux new-window -t "$ticket_id" -n "funnel" -c "$repo_dir"
+    tmux select-window -t "$ticket_id:code"
+    tmux send-keys -t "$ticket_id:code" "pnpm :ci && pnpm :build" Enter
+fi
+
+tmux switch-client -t "$ticket_id"
