@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+# Switch to or create a tmux window named after a Linear ticket assigned to you.
+# Requires LINEAR_API_KEY in env or saved in ~/.config/linear/token
+
+if [[ -z "$TMUX" ]]; then
+    echo "Error: must run inside a tmux session" >&2
+    exit 1
+fi
+
+[[ -z "$LINEAR_API_KEY" && -f ~/.env ]] && source ~/.env
+LINEAR_API_KEY="${LINEAR_API_KEY:-$(cat ~/.config/linear/token 2>/dev/null)}"
+
+if [[ -z "$LINEAR_API_KEY" ]]; then
+    tmux display-message "tmux-linear-ticket: LINEAR_API_KEY not set (env or ~/.config/linear/token)"
+    exit 1
+fi
+
+QUERY='{"query":"{ viewer { assignedIssues(filter: { completedAt: { null: true } }) { nodes { identifier title state { name } } } } }"}'
+
+response=$(curl -sf -X POST https://api.linear.app/graphql \
+    -H "Authorization: $LINEAR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "$QUERY")
+
+if [[ -z "$response" ]]; then
+    tmux display-message "tmux-linear-ticket: failed to reach Linear API"
+    exit 1
+fi
+
+issues=$(echo "$response" | jq -r '.data.viewer.assignedIssues.nodes[] | "\(.identifier)\t[\(.state.name)]\t\(.title)"' 2>/dev/null)
+
+if [[ -z "$issues" ]]; then
+    tmux display-message "tmux-linear-ticket: no assigned issues found"
+    exit 1
+fi
+
+selected=$(echo "$issues" | column -t -s $'\t' | fzf \
+    --prompt="  Linear > " \
+    --reverse \
+    --height=100% \
+    --no-sort)
+
+if [[ -z "$selected" ]]; then
+    exit 0
+fi
+
+ticket_id=$(echo "$selected" | awk '{print $1}')
+
+existing_window=$(tmux list-windows -F '#{window_index}:#{window_name}' | grep ":${ticket_id}$" | cut -d: -f1)
+
+if [[ -n "$existing_window" ]]; then
+    tmux select-window -t "$existing_window"
+else
+    tmux new-window -n "$ticket_id"
+fi

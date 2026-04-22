@@ -12,6 +12,13 @@ bind-key -r f run-shell "tmux neww ~/bin/tmux-sessionizer"
 bind-key -r C-f run-shell "tmux neww ~/bin/tmux-sessionizer"
 bind-key -r C-k run-shell "tmux neww ~/bin/tmux-unsessionizer"
 
+# tmux-linear-ticket: switch to or create a window for a Linear ticket
+bind-key t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
+bind-key C-t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
+
+# enter copy mode without releasing ctrl
+bind-key C-[ copy-mode
+
 # alternate between last two sessions
 bind-key C-p switch-client -l
 
