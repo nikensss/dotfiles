@@ -1,3 +1,8 @@
+# Enable Powerlevel10k instant prompt — must come before everything that can produce output.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 if [[ -f ~/.env ]]; then
   source ~/.env
 fi
@@ -6,19 +11,26 @@ setopt EXTENDED_HISTORY
 
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 
 # For c and c++ stuff (macOS specific)
 if [[ "$OSTYPE" == "darwin"* ]]; then
   export LD_LIBRARY_PATH="/Library/Developer/CommandLineTools/usr/lib/:$LD_LIBRARY_PATH"
 fi
 
-# Homebrew setup (macOS specific)
+# Homebrew setup — cached to avoid ~1s subprocess cost on every shell start.
+_brew_cache="${XDG_CACHE_HOME:-$HOME/.cache}/brew_shellenv"
 if [[ -f "/opt/homebrew/bin/brew" ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  if [[ ! -f "$_brew_cache" ]] || [[ "/opt/homebrew/bin/brew" -nt "$_brew_cache" ]]; then
+    /opt/homebrew/bin/brew shellenv > "$_brew_cache"
+  fi
+  source "$_brew_cache"
 elif [[ -f "/usr/local/bin/brew" ]]; then
-  eval "$(/usr/local/bin/brew shellenv)"
+  if [[ ! -f "$_brew_cache" ]] || [[ "/usr/local/bin/brew" -nt "$_brew_cache" ]]; then
+    /usr/local/bin/brew shellenv > "$_brew_cache"
+  fi
+  source "$_brew_cache"
 fi
+unset _brew_cache
 
 # pnpm
 if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -154,14 +166,14 @@ if [[ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]]; then . "$HOME/google-cl
 export PATH="$PATH:$HOME/.rvm/bin"
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH"
 export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
-if command -v pyenv 1>/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-fi
-
-if which pyenv-virtualenv-init > /dev/null; then 
-  eval "$(pyenv virtualenv-init -)"; 
+if [[ -d "$PYENV_ROOT" ]]; then
+  pyenv() {
+    unset -f pyenv
+    eval "$(command pyenv init --no-rehash -)"
+    pyenv "$@"
+  }
 fi
 
 if command -v ngrok &>/dev/null; then

@@ -14,7 +14,20 @@ kp() {
 }
 
 wu(){
-  lsof -i tcp:$1
+  local lsof_out
+  lsof_out=$(lsof -i tcp:$1)
+
+  if [[ -z "$lsof_out" ]]; then
+    echo "No processes on port $1"
+    return
+  fi
+
+  echo "$lsof_out"
+  echo ""
+  echo "--- Full commands ---"
+  echo "$lsof_out" | awk 'NR>1 {print $2}' | sort -u | while read pid; do
+    echo "PID $pid: $(ps -p $pid -o command= 2>/dev/null)"
+  done
 }
 
 cln(){
