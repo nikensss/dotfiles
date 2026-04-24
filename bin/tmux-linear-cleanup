@@ -27,19 +27,31 @@ if [[ -z "$selected" ]]; then
     exit 0
 fi
 
+current_session=$(tmux display-message -p '#S')
+kill_current_dir=""
+
 while IFS= read -r line; do
     name=$(echo "$line" | awk '{print $1}')
     repo_dir="$HOME/repos/$name"
 
+    if [[ "$name" == "$current_session" ]]; then
+        kill_current_dir="$repo_dir"
+        continue
+    fi
+
     if tmux has-session -t="$name" 2>/dev/null; then
-        echo "Killing session $name..."
         tmux kill-session -t "$name"
     fi
 
     if [[ "$repo_dir" == "$HOME/repos/wm-"* && -d "$repo_dir" ]]; then
-        echo "Removing $repo_dir..."
         rm -rf "$repo_dir"
     fi
-
-    echo "Done: $name"
 done <<< "$selected"
+
+if [[ -n "$kill_current_dir" ]]; then
+    [[ "$kill_current_dir" == "$HOME/repos/wm-"* && -d "$kill_current_dir" ]] && rm -rf "$kill_current_dir"
+    tmp="_cleanup_$$"
+    tmux new-session -d -s "$tmp" -c "$HOME" "~/bin/tmux-sessionizer"
+    tmux switch-client -t "$tmp"
+    tmux kill-session -t "$current_session"
+fi
