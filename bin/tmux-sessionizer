@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
 function tag(){
-  session_basenames=$(tmux list-sessions -F '#S' 2> /dev/null | xargs)
-  while read -r line; do
-    if ! echo "$session_basenames" | grep -q "$(basename "$line")"; then
-      echo "(repo) $line"
-    fi
+  declare -A session_set
+  while IFS= read -r s; do
+    session_set["$s"]=1
+  done <<< "$1"
+
+  while IFS= read -r line; do
+    local bn="${line##*/}"
+    [[ -z "${session_set[$bn]}" ]] && printf '(repo) %s\n' "$line"
   done
 }
 
 function get_options() {
-  # List active tmux sessions
-  tmux list-sessions -F '(session) #S' 2> /dev/null | sort | uniq
+  local sessions
+  sessions=$(tmux list-sessions -F '#S' 2>/dev/null)
 
-  # Use fdfind on Ubuntu/Debian, fd on macOS
-  local fd_cmd="fd"
-  if command -v fdfind > /dev/null 2>&1; then
-    fd_cmd="fdfind"
-  fi
+  while IFS= read -r s; do
+    [[ -n "$s" ]] && printf '(session) %s\n' "$s"
+  done <<< "$sessions"
 
-  # Find all git repos at ~/repos/ level only (no nested repos)
-  $fd_cmd -t d -HI --max-depth 2 --search-path ~/repos '.git' -E 'node_modules' -x dirname | \
-    sort -u | \
-    tag
+  for d in ~/repos/*/; do
+    [[ -d "${d}.git" ]] && printf '%s\n' "${d%/}"
+  done | tag "$sessions"
 }
 
 if [[ $# -eq 1 ]]; then
@@ -35,18 +35,14 @@ if [[ -z $selected ]]; then
     exit 0
 fi
 
-selected=$(echo $selected | perl -pe 's/^\((repo|session)\) (.*)$/\2/')
-selected_name=$(basename $selected | tr . _)
+selected="${selected#* }"
+selected_name="${selected##*/}"
+selected_name="${selected_name//./_}"
 
-tmux_running=$(pgrep tmux)
-
-if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s $selected_name -c $selected
+if [[ -z $TMUX ]]; then
+    tmux new-session -A -s "$selected_name" -c "$selected"
     exit 0
 fi
 
-if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
-fi
-
-tmux switch-client -t $selected_name
+tmux new-session -ds "$selected_name" -c "$selected" 2>/dev/null
+tmux switch-client -t "$selected_name"
