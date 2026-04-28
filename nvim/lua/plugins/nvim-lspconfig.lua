@@ -8,8 +8,7 @@ return {
 				require('neoconf').setup()
 			end,
 		},
-		'hrsh7th/cmp-nvim-lsp',
-		'hrsh7th/nvim-cmp',
+		'saghen/blink.cmp',
 		{
 			'antosha417/nvim-lsp-file-operations',
 			dependencies = {
