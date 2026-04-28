@@ -39,6 +39,10 @@ return {
 			},
 			signature = { enabled = true },
 		},
+		config = function(_, opts)
+			require('blink.cmp').setup(opts)
+			dofile(vim.fn.stdpath('config') .. '/after/plugin/cmp.lua')()
+		end,
 		opts_extend = { 'sources.default' },
 	},
 }

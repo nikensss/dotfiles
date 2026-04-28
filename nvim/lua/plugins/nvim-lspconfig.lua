@@ -36,4 +36,7 @@ return {
 			},
 		},
 	},
+	config = function()
+		dofile(vim.fn.stdpath('config') .. '/after/plugin/lsp.lua')()
+	end,
 }

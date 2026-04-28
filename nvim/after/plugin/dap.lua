@@ -1,3 +1,4 @@
+return function()
 local dap = require('dap')
 
 for _, language in ipairs({ 'typescript', 'javascript' }) do
@@ -192,4 +193,5 @@ end
 
 dap.listeners.before.event_exited['dapui_config'] = function()
 	dapui.close({})
+end
 end

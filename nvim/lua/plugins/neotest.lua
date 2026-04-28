@@ -9,4 +9,7 @@ return {
 		'nvim-neotest/neotest-vim-test',
 		'nvim-neotest/neotest-jest',
 	},
+	config = function()
+		dofile(vim.fn.stdpath('config') .. '/after/plugin/neotest.lua')()
+	end,
 }
