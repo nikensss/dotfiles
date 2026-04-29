@@ -60,12 +60,12 @@ function M.on_attach(client, bufnr)
 
 	opts.desc = 'Go to previous reference'
 	keymap.set('n', '[r', function()
-		require('snacks').words.jump(-1, true)
+		require('illuminate').goto_prev_reference(true)
 	end, opts)
 
 	opts.desc = 'Go to next reference'
 	keymap.set('n', ']r', function()
-		require('snacks').words.jump(1, true)
+		require('illuminate').goto_next_reference(true)
 	end, opts)
 
 	opts.desc = 'Show documentation for what is under cursor'
