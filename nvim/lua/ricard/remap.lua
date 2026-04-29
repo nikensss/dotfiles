@@ -15,6 +15,7 @@ end)
 vim.keymap.set('n', '<leader>qa', vim.cmd.quitall)
 vim.keymap.set('n', '<leader>qc', vim.cmd.cclose)
 vim.keymap.set('n', '<leader>qo', vim.cmd.copen)
+vim.keymap.set('n', '<leader>qt', vim.cmd.tabclose)
 
 vim.keymap.set('x', '<leader>p', [["_dP]])
 
@@ -214,9 +215,22 @@ vim.keymap.set(
 	'<Plug>(nvim-surround-visual)`<Plug>(nvim-surround-normal)i`}i$<ESC>',
 	{ silent = false, noremap = true, desc = 'interpolate string' }
 )
+
 vim.keymap.set(
 	'n',
 	'<leader>ir',
 	'<Plug>(nvim-surround-delete)`x<Plug>(nvim-surround-delete)}',
 	{ silent = false, noremap = true, desc = 'remove interpolation' }
 )
+
+vim.keymap.set('n', '<leader>5', function()
+	local path = vim.fn.expand('%') -- relative path
+
+	if path == '' then
+		vim.notify('Current buffer has no file path', vim.log.levels.WARN)
+		return
+	end
+
+	vim.fn.system('pbcopy', path)
+	vim.notify('Copied: ' .. path)
+end, { desc = 'Copy current relative buffer path' })
