@@ -42,10 +42,68 @@ vim.api.nvim_create_autocmd('FileType', {
 	end,
 })
 
--- Incremental selection
-vim.keymap.set('n', 'grn', function()
-	vim.treesitter.inspect()
-end)
+-- Incremental selection (nvim-treesitter main dropped this, re-implemented via built-in API)
+-- Uses marks + `<v`> so the selection is correct regardless of what mode we enter from.
+local _ts_sel = {} -- buf -> node stack
+
+local function _ts_select(node)
+	if not node then
+		return
+	end
+	local sr, sc, er, ec = node:range() -- 0-indexed, ec is exclusive
+	-- Resolve end position: ec==0 means the node ends at start of line er,
+	-- so the last real character is at the end of line er-1.
+	local end_row, end_col
+	if ec == 0 and er > 0 then
+		end_row = er -- Neovim 1-indexed = 0-indexed (er-1) + 1
+		local line = vim.api.nvim_buf_get_lines(0, er - 1, er, false)[1] or ''
+		end_col = math.max(0, #line - 1)
+	else
+		end_row = er + 1
+		end_col = math.max(0, ec - 1)
+	end
+	-- Use marks a/b instead of </> because Esc (needed to exit visual mode)
+	-- overwrites < and > with the current selection, clobbering our target range.
+	-- Plain buffer marks are unaffected by mode changes.
+	vim.api.nvim_buf_set_mark(0, 'a', sr + 1, sc, {})
+	vim.api.nvim_buf_set_mark(0, 'b', end_row, end_col, {})
+	local esc = vim.api.nvim_replace_termcodes('<Esc>', true, false, true)
+	vim.api.nvim_feedkeys(esc .. '`av`b', 'n', false)
+end
+
+vim.keymap.set('n', 'gnl', function()
+	local buf = vim.api.nvim_get_current_buf()
+	local node = vim.treesitter.get_node()
+	if not node then
+		return
+	end
+	_ts_sel[buf] = { node }
+	_ts_select(node)
+end, { desc = 'Treesitter: select node' })
+
+vim.keymap.set('x', 'gnl', function()
+	local buf = vim.api.nvim_get_current_buf()
+	local stack = _ts_sel[buf]
+	if not stack or #stack == 0 then
+		return
+	end
+	local parent = stack[#stack]:parent()
+	if not parent then
+		return
+	end
+	table.insert(stack, parent)
+	_ts_select(parent)
+end, { desc = 'Treesitter: expand selection to parent' })
+
+vim.keymap.set('x', 'gnm', function()
+	local buf = vim.api.nvim_get_current_buf()
+	local stack = _ts_sel[buf]
+	if not stack or #stack <= 1 then
+		return
+	end
+	table.remove(stack)
+	_ts_select(stack[#stack])
+end, { desc = 'Treesitter: shrink selection to child' })
 
 -- Textobjects setup
 local select = require('nvim-treesitter-textobjects.select')
