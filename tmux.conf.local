@@ -17,6 +17,9 @@ bind-key t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
 bind-key C-t run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-ticket"
 bind-key T run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-cleanup"
 
+# tmux-window-picker: fzf across all windows in all sessions
+bind-key C-w run-shell "tmux neww ~/repos/dotfiles/bin/tmux-window-picker"
+
 # enter copy mode without releasing ctrl
 bind-key C-[ copy-mode
 

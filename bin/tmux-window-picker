@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# List all panes across all tmux sessions showing the actual foreground process.
+# Walks the full process tree from each pane's shell PID down to the leaf process,
+# so nested commands (e.g. zsh -> sh -> tailscale) are resolved correctly.
+
+declare -A proc child
+while read -r pid ppid fullcmd; do
+    exe="${fullcmd%% *}"
+    name="${exe##*/}"
+    if [[ "$fullcmd" == *" "* ]]; then
+        comm="$name ${fullcmd#* }"
+    else
+        comm="$name"
+    fi
+    proc[$pid]="$comm"
+    [[ -z "${child[$ppid]}" ]] && child[$ppid]="$pid"
+done < <(ps -axo pid=,ppid=,command=)
+
+get_foreground() {
+    local pid=$1 depth=${2:-0}
+    (( depth > 10 )) && { echo "${proc[$pid]:-zsh}"; return; }
+    local c="${child[$pid]}"
+    if [[ -n "$c" ]]; then
+        get_foreground "$c" $((depth + 1))
+    else
+        echo "${proc[$pid]:-zsh}"
+    fi
+}
+
+lines=()
+while IFS=$'\t' read -r target wname pid; do
+    pid="${pid//[[:space:]]/}"
+    cmd=$(get_foreground "$pid")
+    lines+=("$target"$'\t'"$wname"$'\t'"$cmd")
+done < <(tmux list-panes -a -F $'#{session_name}:#{window_index}.#{pane_index}\t#{window_name}\t#{pane_pid}')
+
+selected=$(printf '%s\n' "${lines[@]}" \
+    | column -t -s $'\t' \
+    | fzf --prompt="  Windows > " --height=100% --no-sort)
+
+[[ -z "$selected" ]] && exit 0
+tmux switch-client -t "$(awk '{print $1}' <<< "$selected")"

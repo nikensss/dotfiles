@@ -59,20 +59,27 @@ if [[ "$ticket_status" == "Dev Scoping" ]]; then
     fi
 
     current_session=$(tmux display-message -p '#S')
+    new_window=false
 
     if [[ "$current_session" == "workmate" ]]; then
         picker_window=$(tmux display-message -p '#{window_index}')
         if ! tmux list-windows -t "workmate" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
             tmux new-window -d -t "workmate:" -n "$ticket_id_lower" -c "$workmate_dir"
+            new_window=true
         fi
         tmux select-window -t "workmate:=$ticket_id_lower"
         tmux kill-window -t "workmate:$picker_window"
     else
         if ! tmux list-windows -t "workmate" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
             tmux new-window -t "workmate" -n "$ticket_id_lower" -c "$workmate_dir"
+            new_window=true
         fi
         tmux switch-client -t "workmate"
         tmux select-window -t "workmate:$ticket_id_lower"
+    fi
+
+    if [[ "$new_window" == "true" ]]; then
+        tmux send-keys -t "workmate:$ticket_id_lower" "claude" Enter
     fi
 else
     repo_dir="$HOME/repos/$ticket_id_lower"
@@ -90,12 +97,12 @@ else
     fi
 
     if ! tmux has-session -t="$ticket_id_lower" 2>/dev/null; then
-        tmux new-session -ds "$ticket_id_lower" -c "$repo_dir" -n "code"
+        tmux new-session -ds "$ticket_id_lower" -c "$repo_dir" -n "nvim"
         tmux new-window -t "$ticket_id_lower" -n "claude" -c "$repo_dir"
         tmux new-window -t "$ticket_id_lower" -n "watch" -c "$repo_dir"
         tmux new-window -t "$ticket_id_lower" -n "funnel" -c "$repo_dir"
-        tmux select-window -t "$ticket_id_lower:code"
-        tmux send-keys -t "$ticket_id_lower:code" "pnpm :ci && pnpm :build" Enter
+        tmux select-window -t "$ticket_id_lower:nvim"
+        tmux send-keys -t "$ticket_id_lower:nvim" "pnpm :ci && pnpm :build" Enter
     fi
 
     tmux switch-client -t "$ticket_id_lower"
