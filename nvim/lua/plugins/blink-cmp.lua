@@ -12,6 +12,9 @@ return {
 		opts = {
 			snippets = { preset = 'luasnip' },
 			keymap = { preset = 'default' },
+			completion = {
+				list = { selection = { preselect = true, auto_insert = true } },
+			},
 			appearance = { nerd_font_variant = 'mono' },
 			sources = {
 				default = { 'lsp', 'path', 'snippets', 'buffer', 'lazydev' },
