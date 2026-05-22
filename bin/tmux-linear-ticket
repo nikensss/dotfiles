@@ -119,6 +119,7 @@ open_dedicated_session() {
         tmux new-window -t "$ticket_id_lower" -n "funnel" -c "$repo_dir"
         tmux select-window -t "$ticket_id_lower:nvim"
         tmux send-keys -t "$ticket_id_lower:nvim" "pnpm :ci && pnpm :build" Enter
+        tmux send-keys -t "$ticket_id_lower:claude" "claude" Enter
     fi
 
     tmux switch-client -t "$ticket_id_lower"

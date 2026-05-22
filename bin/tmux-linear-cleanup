@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# List ticket clones under ~/repos/wm-* and let you pick ones to delete.
+# List ticket clones under ~/repos/wm-* and ~/repos/nai-* and let you pick ones to delete.
 # Kills the corresponding tmux session and removes the directory.
 
-clones=$(find ~/repos -maxdepth 1 -type d -iname 'wm-*' 2>/dev/null | sort | xargs -I{} basename {} 2>/dev/null | tr '[:upper:]' '[:lower:]')
+clones=$(find ~/repos -maxdepth 1 -type d \( -iname 'wm-*' -o -iname 'nai-*' \) 2>/dev/null | sort | xargs -I{} basename {} 2>/dev/null | tr '[:upper:]' '[:lower:]')
 
 if [[ -z "$clones" ]]; then
     tmux display-message "tmux-linear-cleanup: no ticket clones found"
@@ -43,13 +43,13 @@ while IFS= read -r line; do
         tmux kill-session -t "$name"
     fi
 
-    if [[ "$repo_dir" == "$HOME/repos/wm-"* && -d "$repo_dir" ]]; then
+    if [[ ("$repo_dir" == "$HOME/repos/wm-"* || "$repo_dir" == "$HOME/repos/nai-"*) && -d "$repo_dir" ]]; then
         rm -rf "$repo_dir"
     fi
 done <<< "$selected"
 
 if [[ -n "$kill_current_dir" ]]; then
-    [[ "$kill_current_dir" == "$HOME/repos/wm-"* && -d "$kill_current_dir" ]] && rm -rf "$kill_current_dir"
+    [[ ("$kill_current_dir" == "$HOME/repos/wm-"* || "$kill_current_dir" == "$HOME/repos/nai-"*) && -d "$kill_current_dir" ]] && rm -rf "$kill_current_dir"
     tmp="_cleanup_$$"
     tmux new-session -d -s "$tmp" -c "$HOME" "~/bin/tmux-sessionizer"
     tmux switch-client -t "$tmp"
