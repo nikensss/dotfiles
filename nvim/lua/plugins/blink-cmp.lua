@@ -11,7 +11,10 @@ return {
 		},
 		opts = {
 			snippets = { preset = 'luasnip' },
-			keymap = { preset = 'default' },
+			keymap = {
+				preset = 'default',
+				['<CR>'] = { 'accept', 'fallback' },
+			},
 			completion = {
 				list = { selection = { preselect = true, auto_insert = true } },
 			},
