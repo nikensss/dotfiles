@@ -205,6 +205,7 @@ vim.keymap.set('n', '<leader>ps', pick_session, { silent = true, desc = '[p]ick 
 vim.keymap.set('n', '<leader>ms', function()
 	local session_path = get_session_path()
 	vim.cmd('mksession! ' .. session_path)
+	vim.cmd('wshada!')
 	save_qf_list()
 	print('session saved to ' .. session_path)
 end, { silent = true, desc = '[m]ake [s]ession' })
