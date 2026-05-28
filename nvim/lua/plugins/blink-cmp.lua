@@ -7,7 +7,6 @@ return {
 			{ 'L3MON4D3/LuaSnip', build = 'make install_jsregexp' },
 			'rafamadriz/friendly-snippets',
 			'onsails/lspkind.nvim',
-			{ 'saghen/blink.compat', version = '*', opts = {} },
 		},
 		opts = {
 			snippets = { preset = 'luasnip' },
@@ -33,9 +32,8 @@ return {
 						score_offset = 100,
 					},
 					dadbod = {
-						name = 'dadbod',
-						module = 'blink.compat.source',
-						opts = { name = 'vim-dadbod-completion' },
+						name = 'Dadbod',
+						module = 'vim_dadbod_completion.blink',
 					},
 				},
 			},
