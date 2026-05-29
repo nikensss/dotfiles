@@ -5,8 +5,8 @@
 #   - Dev Scoping: open a window in the shared "workmate" session
 #   - All other: clone workmate, set up env files, create a dedicated session
 # nai-* tickets:
-#   - Dev Scoping: open a window in the shared "elc-rms" session
-#   - All other: clone elc-rms into a dedicated dir, create a dedicated session
+#   - Dev Scoping: open a window in the shared "elc-teifi-apps" session
+#   - All other: clone elc-teifi-apps into a dedicated dir, create a dedicated session
 
 [[ -z "$LINEAR_API_KEY" && -f ~/.env ]] && source ~/.env
 LINEAR_API_KEY="${LINEAR_API_KEY:-$(cat ~/.config/linear/token 2>/dev/null)}"
@@ -51,8 +51,8 @@ branch_name=$(echo "$issues" | awk -F'\t' -v id="$ticket_id" '$1 == id { print $
 
 workmate_dir="$HOME/repos/workmate"
 workmate_remote="git@github.com:Teifi-Digital/workmate.git"
-elc_rms_dir="$HOME/repos/elc-rms"
-elc_rms_remote="git@github.com:Teifi-Digital/elc-teifi-apps.git"
+elc_teifi_apps_dir="$HOME/repos/elc-teifi-apps"
+elc_teifi_apps_remote="git@github.com:Teifi-Digital/elc-teifi-apps.git"
 
 case "$ticket_id_lower" in
     wm-*)
@@ -61,9 +61,9 @@ case "$ticket_id_lower" in
         shared_session="workmate"
         ;;
     nai-*)
-        shared_remote="$elc_rms_remote"
-        shared_dir="$elc_rms_dir"
-        shared_session="elc-rms"
+        shared_remote="$elc_teifi_apps_remote"
+        shared_dir="$elc_teifi_apps_dir"
+        shared_session="elc-teifi-apps"
         ;;
     *)
         tmux display-message "tmux-linear-ticket: unknown ticket prefix for '$ticket_id'"
@@ -137,12 +137,12 @@ setup_repo_nai() {
     local repo_dir="$1"
 
     # Root .env (used by docker-compose, vite loadEnv, and the per-app symlinks).
-    cp "$elc_rms_dir/.env" "$repo_dir/.env"
+    cp "$elc_teifi_apps_dir/.env" "$repo_dir/.env"
 
     # Per-app Shopify CLI configs (gitignored). The repo has two apps; copy
     # whichever the shared dir has linked. Skip silently if missing.
-    [[ -f "$elc_rms_dir/shopify.app.toml" ]] && cp "$elc_rms_dir/shopify.app.toml" "$repo_dir/shopify.app.toml"
-    [[ -f "$elc_rms_dir/shopify.app.rms.toml" ]] && cp "$elc_rms_dir/shopify.app.rms.toml" "$repo_dir/shopify.app.rms.toml"
+    [[ -f "$elc_teifi_apps_dir/shopify.app.toml" ]] && cp "$elc_teifi_apps_dir/shopify.app.toml" "$repo_dir/shopify.app.toml"
+    [[ -f "$elc_teifi_apps_dir/shopify.app.rms.toml" ]] && cp "$elc_teifi_apps_dir/shopify.app.rms.toml" "$repo_dir/shopify.app.rms.toml"
 
     # Backend apps load `dotenv/config` from cwd (`apps/web-{rms,talonone}/`)
     # so each needs its own .env. Symlink to the root .env to keep one source of truth.
