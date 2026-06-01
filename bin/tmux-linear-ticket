@@ -84,28 +84,42 @@ ensure_shared_session() {
 
 open_shared_session() {
     current_session=$(tmux display-message -p '#S')
+    picker_window=""
     new_window=false
 
     if [[ "$current_session" == "$shared_session" ]]; then
         picker_window=$(tmux display-message -p '#{window_index}')
-        if ! tmux list-windows -t "$shared_session" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
-            tmux new-window -d -t "$shared_session:" -n "$ticket_id_lower" -c "$shared_dir"
-            new_window=true
-        fi
-        tmux select-window -t "$shared_session:=$ticket_id_lower"
-        tmux kill-window -t "$shared_session:$picker_window"
-    else
-        if ! tmux list-windows -t "$shared_session" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
-            tmux new-window -t "$shared_session" -n "$ticket_id_lower" -c "$shared_dir"
-            new_window=true
-        fi
-        tmux switch-client -t "$shared_session"
-        tmux select-window -t "$shared_session:$ticket_id_lower"
     fi
+
+    if ! tmux list-windows -t "$shared_session" -F '#{window_name}' | grep -qxF "$ticket_id_lower"; then
+        tmux new-window -d -t "$shared_session:" -n "$ticket_id_lower" -c "$shared_dir"
+        new_window=true
+    fi
+
+    if [[ -z "$picker_window" ]]; then
+        tmux switch-client -t "$shared_session"
+    fi
+    tmux select-window -t "$shared_session:=$ticket_id_lower"
+
+    claude_cmd="claude \"/teifi-dev:scoping $ticket_id_lower\""
+    send_claude=false
 
     if [[ "$new_window" == "true" ]]; then
         sleep 0.2
-        tmux send-keys -t "$shared_session:$ticket_id_lower" "claude" Enter
+        send_claude=true
+    else
+        pane_cmd=$(tmux display-message -p -t "$shared_session:=$ticket_id_lower" '#{pane_current_command}')
+        case "$pane_cmd" in
+            zsh|bash|fish|sh) send_claude=true ;;
+        esac
+    fi
+
+    if [[ "$send_claude" == "true" ]]; then
+        tmux send-keys -t "$shared_session:=$ticket_id_lower" "$claude_cmd"
+    fi
+
+    if [[ -n "$picker_window" ]]; then
+        tmux kill-window -t "$shared_session:$picker_window"
     fi
 }
 
