@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 while true; do
-  SELECTED=$(tmux list-sessions -F "#S" 2>/dev/null | fzf)
+  SELECTED=$(tmux list-sessions -F "#S" 2>/dev/null | fzf --cycle)
 
   if [[ -z "$SELECTED" ]]; then
     break

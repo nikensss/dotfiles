@@ -55,12 +55,12 @@ alias upcg='cargo install $(cargo install --list | egrep "^[a-z0-9_-]+ v[0-9.]+:
 alias gfp='git fetch origin --prune'
 alias gft='git tag -d $(git tag) && git fetch --tags --all'
 alias gbn='git branch --show-current'
-alias gcos='git branch --format="%(refname:short)" | fzf | xargs git checkout'
+alias gcos='git branch --format="%(refname:short)" | fzf --cycle | xargs git checkout'
 alias gpsu='git push --set-upstream origin $(git branch --show-current)'
 alias gdff='git difftool --tool=nvimdiff'
 
 # tmux
-alias tms='tmux a -t "$(tmux ls | perl -pe "s/^(.*?):.*$/\1/" | fzf)"'
+alias tms='tmux a -t "$(tmux ls | perl -pe "s/^(.*?):.*$/\1/" | fzf --cycle)"'
 
 # teifi
 alias dt='pnpm run dev --tunnel-url=https://ricard-mallafre-lopezs-mac.cod-gecko.ts.net:8080'

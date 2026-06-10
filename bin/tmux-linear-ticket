@@ -36,6 +36,7 @@ if [[ -z "$issues" ]]; then
 fi
 
 selected=$(echo "$issues" | cut -f1-3 | column -t -s $'\t' | fzf \
+    --cycle \
     --prompt="  Linear > " \
     --height=100% \
     --no-sort)

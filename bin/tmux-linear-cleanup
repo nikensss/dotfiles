@@ -19,6 +19,7 @@ options=$(while IFS= read -r name; do
 done <<< "$clones")
 
 selected=$(echo "$options" | column -t -s $'\t' | fzf \
+    --cycle \
     --prompt="  Cleanup > " \
     --height=100% \
     --multi)

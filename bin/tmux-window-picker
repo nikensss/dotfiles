@@ -37,7 +37,7 @@ done < <(tmux list-panes -a -F $'#{session_name}:#{window_index}.#{pane_index}\t
 
 selected=$(printf '%s\n' "${lines[@]}" \
     | column -t -s $'\t' \
-    | fzf --prompt="  Windows > " --height=100% --no-sort)
+    | fzf --cycle --prompt="  Windows > " --height=100% --no-sort)
 
 [[ -z "$selected" ]] && exit 0
 tmux switch-client -t "$(awk '{print $1}' <<< "$selected")"
