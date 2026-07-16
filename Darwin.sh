@@ -128,6 +128,10 @@ for file in $config; do
   ln -s $dir/$file $file
 done
 
+cd $HOME
+echo "${BLUE}restoring Claude statusline${RESET}"
+$dir/bin/claude-statusline-restore || echo "${YELLOW}statusline restore skipped (install jq, then run: claude-statusline-restore)${RESET}"
+
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
 if ! chsh -s "$zsh"; then
