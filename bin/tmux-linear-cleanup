@@ -28,31 +28,57 @@ if [[ -z "$selected" ]]; then
     exit 0
 fi
 
+# Remove a directory, showing a live count of files deleted instead of a silent
+# hang (rm -rfv would flood the screen; the awk counter keeps it to one line).
+remove_dir() {
+    local dir="$1"
+    [[ ("$dir" == "$HOME/repos/wm-"* || "$dir" == "$HOME/repos/nai-"*) && -d "$dir" ]] || return 0
+    local size
+    size=$(du -sh "$dir" 2>/dev/null | cut -f1)
+    printf "  removing %s (%s)\n" "$dir" "${size:-?}"
+    rm -rfv "$dir" 2>/dev/null | awk '
+        { n++; if (n % 200 == 0) { printf "\r    %d files deleted...", n; fflush() } }
+        END { printf "\r    %d files deleted. done.        \n", n }
+    '
+}
+
 current_session=$(tmux display-message -p '#S')
 kill_current_dir=""
+
+total=$(printf '%s\n' "$selected" | grep -c .)
+i=0
+echo "Cleaning up $total clone(s)..."
+echo
 
 while IFS= read -r line; do
     name=$(echo "$line" | awk '{print $1}')
     repo_dir="$HOME/repos/$name"
+    i=$((i + 1))
 
     if [[ "$name" == "$current_session" ]]; then
+        echo "[$i/$total] $name (current session) - deferring to end"
         kill_current_dir="$repo_dir"
         continue
     fi
 
+    echo "[$i/$total] $name"
     if tmux has-session -t="$name" 2>/dev/null; then
+        echo "  killing tmux session"
         tmux kill-session -t "$name"
     fi
 
-    if [[ ("$repo_dir" == "$HOME/repos/wm-"* || "$repo_dir" == "$HOME/repos/nai-"*) && -d "$repo_dir" ]]; then
-        rm -rf "$repo_dir"
-    fi
+    remove_dir "$repo_dir"
 done <<< "$selected"
 
+echo
 if [[ -n "$kill_current_dir" ]]; then
-    [[ ("$kill_current_dir" == "$HOME/repos/wm-"* || "$kill_current_dir" == "$HOME/repos/nai-"*) && -d "$kill_current_dir" ]] && rm -rf "$kill_current_dir"
+    echo "Removing current session's clone, then switching away..."
+    remove_dir "$kill_current_dir"
     tmp="_cleanup_$$"
     tmux new-session -d -s "$tmp" -c "$HOME" "~/bin/tmux-sessionizer"
     tmux switch-client -t "$tmp"
     tmux kill-session -t "$current_session"
+else
+    echo "Cleanup complete. Press any key to close..."
+    read -rsn1
 fi
