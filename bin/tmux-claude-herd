@@ -23,7 +23,8 @@
 # invocations, and no matter what appears above it. See assign_labels.
 #
 # Columns, named in the legend header:
-#   key      the hop label - press it to jump straight to that agent
+#   key      the hop label - press it to put the cursor (and the preview) on that agent,
+#            press it again to switch to it, or press it shifted to switch right away
 #   status   what it is doing; a trailing * means inferred from a screen diff
 #   ago      time since this agent's last hook event - how long it has been idle, or
 #            waiting on you, or since its last tool call finished. Blank when the status
@@ -39,6 +40,7 @@
 #   preview <pane_id>     miniature of a pane's current screen
 #   switch <pane_id>      jump the client to a pane
 #   switch-label <char>   resolve a hop label against the live list, then switch
+#   hop <char> <pane_id>  two-stage label press, called by fzf's transform
 #   probe <parent_pid>    background screen-diff loop, dies with its parent
 #   mode <filter|esc>     modal filter / label-jump toggle, called by fzf's transform
 
@@ -568,6 +570,33 @@ switch_label() {
     return 1
 }
 
+# hop <label> <current_pane_id>: the two-stage label press, called by fzf's transform.
+#
+# First press of a lowercase label moves the cursor onto that row, which also brings up
+# its screen in the preview - so a label is a way to look at an agent, not only a way to
+# leave for it. Press the same label again, now that it is the current row, and it
+# switches. Shift+label skips the look and goes straight there.
+#
+# Deciding which of the two it is means comparing the row the label points at with the row
+# the cursor is on, which is why fzf passes {1} - the pane id of the current item. Position
+# is only used for pos(), and label keys are unbound while filtering, so in label mode the
+# row number and the list position are the same thing.
+hop() {
+    local want="$1" cur="${2:-}" label pane_id rest n=0
+    while IFS=$'\t' read -r label pane_id rest; do
+        n=$(( n + 1 ))
+        [[ "$label" == "$want" ]] || continue
+        if [[ "$pane_id" == "$cur" ]]; then
+            printf "become('%s' switch %s)" "$self" "$pane_id"
+        else
+            printf 'pos(%d)' "$n"
+        fi
+        return 0
+    done < <(collect | assign_labels)
+    # No such label: emit nothing rather than an action, so the keypress is a no-op.
+    return 0
+}
+
 # -- background prober ---------------------------------------------------------
 
 # probe <parent_pid>: answer "is this screen actually moving?" for every agent pane
@@ -628,16 +657,18 @@ probe() {
 mode() {
     local which="$1" c actions=""
 
+    # Both cases: the lowercase key hops, the uppercase one jumps, and while filtering
+    # neither may swallow a keystroke meant for the query.
     case "$which" in
         filter)
-            for c in "${LABEL_POOL[@]}"; do actions+="unbind($c)+"; done
+            for c in "${LABEL_POOL[@]}"; do actions+="unbind($c)+unbind(${c^^})+"; done
             actions+="change-prompt(filter> )"
             : > "$MODE_FILE"
             ;;
         esc)
             if [[ -e "$MODE_FILE" ]]; then
                 rm -f "$MODE_FILE"
-                for c in "${LABEL_POOL[@]}"; do actions+="rebind($c)+"; done
+                for c in "${LABEL_POOL[@]}"; do actions+="rebind($c)+rebind(${c^^})+"; done
                 actions+="clear-query+change-prompt(herd> )"
             else
                 actions="abort"
@@ -703,13 +734,12 @@ ui() {
     local -a binds=()
     local c
     for c in "${LABEL_POOL[@]}"; do
-        binds+=(--bind "$c:become('$self' switch-label $c)")
+        binds+=(--bind "$c:transform('$self' hop $c {1})")
+        binds+=(--bind "${c^^}:become('$self' switch-label $c)")
     done
 
-    # Column names, padded to the exact widths render() uses so they sit directly above
-    # the data they describe. Without --header-first this renders between the prompt and
-    # the list, which is where a column legend belongs. The key hints go in the footer
-    # instead - they describe the whole popup, not the columns.
+    # Column names, padded to the exact widths render() uses. --header-first puts them
+    # above the prompt line; the key hints live in the footer at the bottom.
     #
     # `ago` is the one column that cannot explain itself: it is time since this agent's
     # last hook event - how long it has been idle, how long it has been waiting on you, or
@@ -722,8 +752,8 @@ ui() {
     pad h_loc "session:window (i)" "$W_LOC"
     header="${h_label}${h_status}${h_age}${h_loc}task"
 
-    footer="[key] jump  ↵ open  ⇥ preview  ^r reload  / filter  M-a/⎋ close"
-    footer+="  ·  * = inferred from screen"
+    footer="[key] look, again to go  ⇧[KEY] go now  ↵ open  ⇥ preview  ^r reload"
+    footer+="  / filter  M-a/⎋ close  ·  * = inferred"
 
     # Render once up front so the initial cursor can be placed on the row that actually
     # wants attention, instead of on whatever happens to sort first - which, invoked from
@@ -764,6 +794,7 @@ ui() {
         --prompt='herd> ' \
         --pointer='▶' \
         --header="$header" \
+        --header-first \
         --footer="$footer" \
         --footer-border=line \
         --color='header:#71717a,footer:#71717a' \
@@ -819,6 +850,7 @@ case "${1:-open}" in
     preview)      preview "${2:?pane id required}" ;;
     switch)       switch_to "${2:?pane id required}" ;;
     switch-label) switch_label "${2:?label required}" ;;
+    hop)          hop "${2:?label required}" "${3:-}" ;;
     probe)        probe "${2:?parent pid required}" ;;
     mode)         mode "${2:?mode required}" ;;
     *)            printf 'usage: %s [open|ui|render|preview <pane>|switch <pane>]\n' "${0##*/}" >&2; exit 2 ;;
