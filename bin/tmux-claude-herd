@@ -659,16 +659,35 @@ ui() {
     MODE_FILE="$HERD_MODE_FILE"
     rm -f "$MODE_FILE"
 
-    # Sweep anything a previous UI left behind when it was killed hard enough that its
-    # trap never ran. Files are named after the pid that owns them, so a dead pid is a
-    # safe delete and a live one belongs to a popup open on another client.
+    # Sweep anything a previous run left behind when it was killed hard enough that its
+    # trap never ran, or between writing a cache tmp file and renaming it into place.
+    # Every one of these is suffixed with the pid that owns it, so a dead pid is a safe
+    # delete and a live one belongs to a popup open on another client.
     local orphan opid
-    for orphan in "$HERD_DIR"/rows.* "$HERD_DIR"/filter-mode.*; do
+    for orphan in "$HERD_DIR"/rows.* "$HERD_DIR"/filter-mode.* \
+                  "$HERD_DIR"/agent-panes.* "$HERD_DIR"/screen-diff.* \
+                  "$HERD_DIR"/labels.*; do
         [[ -e "$orphan" ]] || continue
         opid="${orphan##*.}"
         [[ "$opid" == *[!0-9]* ]] && continue
         kill -0 "$opid" 2>/dev/null || rm -f "$orphan"
     done
+
+    # Hook state is keyed by pane, and a pane that no longer exists will never get a
+    # SessionEnd to clean itself up. Those files are inert - render only looks up panes
+    # tmux still lists - but without this the directory grows for ever.
+    local -A live_pane=()
+    local p
+    while IFS= read -r p; do live_pane["${p#%}"]=1; done \
+        < <(tmux list-panes -a -F '#{pane_id}' 2>/dev/null)
+    if (( ${#live_pane[@]} > 0 )); then
+        for orphan in "$HERD_DIR"/*.state "$HERD_DIR"/*.subagents; do
+            [[ -e "$orphan" ]] || continue
+            p="${orphan##*/}"
+            p="${p%.*}"
+            [[ -n "${live_pane[$p]:-}" ]] || rm -rf "$orphan"
+        done
+    fi
 
     # The prober outlives fzf unless we reap it - `enter` and the label keys use fzf's
     # `become`, which execs over the fzf process, so this shell's EXIT trap is the only
