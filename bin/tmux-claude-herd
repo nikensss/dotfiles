@@ -62,6 +62,13 @@ PROBE_SETTLE=0.25
 # typing does not filter until you press `/` (see `mode`).
 LABEL_POOL=(a s d f j k l g h e i o r t u w y p q v c n m b x z)
 
+# Assignments are remembered here so a label sticks to an agent for good. Hashing alone
+# is not enough: 26 slots and a dozen agents collide constantly (birthday problem), and a
+# colliding newcomer would otherwise bump an agent you already had a key for. Entries for
+# agents that are gone are kept this long, so recreating a session gets its old key back.
+LABEL_MAP="$HERD_DIR/labels"
+LABEL_TTL=$(( 30 * 86400 ))
+
 # -- palette (matches .claude/statusline.sh) -----------------------------------
 #
 # Everything below writes into caller-named variables with printf -v instead of echoing.
@@ -138,19 +145,20 @@ fnv1a() {
 # (so the popup doubles as a session switcher). Deterministic order matters: it keeps
 # reloads from reshuffling anything, and it makes label assignment reproducible.
 collect() {
-    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() sess_active=()
+    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() pane_idx=() sess_active=()
     local -A parent=()
     local -a claude_pids=()
-    local pane_id ppid sess win wactive pactive title
+    local pane_id ppid sess win pidx wactive pactive title
     local pid pcmd exe base
 
     # One tmux round trip for everything, including each session's current pane, which is
     # where a plain switch would land you. Asking tmux per session instead cost a fork
     # each and told us nothing this list does not already carry.
-    while IFS=$'\t' read -r pane_id ppid sess win wactive pactive title; do
+    while IFS=$'\t' read -r pane_id ppid sess win pidx wactive pactive title; do
         pane_pid_to_target["$ppid"]="$pane_id"
         pane_sess["$pane_id"]="$sess"
         pane_win["$pane_id"]="$win"
+        pane_idx["$pane_id"]="$pidx"
         title="${title//$'\t'/ }"
         # Claude Code prefixes the pane title with its own glyph (a braille frame while
         # running, ✳ otherwise). The status column already carries that meaning, so drop
@@ -162,7 +170,7 @@ collect() {
         fi
         pane_title["$pane_id"]="$title"
         [[ "$wactive" == "1" && "$pactive" == "1" ]] && sess_active["$sess"]="$pane_id"
-    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
+    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{pane_index}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
 
     # One process snapshot (~50ms for ~900 procs) instead of per-pane walks. We build a
     # child->parent map and then walk UP from each claude process until we land on a
@@ -197,22 +205,45 @@ collect() {
         done
     done
 
-    # Agent rows, sorted by session then window. The order has to be total and stable:
-    # bash hash iteration order is not, and a reload that reshuffles rows would move
-    # every label out from under whoever is looking at it.
+    # A window can hold more than one agent - two panes of a split, each running claude.
+    # Count them per window so the location column can disambiguate the ones that need it
+    # without putting a noisy ".1" on every single-agent row.
+    local -A agents_in_window=()
+    local wkey
+    for pane_id in "${!agent_of[@]}"; do
+        wkey="${pane_sess[$pane_id]}:${pane_win[$pane_id]}"
+        agents_in_window["$wkey"]=$(( ${agents_in_window[$wkey]:-0} + 1 ))
+    done
+
+    # Agent rows, sorted by session, then window, then pane. The order has to be TOTAL:
+    # ties fall back to bash hash iteration order, which is reproducible within a run but
+    # not across restarts, so two agents in one window could swap labels between sessions.
+    # Sorting on the pane index too removes the tie entirely.
     local -A sess_has_agent=()
-    local sortkey
-    while IFS=$'\t' read -r _ _ pane_id; do
+    local wsort psort loc seed
+    while IFS=$'\t' read -r _ _ _ pane_id; do
         sess="${pane_sess[$pane_id]}"
         win="${pane_win[$pane_id]}"
+        pidx="${pane_idx[$pane_id]}"
         sess_has_agent["$sess"]=1
-        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-            "$pane_id" "agent" "$sess" "$win" "$sess:$win" "${pane_title[$pane_id]}"
+
+        # Seed is always pane-qualified, so a second agent appearing in the same window
+        # cannot change the seed - and therefore the label - of the one already there.
+        seed="$sess:$win.$pidx"
+        if (( ${agents_in_window[$sess:$win]:-1} > 1 )); then
+            loc="$sess:$win.$pidx"
+        else
+            loc="$sess:$win"
+        fi
+
+        printf '%s\t%s\t%s\t%s\t%s\n' \
+            "$pane_id" "agent" "$loc" "$seed" "${pane_title[$pane_id]}"
     done < <(
         for pane_id in "${!agent_of[@]}"; do
-            printf -v sortkey '%04d' "${pane_win[$pane_id]}"
-            printf '%s\t%s\t%s\n' "${pane_sess[$pane_id]}" "$sortkey" "$pane_id"
-        done | sort -t$'\t' -k1,1 -k2,2
+            printf -v wsort '%04d' "${pane_win[$pane_id]}"
+            printf -v psort '%04d' "${pane_idx[$pane_id]}"
+            printf '%s\t%s\t%s\t%s\n' "${pane_sess[$pane_id]}" "$wsort" "$psort" "$pane_id"
+        done | sort -t$'\t' -k1,1 -k2,2 -k3,3
     )
 
     # Sessions with no agent at all, so the popup is still a complete map of the server
@@ -221,15 +252,24 @@ collect() {
         [[ -n "${sess_has_agent[$sess]:-}" ]] && continue
         pane_id="${sess_active[$sess]:-}"
         [[ -z "$pane_id" ]] && continue
-        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-            "$pane_id" "session" "$sess" "${pane_win[$pane_id]}" "$sess" ""
+        printf '%s\t%s\t%s\t%s\t%s\n' \
+            "$pane_id" "session" "$sess:${pane_win[$pane_id]}" "$sess" ""
     done < <(printf '%s\n' "${!sess_active[@]}" | sort)
 }
 
 # assign_labels: read collect() rows on stdin, prepend a stable hop label to each.
-# A label is the agent's own hash slot, not its row number: the same seed always
-# prefers the same key, and only an actual collision moves anyone. Probing happens in
-# the deterministic row order so the outcome is reproducible for a given target set.
+#
+# A label belongs to the agent, never to the row it happens to occupy. Two passes:
+#
+#   1. hand every agent back the label it already had, from $LABEL_MAP. An agent that
+#      once had a key keeps it for as long as it exists - nothing that appears elsewhere
+#      in the list can take it.
+#   2. only then hash the newcomers (FNV-1a of session:window.pane, linear probe) into
+#      whatever slots are left.
+#
+# Hashing on its own is not enough. With 26 slots and a dozen agents, collisions are the
+# normal case, and a newcomer that hashed onto an occupied slot and sorted above its
+# occupant would steal the key out from under it - measured, not hypothetical.
 assign_labels() {
     local -a rows=()
     local row
@@ -237,29 +277,79 @@ assign_labels() {
     (( ${#rows[@]} == 0 )) && return 0
 
     local pool_n=${#LABEL_POOL[@]}
-    local -A taken=()
-    local seed h start i slot label
-    local -a fields
+    local -A slot_of=()
+    local i
+    for (( i = 0; i < pool_n; i++ )); do slot_of["${LABEL_POOL[$i]}"]="$i"; done
 
+    local -A remembered=() seen_at=()
+    local s l t
+    if [[ -r "$LABEL_MAP" ]]; then
+        while IFS=$'\t' read -r s l t; do
+            [[ -z "$s" || -z "$l" ]] && continue
+            remembered["$s"]="$l"
+            seen_at["$s"]="${t:-0}"
+        done < "$LABEL_MAP"
+    fi
+
+    local -A taken=() assigned=()
+    local -a fields
+    local seed h start slot label changed=0 tmp
+
+    # Pass 1 - honour what this agent already had.
     for row in "${rows[@]}"; do
-        # Field 5 is the label seed. Split in-process - this runs on every reload tick,
+        # Field 4 is the label seed. Split in-process - this runs on every reload tick,
         # so a `cut` per row would be 20 forks a second for nothing.
         IFS=$'\t' read -r -a fields <<< "$row"
-        seed="${fields[4]}"
+        seed="${fields[3]}"
+        label="${remembered[$seed]:-}"
+        [[ -z "$label" ]] && continue
+        slot="${slot_of[$label]:-}"
+        [[ -z "$slot" || -n "${taken[$slot]:-}" ]] && continue
+        taken["$slot"]=1
+        assigned["$seed"]="$label"
+    done
+
+    # Pass 2 - hash the newcomers into what is left.
+    for row in "${rows[@]}"; do
+        IFS=$'\t' read -r -a fields <<< "$row"
+        seed="${fields[3]}"
+        [[ -n "${assigned[$seed]:-}" ]] && continue
+        changed=1
         fnv1a h "$seed"
         start=$(( h % pool_n ))
-        label=""
         for (( i = 0; i < pool_n; i++ )); do
             slot=$(( (start + i) % pool_n ))
             if [[ -z "${taken[$slot]:-}" ]]; then
                 taken["$slot"]=1
-                label="${LABEL_POOL[$slot]}"
+                assigned["$seed"]="${LABEL_POOL[$slot]}"
                 break
             fi
         done
-        # More targets than labels: the overflow rows stay reachable via arrows and /.
-        printf '%s\t%s\n' "${label:- }" "$row"
     done
+
+    for row in "${rows[@]}"; do
+        IFS=$'\t' read -r -a fields <<< "$row"
+        seed="${fields[3]}"
+        # More agents than labels: the overflow rows stay reachable via arrows and /.
+        printf '%s\t%s\n' "${assigned[$seed]:- }" "$row"
+    done
+
+    # Persist only when an assignment actually changed, so the steady state - a reload
+    # every second with the same agents - never touches the disk.
+    (( changed )) || return 0
+    tmp="$LABEL_MAP.$$"
+    {
+        for seed in "${!assigned[@]}"; do
+            printf '%s\t%s\t%s\n' "$seed" "${assigned[$seed]}" "$EPOCHSECONDS"
+        done
+        # Keep gone agents on file until the TTL, so recreating a session hands its old
+        # key back. A present agent always outranks a remembered one for the same slot.
+        for seed in "${!remembered[@]}"; do
+            [[ -n "${assigned[$seed]:-}" ]] && continue
+            (( EPOCHSECONDS - ${seen_at[$seed]:-0} > LABEL_TTL )) && continue
+            printf '%s\t%s\t%s\n' "$seed" "${remembered[$seed]}" "${seen_at[$seed]:-0}"
+        done
+    } > "$tmp" 2>/dev/null && mv "$tmp" "$LABEL_MAP" 2>/dev/null || rm -f "$tmp" 2>/dev/null
 }
 
 # read_hook_state <status_var> <stamp_var> <detail_var> <pane_id>
@@ -292,7 +382,7 @@ render() {
     local sub_w=$(( ${FZF_COLUMNS:-100} - 49 ))
     (( sub_w < 20 )) && sub_w=20
 
-    local label pane_id kind sess win seed title
+    local label pane_id kind loc seed title
     local status stamp detail glyph text colour
     local c_label c_status c_age c_loc c_title spinner frac
 
@@ -300,7 +390,7 @@ render() {
     frac="${EPOCHREALTIME#*[.,]}"
     spinner="${SPINNER[$(( (10#${frac:0:2}) % 10 ))]}"
 
-    while IFS=$'\t' read -r label pane_id kind sess win seed title; do
+    while IFS=$'\t' read -r label pane_id kind loc seed title; do
         if [[ "$kind" == "session" ]]; then
             glyph="·"; text="no agent"; colour="$E_DIM"; stamp=""
         else
@@ -345,7 +435,7 @@ render() {
         pad c_label "[$label]" 5
         pad c_status "$glyph $text" 15
         pad c_age "$c_age" 5
-        pad c_loc "$sess:$win" 22
+        pad c_loc "$loc" 22
         pad c_title "$title" "$sub_w"
 
         printf '%s\t%s%s%s%s%s%s%s%s%s%s%s\n' \
