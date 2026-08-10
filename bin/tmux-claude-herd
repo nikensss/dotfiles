@@ -65,6 +65,17 @@ HOOK_TRUST_SECONDS=60
 # How long a screen-diff verdict stays usable before it reverts to a spinner.
 DIFF_STALE_SECONDS=4
 
+# Which panes hold a claude process - the one genuinely expensive question here, at ~105ms
+# for a walk over ~900 processes. It is also the answer that changes least often, so the
+# prober keeps this cache warm and render just reads it. render only pays the cost itself
+# when the cache is older than this, which means outside the popup or on a cold start.
+#
+# This matters because fzf's --track blocks input while a reload is in flight ("query
+# input and cursor movement are disabled", per its man page), so anything render does on
+# the every(1) tick is felt directly as keyboard lag.
+AGENT_CACHE="$HERD_DIR/agent-panes"
+AGENT_CACHE_TTL=5
+
 # Gap between the two captures that decide whether a screen is moving.
 PROBE_SETTLE=0.25
 
@@ -154,6 +165,86 @@ fnv1a() {
     __out="$__h"
 }
 
+# -- which panes hold an agent (the expensive half) ----------------------------
+
+# Filled by load_agent_panes: pane_id -> the claude pid found in that pane.
+declare -A AGENT_OF=()
+AGENT_CACHE_AT=0
+
+# scan_agent_panes: emit "pane_id<TAB>claude_pid" for every pane with a claude process in
+# its tree. One process snapshot instead of per-pane walks: build a child->parent map, then
+# walk UP from each claude process until landing on a pane's shell pid. That is far cheaper
+# than walking down every pane's subtree and it attributes claude correctly however deeply
+# a wrapper shell nests it.
+scan_agent_panes() {
+    local -A pane_of=() parent=()
+    local -a claude_pids=()
+    local pane_id ppid pid pcmd exe base cur depth
+    local -A agent_depth=()
+
+    while IFS=$'\t' read -r pane_id ppid; do
+        pane_of["$ppid"]="$pane_id"
+    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}' 2>/dev/null)
+
+    while read -r pid ppid pcmd; do
+        parent["$pid"]="$ppid"
+        exe="${pcmd%% *}"
+        base="${exe##*/}"
+        # Matches `claude`, `claude --resume`, and an absolute path to the launcher.
+        [[ "$base" == "claude" ]] && claude_pids+=("$pid")
+    done < <(ps -axo pid=,ppid=,command= 2>/dev/null)
+
+    # Shallowest claude per pane wins, so a nested `claude -p` spawned by an agent's own
+    # Bash tool cannot shadow the real session.
+    for pid in "${claude_pids[@]}"; do
+        cur="$pid"
+        depth=0
+        while [[ -n "${cur:-}" && "$cur" != "0" && "$cur" != "1" ]] && (( depth < 24 )); do
+            if [[ -n "${pane_of[$cur]:-}" ]]; then
+                pane_id="${pane_of[$cur]}"
+                if [[ -z "${agent_depth[$pane_id]:-}" ]] || (( depth < agent_depth[$pane_id] )); then
+                    agent_depth["$pane_id"]="$depth"
+                    AGENT_OF["$pane_id"]="$pid"
+                fi
+                break
+            fi
+            cur="${parent[$cur]:-}"
+            (( depth++ ))
+        done
+    done
+
+    for pane_id in "${!AGENT_OF[@]}"; do
+        printf '%s\t%s\n' "$pane_id" "${AGENT_OF[$pane_id]}"
+    done
+}
+
+refresh_agent_cache() {
+    local tmp="$AGENT_CACHE.$$"
+    AGENT_OF=()
+    { printf '%s\n' "$EPOCHSECONDS"; scan_agent_panes; } > "$tmp" 2>/dev/null &&
+        mv "$tmp" "$AGENT_CACHE" 2>/dev/null || rm -f "$tmp" 2>/dev/null
+}
+
+_read_agent_cache() {
+    local p cpid
+    AGENT_OF=()
+    AGENT_CACHE_AT=0
+    [[ -r "$AGENT_CACHE" ]] || return 0
+    {
+        read -r AGENT_CACHE_AT || AGENT_CACHE_AT=0
+        while IFS=$'\t' read -r p cpid; do
+            [[ -n "$p" ]] && AGENT_OF["$p"]="$cpid"
+        done
+    } < "$AGENT_CACHE"
+}
+
+load_agent_panes() {
+    _read_agent_cache
+    (( EPOCHSECONDS - AGENT_CACHE_AT <= AGENT_CACHE_TTL )) && return 0
+    refresh_agent_cache
+    _read_agent_cache
+}
+
 # -- data collection -----------------------------------------------------------
 
 # collect: emit one TSV row per target, in a fully deterministic order.
@@ -162,18 +253,14 @@ fnv1a() {
 # (so the popup doubles as a session switcher). Deterministic order matters: it keeps
 # reloads from reshuffling anything, and it makes label assignment reproducible.
 collect() {
-    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() pane_idx=()
+    local -A pane_title=() pane_sess=() pane_win=() pane_idx=()
     local -A pane_wname=() sess_active=()
-    local -A parent=()
-    local -a claude_pids=()
     local pane_id ppid sess win pidx wname wactive pactive title
-    local pid pcmd exe base
 
     # One tmux round trip for everything, including each session's current pane, which is
     # where a plain switch would land you. Asking tmux per session instead cost a fork
     # each and told us nothing this list does not already carry.
     while IFS=$'\t' read -r pane_id ppid sess win pidx wname wactive pactive title; do
-        pane_pid_to_target["$ppid"]="$pane_id"
         pane_sess["$pane_id"]="$sess"
         pane_win["$pane_id"]="$win"
         pane_idx["$pane_id"]="$pidx"
@@ -191,37 +278,12 @@ collect() {
         [[ "$wactive" == "1" && "$pactive" == "1" ]] && sess_active["$sess"]="$pane_id"
     done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{pane_index}\t#{window_name}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
 
-    # One process snapshot (~50ms for ~900 procs) instead of per-pane walks. We build a
-    # child->parent map and then walk UP from each claude process until we land on a
-    # pane's shell pid; that is far cheaper than walking down every pane's subtree, and
-    # it correctly attributes claude no matter how deeply a wrapper shell nests it.
-    while read -r pid ppid pcmd; do
-        parent["$pid"]="$ppid"
-        exe="${pcmd%% *}"
-        base="${exe##*/}"
-        # Matches `claude`, `claude --resume`, and an absolute path to the launcher.
-        [[ "$base" == "claude" ]] && claude_pids+=("$pid")
-    done < <(ps -axo pid=,ppid=,command= 2>/dev/null)
-
-    # pane_id -> shallowest claude pid found in that pane. Shallowest wins so a nested
-    # `claude -p` spawned by an agent's own Bash tool cannot shadow the real session.
-    local -A agent_of=() agent_depth=()
-    local cur depth
-    for pid in "${claude_pids[@]}"; do
-        cur="$pid"
-        depth=0
-        while [[ -n "${cur:-}" && "$cur" != "0" && "$cur" != "1" ]] && (( depth < 24 )); do
-            if [[ -n "${pane_pid_to_target[$cur]:-}" ]]; then
-                pane_id="${pane_pid_to_target[$cur]}"
-                if [[ -z "${agent_depth[$pane_id]:-}" ]] || (( depth < agent_depth[$pane_id] )); then
-                    agent_of["$pane_id"]="$pid"
-                    agent_depth["$pane_id"]="$depth"
-                fi
-                break
-            fi
-            cur="${parent[$cur]:-}"
-            (( depth++ ))
-        done
+    # Which panes hold an agent comes from the cache, not from a fresh process walk - see
+    # AGENT_CACHE. Drop entries for panes that have since gone away.
+    load_agent_panes
+    local -A agent_of=()
+    for pane_id in "${!AGENT_OF[@]}"; do
+        [[ -n "${pane_sess[$pane_id]:-}" ]] && agent_of["$pane_id"]="${AGENT_OF[$pane_id]}"
     done
 
     # A window can hold more than one agent - two panes of a split, each running claude.
@@ -521,6 +583,10 @@ probe() {
     while kill -0 "$parent_pid" 2>/dev/null; do
         first=()
 
+        # Keep the expensive pane->agent answer warm out here, so the every(1) render on
+        # the UI thread never has to pay for it and never blocks input on it.
+        refresh_agent_cache
+
         while IFS=$'\t' read -r pane_id kind _ _ _ _; do
             [[ "$kind" == "agent" ]] || continue
             read_hook_state status stamp detail "$pane_id"
@@ -593,13 +659,27 @@ ui() {
     MODE_FILE="$HERD_MODE_FILE"
     rm -f "$MODE_FILE"
 
+    # Sweep anything a previous UI left behind when it was killed hard enough that its
+    # trap never ran. Files are named after the pid that owns them, so a dead pid is a
+    # safe delete and a live one belongs to a popup open on another client.
+    local orphan opid
+    for orphan in "$HERD_DIR"/rows.* "$HERD_DIR"/filter-mode.*; do
+        [[ -e "$orphan" ]] || continue
+        opid="${orphan##*.}"
+        [[ "$opid" == *[!0-9]* ]] && continue
+        kill -0 "$opid" 2>/dev/null || rm -f "$orphan"
+    done
+
     # The prober outlives fzf unless we reap it - `enter` and the label keys use fzf's
     # `become`, which execs over the fzf process, so this shell's EXIT trap is the only
     # thing that still runs.
     "$self" probe "$$" >/dev/null 2>&1 &
     local probe_pid=$!
-    # shellcheck disable=SC2064  # both values must expand now, not at trap time
-    trap "kill $probe_pid 2>/dev/null; rm -f '$MODE_FILE'" EXIT INT TERM
+    # HUP matters as much as INT and TERM here: closing the terminal or a tmux
+    # kill-session delivers SIGHUP, and without it in the list the temp files below
+    # outlive the UI.
+    # shellcheck disable=SC2064  # all values must expand now, not at trap time
+    trap "kill $probe_pid 2>/dev/null; rm -f '$MODE_FILE' '$HERD_DIR/rows.$$'" EXIT INT TERM HUP
 
     local -a binds=()
     local c
@@ -607,27 +687,53 @@ ui() {
         binds+=(--bind "$c:become('$self' switch-label $c)")
     done
 
-    # Two-line legend. Line one names the columns and is padded to the exact widths
-    # render() uses, so it sits directly above the data it describes. `ago` is the one
-    # column that cannot explain itself: it is time since this agent's last hook event -
-    # how long it has been idle, how long it has been waiting on you, or how long since
-    # its last tool call finished. It is blank for a status we only inferred, because a
-    # screen diff says nothing about when anything happened.
-    local h_label h_status h_age h_loc header
+    # Column names, padded to the exact widths render() uses so they sit directly above
+    # the data they describe. Without --header-first this renders between the prompt and
+    # the list, which is where a column legend belongs. The key hints go in the footer
+    # instead - they describe the whole popup, not the columns.
+    #
+    # `ago` is the one column that cannot explain itself: it is time since this agent's
+    # last hook event - how long it has been idle, how long it has been waiting on you, or
+    # how long since its last tool call finished. It is blank for an inferred status,
+    # because a screen diff says nothing about when anything happened.
+    local h_label h_status h_age h_loc header footer
     pad h_label "key" "$W_LABEL"
     pad h_status "status" "$W_STATUS"
     pad h_age "ago" "$W_AGE"
     pad h_loc "session:window (i)" "$W_LOC"
-
-    # Keep line two under ~90 columns: the popup is 90% of the terminal, and anything
-    # longer gets truncated on a narrower one.
     header="${h_label}${h_status}${h_age}${h_loc}task"
-    header+=$'\n'"[key] jump  ↵ open  ⇥ preview  ^r reload  / filter  M-a/⎋ close"
-    header+="  ·  * = inferred from screen"
+
+    footer="[key] jump  ↵ open  ⇥ preview  ^r reload  / filter  M-a/⎋ close"
+    footer+="  ·  * = inferred from screen"
+
+    # Render once up front so the initial cursor can be placed on the row that actually
+    # wants attention, instead of on whatever happens to sort first - which, invoked from
+    # a session that has an agent, was your own pane. Order of preference:
+    #   1. the first agent asking for you
+    #   2. the first row that is NOT the session you are already sitting in
+    #   3. failing both, the first row
+    local rows_file="$HERD_DIR/rows.$$"
+    "$self" render > "$rows_file"
+
+    local cur_sess pos=1 first_needs=0 first_other=0 n=0 line
+    cur_sess="$(tmux display-message -p '#{client_session}' 2>/dev/null)"
+    while IFS= read -r line; do
+        n=$(( n + 1 ))
+        if (( first_needs == 0 )) && [[ "$line" == *"needs you"* ]]; then
+            first_needs="$n"
+        fi
+        if (( first_other == 0 )) && [[ -n "$cur_sess" && "$line" != *"$cur_sess:"* ]]; then
+            first_other="$n"
+        fi
+    done < "$rows_file"
+    if   (( first_needs > 0 )); then pos="$first_needs"
+    elif (( first_other > 0 )); then pos="$first_other"
+    fi
 
     local status=0
-    "$self" render | fzf \
+    fzf < "$rows_file" \
         --ansi \
+        --sync \
         --delimiter=$'\t' \
         --with-nth=2 \
         --id-nth=1 \
@@ -639,8 +745,10 @@ ui() {
         --prompt='herd> ' \
         --pointer='▶' \
         --header="$header" \
-        --header-first \
-        --color='header:#71717a' \
+        --footer="$footer" \
+        --footer-border=line \
+        --color='header:#71717a,footer:#71717a' \
+        --bind "start:pos($pos)" \
         --preview="'$self' preview {1}" \
         --preview-window='down,55%,border-top,nowrap' \
         --preview-label=' live ' \
