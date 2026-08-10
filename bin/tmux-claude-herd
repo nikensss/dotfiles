@@ -18,9 +18,19 @@
 # Inferred statuses are marked so a guess never reads like a fact. Install the hooks
 # with `claude-herd-install` to get the real ones.
 #
-# Hop labels are derived from a hash of session:window, not from row position, so a
-# given agent keeps the same key across reloads AND across invocations - muscle memory
-# survives a new session appearing above it in the list.
+# Hop labels belong to the agent, not to the row it happens to occupy: assignments are
+# remembered in ~/.claude/herd/labels, so an agent keeps its key across reloads, across
+# invocations, and no matter what appears above it. See assign_labels.
+#
+# Columns, named in the legend header:
+#   key      the hop label - press it to jump straight to that agent
+#   status   what it is doing; a trailing * means inferred from a screen diff
+#   ago      time since this agent's last hook event - how long it has been idle, or
+#            waiting on you, or since its last tool call finished. Blank when the status
+#            was inferred, because a screen diff says nothing about when.
+#   session  session:window-name (window-index), plus .pane when one window holds more
+#            than one agent
+#   task     the summary Claude Code puts in the pane title
 #
 # Subcommands (only `open` is meant for humans):
 #   open                  launch the popup (default)
@@ -93,6 +103,13 @@ mkesc E_DIM   "#52525b"   # zinc-600   - unknown / no agent
 
 SPINNER=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
 
+# Column widths, shared by the rows in render() and the legend header in ui() so the two
+# cannot drift apart. W_LOC holds the longest "session:window (index)".
+W_LABEL=5
+W_STATUS=15
+W_AGE=6
+W_LOC=28
+
 # -- small helpers -------------------------------------------------------------
 
 # pad <outvar> <string> <width>: pad or truncate to exactly <width> display cells.
@@ -145,20 +162,22 @@ fnv1a() {
 # (so the popup doubles as a session switcher). Deterministic order matters: it keeps
 # reloads from reshuffling anything, and it makes label assignment reproducible.
 collect() {
-    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() pane_idx=() sess_active=()
+    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() pane_idx=()
+    local -A pane_wname=() sess_active=()
     local -A parent=()
     local -a claude_pids=()
-    local pane_id ppid sess win pidx wactive pactive title
+    local pane_id ppid sess win pidx wname wactive pactive title
     local pid pcmd exe base
 
     # One tmux round trip for everything, including each session's current pane, which is
     # where a plain switch would land you. Asking tmux per session instead cost a fork
     # each and told us nothing this list does not already carry.
-    while IFS=$'\t' read -r pane_id ppid sess win pidx wactive pactive title; do
+    while IFS=$'\t' read -r pane_id ppid sess win pidx wname wactive pactive title; do
         pane_pid_to_target["$ppid"]="$pane_id"
         pane_sess["$pane_id"]="$sess"
         pane_win["$pane_id"]="$win"
         pane_idx["$pane_id"]="$pidx"
+        pane_wname["$pane_id"]="${wname//$'\t'/ }"
         title="${title//$'\t'/ }"
         # Claude Code prefixes the pane title with its own glyph (a braille frame while
         # running, ✳ otherwise). The status column already carries that meaning, so drop
@@ -170,7 +189,7 @@ collect() {
         fi
         pane_title["$pane_id"]="$title"
         [[ "$wactive" == "1" && "$pactive" == "1" ]] && sess_active["$sess"]="$pane_id"
-    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{pane_index}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
+    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{pane_index}\t#{window_name}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
 
     # One process snapshot (~50ms for ~900 procs) instead of per-pane walks. We build a
     # child->parent map and then walk UP from each claude process until we land on a
@@ -229,11 +248,13 @@ collect() {
 
         # Seed is always pane-qualified, so a second agent appearing in the same window
         # cannot change the seed - and therefore the label - of the one already there.
+        # It stays on the window INDEX, never the name: a window can be renamed (tmux
+        # does it automatically unless told not to) and a rename must not move a label.
         seed="$sess:$win.$pidx"
         if (( ${agents_in_window[$sess:$win]:-1} > 1 )); then
-            loc="$sess:$win.$pidx"
+            loc="$sess:${pane_wname[$pane_id]} ($win.$pidx)"
         else
-            loc="$sess:$win"
+            loc="$sess:${pane_wname[$pane_id]} ($win)"
         fi
 
         printf '%s\t%s\t%s\t%s\t%s\n' \
@@ -253,7 +274,8 @@ collect() {
         pane_id="${sess_active[$sess]:-}"
         [[ -z "$pane_id" ]] && continue
         printf '%s\t%s\t%s\t%s\t%s\n' \
-            "$pane_id" "session" "$sess:${pane_win[$pane_id]}" "$sess" ""
+            "$pane_id" "session" \
+            "$sess:${pane_wname[$pane_id]} (${pane_win[$pane_id]})" "$sess" ""
     done < <(printf '%s\n' "${!sess_active[@]}" | sort)
 }
 
@@ -378,8 +400,9 @@ render() {
         done < "$DIFF_CACHE"
     fi
 
-    # 5 (label) + 15 (status) + 5 (age) + 22 (location) + 2 slack.
-    local sub_w=$(( ${FZF_COLUMNS:-100} - 49 ))
+    # Column widths, shared with the legend header built in ui(). W_LOC has to hold the
+    # longest "session:window (index)" - 28 fits "elc-teifi-apps:claude (2)" with room.
+    local sub_w=$(( ${FZF_COLUMNS:-100} - W_LABEL - W_STATUS - W_AGE - W_LOC - 2 ))
     (( sub_w < 20 )) && sub_w=20
 
     local label pane_id kind loc seed title
@@ -432,10 +455,10 @@ render() {
         fi
 
         age c_age "$stamp"
-        pad c_label "[$label]" 5
-        pad c_status "$glyph $text" 15
-        pad c_age "$c_age" 5
-        pad c_loc "$loc" 22
+        pad c_label "[$label]" "$W_LABEL"
+        pad c_status "$glyph $text" "$W_STATUS"
+        pad c_age "$c_age" "$W_AGE"
+        pad c_loc "$loc" "$W_LOC"
         pad c_title "$title" "$sub_w"
 
         printf '%s\t%s%s%s%s%s%s%s%s%s%s%s\n' \
@@ -584,8 +607,23 @@ ui() {
         binds+=(--bind "$c:become('$self' switch-label $c)")
     done
 
-    local header
-    header="[key] jump   ↵ open   ⇥ preview   ^r refresh   / filter   ⎋ quit"
+    # Two-line legend. Line one names the columns and is padded to the exact widths
+    # render() uses, so it sits directly above the data it describes. `ago` is the one
+    # column that cannot explain itself: it is time since this agent's last hook event -
+    # how long it has been idle, how long it has been waiting on you, or how long since
+    # its last tool call finished. It is blank for a status we only inferred, because a
+    # screen diff says nothing about when anything happened.
+    local h_label h_status h_age h_loc header
+    pad h_label "key" "$W_LABEL"
+    pad h_status "status" "$W_STATUS"
+    pad h_age "ago" "$W_AGE"
+    pad h_loc "session:window (i)" "$W_LOC"
+
+    # Keep line two under ~90 columns: the popup is 90% of the terminal, and anything
+    # longer gets truncated on a narrower one.
+    header="${h_label}${h_status}${h_age}${h_loc}task"
+    header+=$'\n'"[key] jump  ↵ open  ⇥ preview  ^r reload  / filter  M-a/⎋ close"
+    header+="  ·  * = inferred from screen"
 
     local status=0
     "$self" render | fzf \
@@ -602,6 +640,7 @@ ui() {
         --pointer='▶' \
         --header="$header" \
         --header-first \
+        --color='header:#71717a' \
         --preview="'$self' preview {1}" \
         --preview-window='down,55%,border-top,nowrap' \
         --preview-label=' live ' \
@@ -611,6 +650,7 @@ ui() {
         --bind "enter:become('$self' switch {1})" \
         --bind "/:transform('$self' mode filter)" \
         --bind "esc:transform('$self' mode esc)" \
+        --bind 'alt-a:abort' \
         "${binds[@]}" || status=$?
 
     # Closing the popup is not a failure, but the key bindings run this through tmux's
