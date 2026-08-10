@@ -20,6 +20,13 @@ bind-key T run-shell "tmux neww ~/repos/dotfiles/bin/tmux-linear-cleanup"
 # tmux-window-picker: fzf across all windows in all sessions
 bind-key C-w run-shell "tmux neww ~/repos/dotfiles/bin/tmux-window-picker"
 
+# tmux-claude-herd: popup showing every Claude Code agent, what it is doing, and a live
+# miniature of its screen. One keystroke (the [x] label on the row) jumps to it.
+# M-a is a ROOT binding - no prefix, closest thing to nvim's alt+i terminal. Drop that
+# line if you ever need alt+a inside a program.
+bind-key a run-shell "~/repos/dotfiles/bin/tmux-claude-herd"
+bind-key -n M-a run-shell "~/repos/dotfiles/bin/tmux-claude-herd"
+
 # enter copy mode without releasing ctrl
 bind-key C-[ copy-mode
 

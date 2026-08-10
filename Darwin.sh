@@ -132,6 +132,9 @@ cd $HOME
 echo "${BLUE}restoring Claude statusline${RESET}"
 $dir/bin/claude-statusline-restore || echo "${YELLOW}statusline restore skipped (install jq, then run: claude-statusline-restore)${RESET}"
 
+echo "${BLUE}installing Claude herd hooks${RESET}"
+$dir/bin/claude-herd-install || echo "${YELLOW}herd hooks skipped (install jq, then run: claude-herd-install)${RESET}"
+
 echo "${YELLOW}changing shell...${RESET}"
 zsh=$(command -v zsh)
 if ! chsh -s "$zsh"; then

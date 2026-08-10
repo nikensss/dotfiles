@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+
+# claude-herd-hook <event> - record what this Claude Code session is doing, for
+# tmux-claude-herd to read.
+#
+# Wired into ~/.claude/settings.json by claude-herd-install. Each Claude Code hook
+# event passes a literal event name here, so this script never has to parse the JSON
+# payload on stdin - it only needs $TMUX_PANE, which Claude inherits from the tmux pane
+# it was started in (verified: TMUX_PANE=%95 in a running claude's environment).
+#
+# Events -> state, mapped in settings.json:
+#   UserPromptSubmit               -> working     (a turn started)
+#   PostToolUse                    -> working     (still going; also clears a stale "needs you")
+#   SubagentStart / SubagentStop   -> subagent    (parent is waiting on N subagents)
+#   Notification/permission_prompt -> needs-you
+#   Notification/agent_needs_input -> needs-you
+#   Notification/idle_prompt       -> idle
+#   Stop                           -> idle        (turn finished)
+#   SessionEnd                     -> clear
+#
+# State file: ~/.claude/herd/<pane>.state, one line, "status<TAB>epoch<TAB>detail".
+#
+# Two rules this script must never break, because it runs inside every turn of every
+# agent: exit 0 no matter what, and print nothing on stdout (Claude Code feeds hook
+# stdout back into the session for some events).
+
+set -uo pipefail
+
+# Drain the JSON payload with a builtin rather than `cat`, so Claude never blocks on a
+# full pipe and we do not fork a process per hook event. -d '' reads to EOF; the
+# non-zero return at EOF is expected.
+if [[ ! -t 0 ]]; then
+    IFS= read -r -d '' _payload || true
+fi
+
+event="${1:-}"
+[[ -z "$event" ]] && exit 0
+
+# Not running inside tmux: nothing to attribute this state to.
+pane="${TMUX_PANE:-}"
+[[ -z "$pane" ]] && exit 0
+
+HERD_DIR="${HERD_DIR:-$HOME/.claude/herd}"
+key="${pane#%}"
+state_file="$HERD_DIR/$key.state"
+sub_dir="$HERD_DIR/$key.subagents"
+
+mkdir -p "$sub_dir" 2>/dev/null || exit 0
+
+# subagent_count: markers are one file per running subagent. A file per start (rather
+# than a counter to increment) means two concurrent SubagentStart hooks cannot lose an
+# increment to each other without a lock. The count is reset at turn boundaries, so a
+# lost decrement self-heals on the next prompt or Stop.
+subagent_count() {
+    local -a markers=("$sub_dir"/*)
+    [[ -e "${markers[0]}" ]] || { printf '0'; return; }
+    printf '%s' "${#markers[@]}"
+}
+
+write_state() {
+    local status="$1" detail="${2:-}" tmp="$state_file.$$"
+    printf '%s\t%s\t%s\n' "$status" "$EPOCHSECONDS" "$detail" > "$tmp" 2>/dev/null &&
+        mv "$tmp" "$state_file" 2>/dev/null || rm -f "$tmp" 2>/dev/null
+}
+
+case "$event" in
+    working)
+        rm -f "$sub_dir"/* 2>/dev/null
+        write_state working
+        ;;
+
+    tool-done)
+        # Subagents run inside the same session, so their own PostToolUse events reach
+        # this hook too. While any subagent is outstanding the parent is still waiting on
+        # it - do not let a nested tool call overwrite that with a plain "working".
+        n="$(subagent_count)"
+        if (( n > 0 )); then
+            write_state subagent "$n"
+        else
+            write_state working
+        fi
+        ;;
+
+    subagent-start)
+        : > "$sub_dir/$$-${RANDOM}" 2>/dev/null
+        write_state subagent "$(subagent_count)"
+        ;;
+
+    subagent-stop)
+        for marker in "$sub_dir"/*; do
+            [[ -e "$marker" ]] || break
+            rm -f "$marker" 2>/dev/null
+            break
+        done
+        n="$(subagent_count)"
+        if (( n > 0 )); then
+            write_state subagent "$n"
+        else
+            write_state working
+        fi
+        ;;
+
+    needs-you)
+        write_state needs-you
+        ;;
+
+    idle)
+        rm -f "$sub_dir"/* 2>/dev/null
+        write_state idle
+        ;;
+
+    clear)
+        rm -rf "$sub_dir" 2>/dev/null
+        rm -f "$state_file" 2>/dev/null
+        ;;
+esac
+
+exit 0

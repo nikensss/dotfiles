@@ -1,0 +1,546 @@
+#!/usr/bin/env bash
+
+# tmux-claude-herd - one popup showing every Claude Code agent running in tmux.
+#
+# Lists every tmux pane that has a `claude` process in its tree (there can be more
+# than one per session), shows what that agent is doing, previews its screen inline,
+# and jumps to it with a single keystroke.
+#
+# The list paints immediately from data tmux already has, then statuses fill in as
+# they resolve - fzf re-renders on a timer via `every(N):reload-sync`, and a detached
+# prober answers the slow question (is this screen actually moving?) in the background.
+# Rows that have not been answered yet show a spinner.
+#
+# Status sources, best first:
+#   1. hook state from claude-herd-hook  - authoritative: working / subagent / needs you / idle
+#   2. screen diff (two captures 250ms apart) - inferred, marked with a trailing *
+#   3. nothing yet - spinner
+# Inferred statuses are marked so a guess never reads like a fact. Install the hooks
+# with `claude-herd-install` to get the real ones.
+#
+# Hop labels are derived from a hash of session:window, not from row position, so a
+# given agent keeps the same key across reloads AND across invocations - muscle memory
+# survives a new session appearing above it in the list.
+#
+# Subcommands (only `open` is meant for humans):
+#   open                  launch the popup (default)
+#   ui                    the fzf UI; runs inside the popup
+#   render                emit the fzf item list
+#   preview <pane_id>     miniature of a pane's current screen
+#   switch <pane_id>      jump the client to a pane
+#   switch-label <char>   resolve a hop label against the live list, then switch
+#   probe <parent_pid>    background screen-diff loop, dies with its parent
+#   mode <filter|esc>     modal filter / label-jump toggle, called by fzf's transform
+
+set -uo pipefail
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# Resolve the real path even when invoked through the ~/bin symlink, so the fzf
+# bindings below can call back into this same script.
+self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+self="$self_dir/$(basename "${BASH_SOURCE[0]}")"
+
+HERD_DIR="${HERD_DIR:-$HOME/.claude/herd}"
+DIFF_CACHE="$HERD_DIR/screen-diff"
+# Per-UI so two popups on two clients cannot toggle each other's mode. `ui` exports this
+# before launching fzf; the transform helpers inherit it.
+MODE_FILE="${HERD_MODE_FILE:-$HERD_DIR/filter-mode}"
+
+# A hook status of working/subagent is only trusted this long. If the hook chain dies
+# mid-turn (claude -9'd, hook script broken) the row would otherwise say "working"
+# forever; past this age we fall back to the screen diff instead.
+HOOK_TRUST_SECONDS=60
+
+# How long a screen-diff verdict stays usable before it reverts to a spinner.
+DIFF_STALE_SECONDS=4
+
+# Gap between the two captures that decide whether a screen is moving.
+PROBE_SETTLE=0.25
+
+# Hop label pool: home row first, then outward by reach. Every letter is bound, so
+# typing does not filter until you press `/` (see `mode`).
+LABEL_POOL=(a s d f j k l g h e i o r t u w y p q v c n m b x z)
+
+# -- palette (matches .claude/statusline.sh) -----------------------------------
+#
+# Everything below writes into caller-named variables with printf -v instead of echoing.
+# render() runs on every reload tick, so a $(...) per cell would mean ~90 subshell forks
+# per frame - that measured 540ms, against 60ms for the fork-free version.
+
+RESET=$'\033[0m'
+
+# mkesc <outvar> <#rrggbb>: build a truecolor SGR sequence, no fork.
+mkesc() {
+    printf -v "$1" '\033[38;2;%d;%d;%dm' "0x${2:1:2}" "0x${2:3:2}" "0x${2:5:2}"
+}
+
+mkesc E_LABEL "#c4b5fd"   # violet-300 - hop key
+mkesc E_WORK  "#86efac"   # green-300  - working
+mkesc E_AGENT "#7dd3fc"   # sky-300    - waiting on a subagent
+mkesc E_NEED  "#fb923c"   # orange-400 - wants your attention
+mkesc E_IDLE  "#71717a"   # zinc-500   - idle
+mkesc E_LOC   "#e4e4e4"   # white      - session:window
+mkesc E_SUB   "#a1a1aa"   # zinc-400   - task summary
+mkesc E_DIM   "#52525b"   # zinc-600   - unknown / no agent
+
+SPINNER=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
+
+# -- small helpers -------------------------------------------------------------
+
+# pad <outvar> <string> <width>: pad or truncate to exactly <width> display cells.
+# Bash counts characters (not bytes) for ${#s} under a UTF-8 locale, and the padding we
+# add is ASCII, so this stays correct for braille glyphs and for task summaries with
+# multibyte text. A plain printf '%-*s' pads by bytes and drifts on both.
+# Every local in these functions is __-prefixed: a nameref resolves in the CALLER's
+# scope, so an internal named `h` would shadow a caller that asked for its result in `h`
+# and the assignment would vanish into the local instead.
+pad() {
+    local -n __out="$1"
+    local __s="$2" __w="$3"
+    (( ${#__s} > __w )) && __s="${__s:0:__w-1}…"
+    printf -v __out '%s%*s' "$__s" $(( __w - ${#__s} )) ''
+}
+
+# age <outvar> <epoch>: compact age, empty for unknown.
+age() {
+    local -n __out="$1"
+    local __then="$2" __d
+    __out=""
+    [[ -z "$__then" ]] && return 0
+    __d=$(( EPOCHSECONDS - __then ))
+    (( __d < 0 )) && __d=0
+    if   (( __d < 60 ));    then printf -v __out '%ds' "$__d"
+    elif (( __d < 3600 ));  then printf -v __out '%dm' "$(( __d / 60 ))"
+    elif (( __d < 86400 )); then printf -v __out '%dh' "$(( __d / 3600 ))"
+    else                         printf -v __out '%dd' "$(( __d / 86400 ))"
+    fi
+}
+
+# fnv1a <outvar> <string>: FNV-1a 32-bit. Deterministic across machines and runs, which
+# is what makes a label stick to an agent instead of to a row number.
+fnv1a() {
+    local -n __out="$1"
+    local __s="$2" __h=2166136261 __i __c
+    for (( __i = 0; __i < ${#__s}; __i++ )); do
+        printf -v __c '%d' "'${__s:__i:1}"
+        __h=$(( (__h ^ __c) & 0xFFFFFFFF ))
+        __h=$(( (__h * 16777619) & 0xFFFFFFFF ))
+    done
+    __out="$__h"
+}
+
+# -- data collection -----------------------------------------------------------
+
+# collect: emit one TSV row per target, in a fully deterministic order.
+#   pane_id \t kind \t session \t window \t seed \t title
+# kind is `agent` for panes running claude, `session` for a session that has none
+# (so the popup doubles as a session switcher). Deterministic order matters: it keeps
+# reloads from reshuffling anything, and it makes label assignment reproducible.
+collect() {
+    local -A pane_pid_to_target=() pane_title=() pane_sess=() pane_win=() sess_active=()
+    local -A parent=()
+    local -a claude_pids=()
+    local pane_id ppid sess win wactive pactive title
+    local pid pcmd exe base
+
+    # One tmux round trip for everything, including each session's current pane, which is
+    # where a plain switch would land you. Asking tmux per session instead cost a fork
+    # each and told us nothing this list does not already carry.
+    while IFS=$'\t' read -r pane_id ppid sess win wactive pactive title; do
+        pane_pid_to_target["$ppid"]="$pane_id"
+        pane_sess["$pane_id"]="$sess"
+        pane_win["$pane_id"]="$win"
+        title="${title//$'\t'/ }"
+        # Claude Code prefixes the pane title with its own glyph (a braille frame while
+        # running, ✳ otherwise). The status column already carries that meaning, so drop
+        # the glyph and keep the summary. The test is "first char is not printable ASCII,
+        # second char is a space", which is locale-independent and leaves a genuine title
+        # like "PR review" alone.
+        if [[ "${title:1:1}" == " " && ! "${title:0:1}" == [\ -~] ]]; then
+            title="${title:2}"
+        fi
+        pane_title["$pane_id"]="$title"
+        [[ "$wactive" == "1" && "$pactive" == "1" ]] && sess_active["$sess"]="$pane_id"
+    done < <(tmux list-panes -a -F $'#{pane_id}\t#{pane_pid}\t#{session_name}\t#{window_index}\t#{window_active}\t#{pane_active}\t#{pane_title}' 2>/dev/null)
+
+    # One process snapshot (~50ms for ~900 procs) instead of per-pane walks. We build a
+    # child->parent map and then walk UP from each claude process until we land on a
+    # pane's shell pid; that is far cheaper than walking down every pane's subtree, and
+    # it correctly attributes claude no matter how deeply a wrapper shell nests it.
+    while read -r pid ppid pcmd; do
+        parent["$pid"]="$ppid"
+        exe="${pcmd%% *}"
+        base="${exe##*/}"
+        # Matches `claude`, `claude --resume`, and an absolute path to the launcher.
+        [[ "$base" == "claude" ]] && claude_pids+=("$pid")
+    done < <(ps -axo pid=,ppid=,command= 2>/dev/null)
+
+    # pane_id -> shallowest claude pid found in that pane. Shallowest wins so a nested
+    # `claude -p` spawned by an agent's own Bash tool cannot shadow the real session.
+    local -A agent_of=() agent_depth=()
+    local cur depth
+    for pid in "${claude_pids[@]}"; do
+        cur="$pid"
+        depth=0
+        while [[ -n "${cur:-}" && "$cur" != "0" && "$cur" != "1" ]] && (( depth < 24 )); do
+            if [[ -n "${pane_pid_to_target[$cur]:-}" ]]; then
+                pane_id="${pane_pid_to_target[$cur]}"
+                if [[ -z "${agent_depth[$pane_id]:-}" ]] || (( depth < agent_depth[$pane_id] )); then
+                    agent_of["$pane_id"]="$pid"
+                    agent_depth["$pane_id"]="$depth"
+                fi
+                break
+            fi
+            cur="${parent[$cur]:-}"
+            (( depth++ ))
+        done
+    done
+
+    # Agent rows, sorted by session then window. The order has to be total and stable:
+    # bash hash iteration order is not, and a reload that reshuffles rows would move
+    # every label out from under whoever is looking at it.
+    local -A sess_has_agent=()
+    local sortkey
+    while IFS=$'\t' read -r _ _ pane_id; do
+        sess="${pane_sess[$pane_id]}"
+        win="${pane_win[$pane_id]}"
+        sess_has_agent["$sess"]=1
+        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "$pane_id" "agent" "$sess" "$win" "$sess:$win" "${pane_title[$pane_id]}"
+    done < <(
+        for pane_id in "${!agent_of[@]}"; do
+            printf -v sortkey '%04d' "${pane_win[$pane_id]}"
+            printf '%s\t%s\t%s\n' "${pane_sess[$pane_id]}" "$sortkey" "$pane_id"
+        done | sort -t$'\t' -k1,1 -k2,2
+    )
+
+    # Sessions with no agent at all, so the popup is still a complete map of the server
+    # and doubles as a session switcher.
+    while IFS= read -r sess; do
+        [[ -n "${sess_has_agent[$sess]:-}" ]] && continue
+        pane_id="${sess_active[$sess]:-}"
+        [[ -z "$pane_id" ]] && continue
+        printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+            "$pane_id" "session" "$sess" "${pane_win[$pane_id]}" "$sess" ""
+    done < <(printf '%s\n' "${!sess_active[@]}" | sort)
+}
+
+# assign_labels: read collect() rows on stdin, prepend a stable hop label to each.
+# A label is the agent's own hash slot, not its row number: the same seed always
+# prefers the same key, and only an actual collision moves anyone. Probing happens in
+# the deterministic row order so the outcome is reproducible for a given target set.
+assign_labels() {
+    local -a rows=()
+    local row
+    while IFS= read -r row; do rows+=("$row"); done
+    (( ${#rows[@]} == 0 )) && return 0
+
+    local pool_n=${#LABEL_POOL[@]}
+    local -A taken=()
+    local seed h start i slot label
+    local -a fields
+
+    for row in "${rows[@]}"; do
+        # Field 5 is the label seed. Split in-process - this runs on every reload tick,
+        # so a `cut` per row would be 20 forks a second for nothing.
+        IFS=$'\t' read -r -a fields <<< "$row"
+        seed="${fields[4]}"
+        fnv1a h "$seed"
+        start=$(( h % pool_n ))
+        label=""
+        for (( i = 0; i < pool_n; i++ )); do
+            slot=$(( (start + i) % pool_n ))
+            if [[ -z "${taken[$slot]:-}" ]]; then
+                taken["$slot"]=1
+                label="${LABEL_POOL[$slot]}"
+                break
+            fi
+        done
+        # More targets than labels: the overflow rows stay reachable via arrows and /.
+        printf '%s\t%s\n' "${label:- }" "$row"
+    done
+}
+
+# read_hook_state <status_var> <stamp_var> <detail_var> <pane_id>
+read_hook_state() {
+    local -n __st="$1" __ts="$2" __dt="$3"
+    local __f="$HERD_DIR/${4#%}.state"
+    __st=""; __ts=""; __dt=""
+    [[ -r "$__f" ]] || return 0
+    IFS=$'\t' read -r __st __ts __dt < "$__f" 2>/dev/null || true
+}
+
+# -- render --------------------------------------------------------------------
+
+# render: one fzf item per line, as "pane_id<TAB>display".
+# Field 1 is the identity fzf tracks across reloads (--id-nth=1) and what the preview and
+# jump bindings receive; field 2 is what gets shown and searched. Note there is no
+# --nth: it applies to the string AFTER --with-nth has already reduced the item to field
+# 2, so --nth=2 would look for a second field that no longer exists and match nothing.
+render() {
+    local -A diff=() diff_at=()
+    local p verdict at
+    if [[ -r "$DIFF_CACHE" ]]; then
+        while IFS=$'\t' read -r p verdict at; do
+            diff["$p"]="$verdict"
+            diff_at["$p"]="$at"
+        done < "$DIFF_CACHE"
+    fi
+
+    # 5 (label) + 15 (status) + 5 (age) + 22 (location) + 2 slack.
+    local sub_w=$(( ${FZF_COLUMNS:-100} - 49 ))
+    (( sub_w < 20 )) && sub_w=20
+
+    local label pane_id kind sess win seed title
+    local status stamp detail glyph text colour
+    local c_label c_status c_age c_loc c_title spinner frac
+
+    # Spinner frame from the wall clock, so a stateless render still animates.
+    frac="${EPOCHREALTIME#*[.,]}"
+    spinner="${SPINNER[$(( (10#${frac:0:2}) % 10 ))]}"
+
+    while IFS=$'\t' read -r label pane_id kind sess win seed title; do
+        if [[ "$kind" == "session" ]]; then
+            glyph="·"; text="no agent"; colour="$E_DIM"; stamp=""
+        else
+            read_hook_state status stamp detail "$pane_id"
+
+            # A stale in-progress hook status is not trusted - if the hook chain died
+            # mid-turn this row would otherwise claim "working" forever, so drop through
+            # to the screen diff instead.
+            if [[ "$status" == "working" || "$status" == "subagent" ]] &&
+               [[ -n "$stamp" ]] && (( EPOCHSECONDS - stamp > HOOK_TRUST_SECONDS )); then
+                status=""
+            fi
+
+            case "$status" in
+                working)   glyph="●"; text="working";   colour="$E_WORK" ;;
+                subagent)  glyph="◆"; colour="$E_AGENT"
+                           if [[ -n "$detail" && "$detail" != "1" ]]; then
+                               text="$detail subagents"
+                           else
+                               text="subagent"
+                           fi ;;
+                needs-you) glyph="▲"; text="needs you"; colour="$E_NEED" ;;
+                idle)      glyph="○"; text="idle";      colour="$E_IDLE" ;;
+                *)
+                    # No usable hook state: fall back to the screen diff, and mark it
+                    # inferred with a * so a guess never reads as a fact.
+                    stamp=""
+                    at="${diff_at[$pane_id]:-}"
+                    if [[ -n "$at" ]] && (( EPOCHSECONDS - at <= DIFF_STALE_SECONDS )); then
+                        if [[ "${diff[$pane_id]}" == "moving" ]]; then
+                            glyph="●"; text="working*"; colour="$E_WORK"
+                        else
+                            glyph="○"; text="quiet*";   colour="$E_IDLE"
+                        fi
+                    else
+                        glyph="$spinner"; text="…"; colour="$E_DIM"
+                    fi ;;
+            esac
+        fi
+
+        age c_age "$stamp"
+        pad c_label "[$label]" 5
+        pad c_status "$glyph $text" 15
+        pad c_age "$c_age" 5
+        pad c_loc "$sess:$win" 22
+        pad c_title "$title" "$sub_w"
+
+        printf '%s\t%s%s%s%s%s%s%s%s%s%s%s\n' \
+            "$pane_id" \
+            "$E_LABEL" "$c_label" \
+            "$colour"  "$c_status" \
+            "$E_DIM"   "$c_age" \
+            "$E_LOC"   "$c_loc" \
+            "$E_SUB"   "$c_title" \
+            "$RESET"
+    done < <(collect | assign_labels)
+}
+
+# -- preview -------------------------------------------------------------------
+
+# preview <pane_id>: the pane's visible screen, colours intact, cropped to the last
+# $FZF_PREVIEW_LINES rows so you see the newest output rather than the top of the pane.
+preview() {
+    local pane_id="$1" lines="${FZF_PREVIEW_LINES:-20}"
+    tmux capture-pane -p -e -t "$pane_id" 2>/dev/null | tail -n "$lines"
+}
+
+# -- switching -----------------------------------------------------------------
+
+switch_to() {
+    local pane_id="$1" sess win
+    read -r sess win < <(tmux display-message -p -t "$pane_id" $'#{session_name} #{window_index}' 2>/dev/null)
+    [[ -z "${sess:-}" ]] && return 1
+    tmux switch-client -t "$sess" 2>/dev/null
+    tmux select-window -t "$sess:$win" 2>/dev/null
+    tmux select-pane -t "$pane_id" 2>/dev/null
+}
+
+# switch-label <char>: resolve the label against a fresh list, so a label pressed after
+# the set changed can never send you to a pane that has since moved or died.
+switch_label() {
+    local want="$1" label pane_id rest
+    while IFS=$'\t' read -r label pane_id rest; do
+        if [[ "$label" == "$want" ]]; then
+            switch_to "$pane_id"
+            return $?
+        fi
+    done < <(collect | assign_labels)
+    tmux display-message "herd: no target labelled '$want'" 2>/dev/null
+    return 1
+}
+
+# -- background prober ---------------------------------------------------------
+
+# probe <parent_pid>: answer "is this screen actually moving?" for every agent pane
+# that has no trustworthy hook state, by capturing twice with a settle gap in between.
+# This is the only slow signal, which is exactly why it lives out here instead of in
+# the render path - the list paints at once and these verdicts land a moment later.
+probe() {
+    local parent_pid="$1"
+    local -A first=()
+    local pane_id kind status stamp detail
+    local tmp
+
+    while kill -0 "$parent_pid" 2>/dev/null; do
+        first=()
+
+        while IFS=$'\t' read -r pane_id kind _ _ _ _; do
+            [[ "$kind" == "agent" ]] || continue
+            read_hook_state status stamp detail "$pane_id"
+            case "$status" in
+                needs-you|idle) continue ;;
+                working|subagent)
+                    if [[ -n "$stamp" ]] && (( EPOCHSECONDS - stamp <= HOOK_TRUST_SECONDS )); then
+                        continue
+                    fi ;;
+            esac
+            first["$pane_id"]="$(tmux capture-pane -p -t "$pane_id" 2>/dev/null)"
+        done < <(collect)
+
+        if (( ${#first[@]} > 0 )); then
+            sleep "$PROBE_SETTLE"
+            tmp="$DIFF_CACHE.$$"
+            : > "$tmp"
+            for pane_id in "${!first[@]}"; do
+                if [[ "$(tmux capture-pane -p -t "$pane_id" 2>/dev/null)" == "${first[$pane_id]}" ]]; then
+                    printf '%s\tquiet\t%s\n' "$pane_id" "$EPOCHSECONDS" >> "$tmp"
+                else
+                    printf '%s\tmoving\t%s\n' "$pane_id" "$EPOCHSECONDS" >> "$tmp"
+                fi
+            done
+            # Atomic swap so a render never reads a half-written cache.
+            mv "$tmp" "$DIFF_CACHE" 2>/dev/null || rm -f "$tmp"
+        fi
+
+        sleep 0.5
+    done
+}
+
+# -- modal filter --------------------------------------------------------------
+
+# Every letter is bound to a jump, so `/` has to lift those bindings before the query
+# line can accept text, and Esc has to put them back. fzf cannot swap a key's action at
+# runtime, so both keys go through `transform` and this function decides what to emit
+# based on a mode file. In label mode Esc means quit; in filter mode it means go back.
+mode() {
+    local which="$1" c actions=""
+
+    case "$which" in
+        filter)
+            for c in "${LABEL_POOL[@]}"; do actions+="unbind($c)+"; done
+            actions+="change-prompt(filter> )"
+            : > "$MODE_FILE"
+            ;;
+        esc)
+            if [[ -e "$MODE_FILE" ]]; then
+                rm -f "$MODE_FILE"
+                for c in "${LABEL_POOL[@]}"; do actions+="rebind($c)+"; done
+                actions+="clear-query+change-prompt(herd> )"
+            else
+                actions="abort"
+            fi
+            ;;
+    esac
+
+    printf '%s' "$actions"
+}
+
+# -- ui ------------------------------------------------------------------------
+
+ui() {
+    mkdir -p "$HERD_DIR"
+
+    # Child processes fzf spawns (reload, transform, preview) inherit this, which is how
+    # `mode` finds the same mode file this UI owns.
+    export HERD_MODE_FILE="$HERD_DIR/filter-mode.$$"
+    MODE_FILE="$HERD_MODE_FILE"
+    rm -f "$MODE_FILE"
+
+    # The prober outlives fzf unless we reap it - `enter` and the label keys use fzf's
+    # `become`, which execs over the fzf process, so this shell's EXIT trap is the only
+    # thing that still runs.
+    "$self" probe "$$" >/dev/null 2>&1 &
+    local probe_pid=$!
+    # shellcheck disable=SC2064  # both values must expand now, not at trap time
+    trap "kill $probe_pid 2>/dev/null; rm -f '$MODE_FILE'" EXIT INT TERM
+
+    local -a binds=()
+    local c
+    for c in "${LABEL_POOL[@]}"; do
+        binds+=(--bind "$c:become('$self' switch-label $c)")
+    done
+
+    local header
+    header="[key] jump   ↵ open   ⇥ preview   ^r refresh   / filter   ⎋ quit"
+
+    "$self" render | fzf \
+        --ansi \
+        --delimiter=$'\t' \
+        --with-nth=2 \
+        --id-nth=1 \
+        --track \
+        --no-sort \
+        --cycle \
+        --layout=reverse \
+        --info=inline-right \
+        --prompt='herd> ' \
+        --pointer='▶' \
+        --header="$header" \
+        --header-first \
+        --preview="'$self' preview {1}" \
+        --preview-window='down,55%,border-top,nowrap' \
+        --preview-label=' live ' \
+        --bind "every(1):reload-sync('$self' render)+refresh-preview" \
+        --bind "ctrl-r:reload-sync('$self' render)+refresh-preview" \
+        --bind 'tab:change-preview-window(down,75%,border-top|hidden|down,55%,border-top)' \
+        --bind "enter:become('$self' switch {1})" \
+        --bind "/:transform('$self' mode filter)" \
+        --bind "esc:transform('$self' mode esc)" \
+        "${binds[@]}"
+}
+
+open_popup() {
+    if [[ -n "${TMUX:-}" ]]; then
+        tmux display-popup -E -w 90% -h 80% -b rounded -T ' claude herd ' "'$self' ui"
+    else
+        exec "$self" ui
+    fi
+}
+
+# -- dispatch ------------------------------------------------------------------
+
+case "${1:-open}" in
+    open)         open_popup ;;
+    ui)           ui ;;
+    render)       render ;;
+    preview)      preview "${2:?pane id required}" ;;
+    switch)       switch_to "${2:?pane id required}" ;;
+    switch-label) switch_label "${2:?label required}" ;;
+    probe)        probe "${2:?parent pid required}" ;;
+    mode)         mode "${2:?mode required}" ;;
+    *)            printf 'usage: %s [open|ui|render|preview <pane>|switch <pane>]\n' "${0##*/}" >&2; exit 2 ;;
+esac
