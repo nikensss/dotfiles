@@ -587,6 +587,7 @@ ui() {
     local header
     header="[key] jump   ↵ open   ⇥ preview   ^r refresh   / filter   ⎋ quit"
 
+    local status=0
     "$self" render | fzf \
         --ansi \
         --delimiter=$'\t' \
@@ -610,15 +611,36 @@ ui() {
         --bind "enter:become('$self' switch {1})" \
         --bind "/:transform('$self' mode filter)" \
         --bind "esc:transform('$self' mode esc)" \
-        "${binds[@]}"
+        "${binds[@]}" || status=$?
+
+    # Closing the popup is not a failure, but the key bindings run this through tmux's
+    # run-shell, which reports ANY non-zero status as an "... returned 130" message the
+    # user then has to dismiss with a second keypress. Normalise the expected exits:
+    #   130      aborted with Esc or ctrl-c
+    #   1        nothing matched, or a `become` target that had nothing to switch to
+    #            (switch-label already says so via tmux display-message)
+    #   >= 128   killed by a signal, i.e. the popup was torn down
+    # Anything else is a real bug in this script and should stay loud.
+    if (( status == 1 || status >= 128 )); then
+        return 0
+    fi
+    return "$status"
 }
 
 open_popup() {
-    if [[ -n "${TMUX:-}" ]]; then
-        tmux display-popup -E -w 90% -h 80% -b rounded -T ' claude herd ' "'$self' ui"
-    else
+    if [[ -z "${TMUX:-}" ]]; then
         exec "$self" ui
     fi
+
+    # Same reasoning as in ui(): the popup being dismissed - by Esc, by a click outside,
+    # by prefix-q - must not come back as a status that run-shell turns into a message.
+    # tmux still prints its own stderr for a real failure like "no client".
+    local status=0
+    tmux display-popup -E -w 90% -h 80% -b rounded -T ' claude herd ' "'$self' ui" || status=$?
+    if (( status == 1 || status >= 128 )); then
+        return 0
+    fi
+    return "$status"
 }
 
 # -- dispatch ------------------------------------------------------------------
