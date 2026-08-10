@@ -473,6 +473,17 @@ render() {
     local status stamp detail glyph text colour
     local c_label c_status c_age c_loc c_title spinner frac
 
+    # The table's own header row, emitted as the first item so fzf can pin it directly
+    # above the list with --header-lines=1. Built from the same pad calls as the rows, so
+    # the names cannot drift out of alignment with the data underneath them. The leading
+    # tab is the empty pane-id field every line carries.
+    pad c_label "key" "$W_LABEL"
+    pad c_status "status" "$W_STATUS"
+    pad c_age "ago" "$W_AGE"
+    pad c_loc "session:window (i)" "$W_LOC"
+    printf '\t%s%s%s%s%stask%s\n' \
+        "$E_DIM" "$c_label" "$c_status" "$c_age" "$c_loc" "$RESET"
+
     # Spinner frame from the wall clock, so a stateless render still animates.
     frac="${EPOCHREALTIME#*[.,]}"
     spinner="${SPINNER[$(( (10#${frac:0:2}) % 10 ))]}"
@@ -738,22 +749,17 @@ ui() {
         binds+=(--bind "${c^^}:become('$self' switch-label $c)")
     done
 
-    # Column names, padded to the exact widths render() uses. --header-first puts them
-    # above the prompt line; the key hints live in the footer at the bottom.
+    # The key legend, above the prompt line via --header-first. The table's column names
+    # are a different thing in a different place: render() emits them as the first item and
+    # --header-lines=1 pins them directly above the list they describe.
     #
     # `ago` is the one column that cannot explain itself: it is time since this agent's
     # last hook event - how long it has been idle, how long it has been waiting on you, or
     # how long since its last tool call finished. It is blank for an inferred status,
     # because a screen diff says nothing about when anything happened.
-    local h_label h_status h_age h_loc header footer
-    pad h_label "key" "$W_LABEL"
-    pad h_status "status" "$W_STATUS"
-    pad h_age "ago" "$W_AGE"
-    pad h_loc "session:window (i)" "$W_LOC"
-    header="${h_label}${h_status}${h_age}${h_loc}task"
-
-    footer="[key] look, again to go  ⇧[KEY] go now  ↵ open  ⇥ preview  ^r reload"
-    footer+="  / filter  M-a/⎋ close  ·  * = inferred"
+    local header
+    header="[key] look, again to go  ⇧[KEY] go now  ↵ open  ⇥ preview  ^r reload"
+    header+="  / filter  M-a/⎋ close  ·  * = inferred"
 
     # Render once up front so the initial cursor can be placed on the row that actually
     # wants attention, instead of on whatever happens to sort first - which, invoked from
@@ -764,9 +770,11 @@ ui() {
     local rows_file="$HERD_DIR/rows.$$"
     "$self" render > "$rows_file"
 
-    local cur_sess pos=1 first_needs=0 first_other=0 n=0 line
+    local cur_sess pos=1 first_needs=0 first_other=0 n=0 line skipped=0
     cur_sess="$(tmux display-message -p '#{client_session}' 2>/dev/null)"
     while IFS= read -r line; do
+        # First line is the pinned column-name row, not an item fzf can put a cursor on.
+        if (( skipped == 0 )); then skipped=1; continue; fi
         n=$(( n + 1 ))
         if (( first_needs == 0 )) && [[ "$line" == *"needs you"* ]]; then
             first_needs="$n"
@@ -795,9 +803,8 @@ ui() {
         --pointer='▶' \
         --header="$header" \
         --header-first \
-        --footer="$footer" \
-        --footer-border=line \
-        --color='header:#71717a,footer:#71717a' \
+        --header-lines=1 \
+        --color='header:#71717a' \
         --bind "start:pos($pos)" \
         --preview="'$self' preview {1}" \
         --preview-window='down,55%,border-top,nowrap' \
