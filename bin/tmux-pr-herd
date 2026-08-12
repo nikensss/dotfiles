@@ -1,0 +1,1034 @@
+#!/usr/bin/env bash
+
+# tmux-pr-herd - one popup showing every open pull request in the repo you launched from.
+#
+# The sibling of tmux-claude-herd: same popup, same hop keys, same palette, pointed at pull
+# requests instead of agents. Each row is one open PR - what it is waiting on, who wrote it,
+# who owns it, and how many review threads are still unresolved. The miniature underneath is
+# those threads, with every reply to them, so the question "what is actually blocking this"
+# is answered without leaving the terminal.
+#
+# The list is 30% of the popup and the threads are the other 70%, because the threads are
+# the part you came to read.
+#
+# WHERE THE ARCHITECTURE DIFFERS FROM HERD, AND WHY
+#
+# herd's data is local: tmux already knows its panes, so render() can ask on every tick.
+# This one's data is a GitHub GraphQL call that measures ~3.5s. Three consequences:
+#
+#   1. A detached fetcher owns the network. It writes an atomically-swapped JSON cache and
+#      a stamp file; render() only ever reads the cache, so the UI paints at once and is
+#      never blocked on the network.
+#   2. The list does NOT reload on a timer. `every(1):reload` costs more than a repaint: a
+#      reload resets the preview scroll to the top (verified - see pscroll) and swallows
+#      keystrokes that arrive while it is in flight (measured: 5 rapid ctrl-f presses became
+#      4). Since the data only changes once a fetch lands, the tick reloads only when the
+#      stamp moves, and otherwise just repaints the footer clock.
+#   3. Preview scroll position is kept in the --preview-window spec, not in fzf's transient
+#      scroll state, so the rare real reload cannot lose your place. See pscroll.
+#
+# Hop labels belong to the PR, not to the row it happens to occupy: assignments are
+# remembered in the cache dir, so a PR keeps its key as the list reorders under it (the API
+# returns most-recently-updated first, so it reorders constantly). See assign_labels.
+#
+# Columns, named in the legend header:
+#   key       the hop label - press it to put the cursor (and the preview) on that PR,
+#             press it again to open the PR in a browser, or press it shifted to open now
+#   pr        the PR number. Two open PRs really can share one ticket, so this is the only
+#             identifier that is always unique
+#   state     what the PR is waiting on - draft, changes, ci, conflict, approved, review
+#   ticket    the ticket key parsed out of the title (NAI-651), or the whole title when
+#             there is no key to parse
+#   author    who opened it
+#   assignee  who owns it, "+n" when there is more than one
+#   unres     unresolved review threads, bots included - the number in the miniature
+#
+# Subcommands (only `open` is meant for humans):
+#   open                  launch the popup (default)
+#   ui                    the fzf UI; runs inside the popup
+#   render                emit the fzf item list
+#   preview <number>      miniature of one PR's unresolved review threads
+#   open-pr <number>      open a PR in the browser
+#   open-label <char>     resolve a hop label against the live list, then open
+#   hop <char> <query> <number>
+#                         two-stage label press, called by fzf's transform
+#   fetch                 one synchronous GraphQL call into the cache
+#   fetcher <parent_pid>  background fetch loop, dies with its parent
+#   tick                  the every(1) footer clock and gated reload, called by fzf
+#   pscroll <n|reset>     preview scroll offset, called by fzf's transform
+#   pwsize                cycle the preview window size, called by fzf's transform
+#   refresh               force the fetcher to go now, called by fzf's transform
+#   mode <filter|esc|clear>
+#                         modal filter / label-jump toggle, called by fzf's transform
+
+set -uo pipefail
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# Resolve the real path even when invoked through the ~/bin symlink, so the fzf bindings
+# below can call back into this same script, and so the jq renderer is found next to it.
+self_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+self="$self_dir/$(basename "${BASH_SOURCE[0]}")"
+PREVIEW_JQ="$self_dir/tmux-pr-herd.jq"
+
+PR_DIR="${PR_HERD_DIR:-${XDG_CACHE_HOME:-$HOME/.cache}/tmux-pr-herd}"
+
+# Per-UI state - scroll offset, preview size, filter mode, last-seen stamp - keyed by the
+# pid of the popup that owns it, so two popups on two clients cannot move each other's
+# cursor. `ui` exports this before launching fzf and every transform helper inherits it;
+# the default is here so those helpers are still safe to run straight from a shell.
+PR_HERD_UI="${PR_HERD_UI:-$PR_DIR/ui.$$}"
+
+# How old the cache may get before the fetcher goes back to GitHub. The call costs ~3.5s and
+# a review thread does not change on a one-second timescale; ctrl-r is there for the moment
+# you know something changed and do not want to wait.
+FETCH_INTERVAL=45
+
+# Hop label pool: home row first, then outward by reach. Every letter is bound, so typing
+# does not filter until you press `/` (see `mode`). Same pool as herd, so the same PR and
+# the same agent tend to keep the same key in your fingers.
+LABEL_POOL=(a s d f j k l g h e i o r t u w y p q v c n m b x z)
+
+# Assignments are remembered here so a label sticks to a PR for good. Hashing alone is not
+# enough: 26 slots and 21 open PRs collide constantly (birthday problem), and a colliding
+# newcomer would otherwise bump a PR you already had a key for. Entries for PRs that are
+# gone (merged, closed) are kept this long, so a reopened PR gets its old key back.
+LABEL_MAP="$PR_DIR/labels"
+LABEL_TTL=$(( 30 * 86400 ))
+
+# Preview window sizes, cycled by tab. The offset is appended by pw_spec.
+PW_SIZES=("down,70%,border-top,nowrap" "down,85%,border-top,nowrap" "hidden")
+
+# -- palette (herd's, hex for hex - tmux-claude-herd:108-115) ------------------
+#
+# Everything below writes into caller-named variables with printf -v instead of echoing.
+# render() runs on every reload, so a $(...) per cell would mean a subshell fork per cell.
+
+RESET=$'\033[0m'
+
+# mkesc <outvar> <#rrggbb>: build a truecolor SGR sequence, no fork.
+mkesc() {
+    printf -v "$1" '\033[38;2;%d;%d;%dm' "0x${2:1:2}" "0x${2:3:2}" "0x${2:5:2}"
+}
+
+mkesc E_LABEL "#c4b5fd"   # violet-300 - hop key
+mkesc E_WORK  "#86efac"   # green-300  - approved
+mkesc E_AGENT "#7dd3fc"   # sky-300    - waiting on review
+mkesc E_NEED  "#fb923c"   # orange-400 - wants your attention: changes, conflicts
+mkesc E_FAIL  "#f87171"   # red-400    - CI is red. The one meaning herd never had, and
+                          #              the one thing here that is broken rather than busy
+mkesc E_IDLE  "#71717a"   # zinc-500   - draft
+mkesc E_LOC   "#e4e4e4"   # white      - ticket / title
+mkesc E_SUB   "#a1a1aa"   # zinc-400   - author, assignee
+mkesc E_DIM   "#52525b"   # zinc-600   - numbers, zero counts, chrome
+
+# Column widths, shared by the rows in render() and the legend header in ui() so the two
+# cannot drift apart. The ticket column takes whatever is left.
+W_LABEL=5
+W_NUM=7
+W_STATE=12
+W_AUTHOR=16
+W_ASSIGN=16
+W_UNRES=6
+
+# -- small helpers -------------------------------------------------------------
+
+# pad <outvar> <string> <width>: pad or truncate to exactly <width> display cells.
+# Bash counts characters (not bytes) for ${#s} under a UTF-8 locale, and the padding we add
+# is ASCII, so this stays correct for a title with multibyte text. A plain printf '%-*s'
+# pads by bytes and drifts on both.
+# Every local in these functions is __-prefixed: a nameref resolves in the CALLER's scope,
+# so an internal named `s` would shadow a caller that asked for its result in `s` and the
+# assignment would vanish into the local instead.
+pad() {
+    local -n __out="$1"
+    local __s="$2" __w="$3"
+    (( ${#__s} > __w )) && __s="${__s:0:__w-1}…"
+    printf -v __out '%s%*s' "$__s" $(( __w - ${#__s} )) ''
+}
+
+# padl <outvar> <string> <width>: as pad, but right-aligned. Counts read as columns of
+# digits, so they line up on the right or they do not line up at all.
+padl() {
+    local -n __out="$1"
+    local __s="$2" __w="$3"
+    (( ${#__s} > __w )) && __s="${__s:0:__w}"
+    printf -v __out '%*s' "$__w" "$__s"
+}
+
+# age <outvar> <epoch>: compact age, empty for unknown.
+age() {
+    local -n __out="$1"
+    local __then="$2" __d
+    __out=""
+    [[ -z "$__then" ]] && return 0
+    __d=$(( EPOCHSECONDS - __then ))
+    (( __d < 0 )) && __d=0
+    if   (( __d < 60 ));    then printf -v __out '%ds' "$__d"
+    elif (( __d < 3600 ));  then printf -v __out '%dm' "$(( __d / 60 ))"
+    elif (( __d < 86400 )); then printf -v __out '%dh' "$(( __d / 3600 ))"
+    else                         printf -v __out '%dd' "$(( __d / 86400 ))"
+    fi
+}
+
+# fnv1a <outvar> <string>: FNV-1a 32-bit. Deterministic across machines and runs, which is
+# what makes a label stick to a PR instead of to a row number.
+fnv1a() {
+    local -n __out="$1"
+    local __s="$2" __h=2166136261 __i __c
+    for (( __i = 0; __i < ${#__s}; __i++ )); do
+        printf -v __c '%d' "'${__s:__i:1}"
+        __h=$(( (__h ^ __c) & 0xFFFFFFFF ))
+        __h=$(( (__h * 16777619) & 0xFFFFFFFF ))
+    done
+    __out="$__h"
+}
+
+# -- which repo ----------------------------------------------------------------
+
+OWNER=""; NAME=""; SLUG=""; REPO_ERR=""
+
+# resolve_repo: fill OWNER/NAME/SLUG from the `origin` remote of the current directory.
+#
+# Parsed locally rather than asked of `gh repo view`, which is a network round trip we would
+# pay before the popup could paint anything at all. Handles the three URL shapes git hands
+# out: scp-style (git@github.com:Owner/Repo.git), https, and ssh://.
+resolve_repo() {
+    local url
+    OWNER=""; NAME=""; SLUG=""; REPO_ERR=""
+
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        REPO_ERR="not a git repository"
+        return 1
+    fi
+    if ! url="$(git remote get-url origin 2>/dev/null)" || [[ -z "$url" ]]; then
+        REPO_ERR="this repo has no 'origin' remote"
+        return 1
+    fi
+
+    url="${url%.git}"
+    url="${url%/}"
+    url="${url#ssh://}"; url="${url#git://}"; url="${url#https://}"; url="${url#http://}"
+    url="${url#*@}"          # strip any user@ left by the scp-style or ssh:// forms
+    url="${url#*github.com}" # tolerate github.com and any enterprise host prefix
+    url="${url#:}"; url="${url#/}"
+
+    OWNER="${url%%/*}"
+    NAME="${url#*/}"
+    NAME="${NAME%%/*}"
+    if [[ -z "$OWNER" || -z "$NAME" || "$OWNER" == "$url" ]]; then
+        REPO_ERR="could not read Owner/Repo out of the origin remote"
+        return 1
+    fi
+
+    SLUG="${OWNER}__${NAME}"
+    return 0
+}
+
+# Cache paths for the resolved repo. Set by need_repo, inherited by every child fzf spawns.
+JSON=""; STAMP=""; ERRF=""; FORCE=""
+
+set_paths() {
+    JSON="$PR_DIR/$SLUG.json"
+    STAMP="$PR_DIR/$SLUG.stamp"
+    ERRF="$PR_DIR/$SLUG.err"
+    FORCE="$PR_DIR/$SLUG.force"
+}
+
+# need_repo: resolve from the environment when a parent already did the work, otherwise from
+# the current directory. The popup is opened with the pane's own path, and everything fzf
+# spawns inherits both the cwd and these, so this is a no-op after the first call.
+need_repo() {
+    if [[ -n "${PR_HERD_SLUG:-}" ]]; then
+        OWNER="$PR_HERD_OWNER"; NAME="$PR_HERD_NAME"; SLUG="$PR_HERD_SLUG"
+        set_paths
+        return 0
+    fi
+    resolve_repo || return 1
+    set_paths
+    return 0
+}
+
+# -- fetching ------------------------------------------------------------------
+
+# One call for the whole list, threads and replies included. 50 PRs and 50 threads and 20
+# comments deep measured ~3.5s and 160KB against a repo with 24 open PRs; going deeper costs
+# latency on every popup for data that is already past the point of being readable.
+#
+# There is no server-side filter for "unresolved", so the count in the list is counted from
+# the threads this query actually returned - it cannot come from totalCount, which counts
+# resolved ones too. That makes the caps visible rather than silent: reviewThreads.totalCount
+# is fetched purely so a truncated PR can print its count as "17+" instead of quietly
+# reporting the part that fitted. The 50-PR cap is the one with no marker; it is the tail of
+# the least-recently-updated PRs, which is the tail you were least likely to be reading.
+read -r -d '' GQL <<'GRAPHQL'
+query($owner:String!, $name:String!) {
+  repository(owner:$owner, name:$name) {
+    pullRequests(states:OPEN, first:50, orderBy:{field:UPDATED_AT, direction:DESC}) {
+      nodes {
+        number title isDraft url updatedAt
+        author { login }
+        assignees(first:5) { nodes { login } }
+        reviewDecision
+        mergeable
+        commits(last:1) { nodes { commit { statusCheckRollup { state } } } }
+        reviewThreads(first:50) {
+          totalCount
+          nodes {
+            isResolved isOutdated path line
+            comments(first:20) {
+              totalCount
+              nodes { author { login } body createdAt }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+GRAPHQL
+
+# fetch: one synchronous GraphQL call into the cache. Writes the payload atomically so a
+# render can never read a half-written file, and records a one-line reason on failure.
+fetch() {
+    need_repo || { mkdir -p "$PR_DIR"; printf '%s\n' "$REPO_ERR" > "$PR_DIR/no-repo.err"; return 1; }
+    mkdir -p "$PR_DIR"
+
+    if ! command -v gh >/dev/null 2>&1; then
+        printf 'gh is not installed - run Darwin.sh or Linux.sh, or install the GitHub CLI\n' > "$ERRF"
+        return 1
+    fi
+
+    local tmp="$JSON.$$" errtmp="$ERRF.$$" msg
+    if ! gh api graphql -F owner="$OWNER" -F name="$NAME" -f query="$GQL" \
+            > "$tmp" 2> "$errtmp"; then
+        # gh puts the useful half on stderr, but a GraphQL error arrives on stdout with a
+        # zero-ish body; take whichever actually says something.
+        msg="$(head -n 3 "$errtmp" 2>/dev/null | tr '\n' ' ')"
+        [[ -z "${msg// }" ]] && msg="$(jq -r '[.errors[]?.message] | join("; ")' "$tmp" 2>/dev/null)"
+        [[ -z "${msg// }" ]] && msg="gh api graphql failed"
+        printf '%s\n' "$msg" > "$ERRF"
+        rm -f "$tmp" "$errtmp"
+        return 1
+    fi
+
+    # gh can exit 0 and still hand back an errors[] payload with a null repository - a
+    # renamed repo, or a token without access to it. That must not overwrite good data.
+    if [[ "$(jq -r 'try (.data.repository | type) catch "null"' "$tmp" 2>/dev/null)" != "object" ]]; then
+        msg="$(jq -r '[.errors[]?.message] | join("; ")' "$tmp" 2>/dev/null)"
+        [[ -z "${msg// }" ]] && msg="$OWNER/$NAME: no such repository, or no access to it"
+        printf '%s\n' "$msg" > "$ERRF"
+        rm -f "$tmp" "$errtmp"
+        return 1
+    fi
+
+    mv "$tmp" "$JSON" 2>/dev/null || { rm -f "$tmp" "$errtmp"; return 1; }
+    printf '%s\n' "$EPOCHSECONDS" > "$STAMP"
+    rm -f "$ERRF" "$errtmp" "$FORCE"
+    return 0
+}
+
+# fetcher <parent_pid>: keep the cache warm for as long as the popup is up, and go early
+# when ctrl-r asks. Polls twice a second, which is cheap - the expensive thing is guarded by
+# the interval and by the force file.
+fetcher() {
+    local parent_pid="$1" last
+
+    while kill -0 "$parent_pid" 2>/dev/null; do
+        last="$(cat "$STAMP" 2>/dev/null || printf '0')"
+        [[ "$last" == *[!0-9]* ]] && last=0
+        if [[ -e "$FORCE" ]] || (( EPOCHSECONDS - last >= FETCH_INTERVAL )); then
+            fetch
+        fi
+        sleep 0.5
+    done
+}
+
+# -- render --------------------------------------------------------------------
+
+# The list projection. One jq pass over the cache turns each PR into the six cells a row
+# needs plus its URL, so render() never parses JSON itself and never forks per cell.
+#
+# The ticket is the first Linear-style key found anywhere in the title, which covers both
+# shapes that occur in practice: "[NAI-651] ..." and "feat(checkout): ... (LIP-394)". A
+# title with no key at all keeps the whole title.
+read -r -d '' LIST_JQ <<'JQ'
+.data.repository.pullRequests.nodes[]
+| (.commits.nodes[0].commit.statusCheckRollup.state // "") as $ci
+| [ (.number|tostring),
+    (if   .isDraft                             then "draft"
+     elif .reviewDecision == "CHANGES_REQUESTED" then "changes"
+     elif ($ci == "FAILURE" or $ci == "ERROR")   then "ci"
+     elif .mergeable == "CONFLICTING"            then "conflict"
+     elif .reviewDecision == "APPROVED"          then "approved"
+     elif $ci == "PENDING"                       then "building"
+     else "review" end),
+    ((.title | [scan("[A-Z][A-Z0-9]+-[0-9]+")] | first) // .title),
+    (.author.login // "ghost"),
+    (.assignees.nodes
+     | if   length == 0 then "-"
+       elif length == 1 then .[0].login
+       else "\(.[0].login) +\(length - 1)" end),
+    (([.reviewThreads.nodes[] | select(.isResolved | not)] | length | tostring)
+     + (if .reviewThreads.totalCount > (.reviewThreads.nodes | length) then "+" else "" end)),
+    .url
+  ] | @tsv
+JQ
+
+# assign_labels: read projected rows on stdin, prepend a stable hop label to each.
+#
+# A label belongs to the PR, never to the row it occupies - which matters more here than in
+# herd, because the API orders by last update and the list genuinely reshuffles under you
+# while you read it. Two passes:
+#
+#   1. hand every PR back the label it already had, from $LABEL_MAP.
+#   2. only then hash the newcomers (FNV-1a of owner/repo#number, linear probe) into
+#      whatever slots are left.
+#
+# Hashing on its own is not enough. With 26 slots and 21 open PRs, collisions are the normal
+# case, and a newcomer that hashed onto an occupied slot and sorted above its occupant would
+# steal the key out from under it.
+assign_labels() {
+    local -a rows=()
+    local row
+    while IFS= read -r row; do rows+=("$row"); done
+    (( ${#rows[@]} == 0 )) && return 0
+
+    local pool_n=${#LABEL_POOL[@]}
+    local -A slot_of=()
+    local i
+    for (( i = 0; i < pool_n; i++ )); do slot_of["${LABEL_POOL[$i]}"]="$i"; done
+
+    local -A remembered=() seen_at=()
+    local s l t
+    if [[ -r "$LABEL_MAP" ]]; then
+        while IFS=$'\t' read -r s l t; do
+            [[ -z "$s" || -z "$l" ]] && continue
+            remembered["$s"]="$l"
+            seen_at["$s"]="${t:-0}"
+        done < "$LABEL_MAP"
+    fi
+
+    local -A taken=() assigned=()
+    local seed h start slot label changed=0 tmp num
+
+    # Pass 1 - honour what this PR already had.
+    for row in "${rows[@]}"; do
+        num="${row%%$'\t'*}"
+        seed="$OWNER/$NAME#$num"
+        label="${remembered[$seed]:-}"
+        [[ -z "$label" ]] && continue
+        slot="${slot_of[$label]:-}"
+        [[ -z "$slot" || -n "${taken[$slot]:-}" ]] && continue
+        taken["$slot"]=1
+        assigned["$seed"]="$label"
+    done
+
+    # Pass 2 - hash the newcomers into what is left.
+    for row in "${rows[@]}"; do
+        num="${row%%$'\t'*}"
+        seed="$OWNER/$NAME#$num"
+        [[ -n "${assigned[$seed]:-}" ]] && continue
+        changed=1
+        fnv1a h "$seed"
+        start=$(( h % pool_n ))
+        for (( i = 0; i < pool_n; i++ )); do
+            slot=$(( (start + i) % pool_n ))
+            if [[ -z "${taken[$slot]:-}" ]]; then
+                taken["$slot"]=1
+                assigned["$seed"]="${LABEL_POOL[$slot]}"
+                break
+            fi
+        done
+    done
+
+    for row in "${rows[@]}"; do
+        num="${row%%$'\t'*}"
+        seed="$OWNER/$NAME#$num"
+        # More open PRs than labels: the overflow rows stay reachable via arrows and /.
+        printf '%s\t%s\n' "${assigned[$seed]:- }" "$row"
+    done
+
+    # Persist only when an assignment actually changed, so the steady state never touches
+    # the disk.
+    (( changed )) || return 0
+    tmp="$LABEL_MAP.$$"
+    {
+        for seed in "${!assigned[@]}"; do
+            printf '%s\t%s\t%s\n' "$seed" "${assigned[$seed]}" "$EPOCHSECONDS"
+        done
+        # Keep merged and closed PRs on file until the TTL, so a reopened one gets its old
+        # key back. A live PR always outranks a remembered one for the same slot.
+        for seed in "${!remembered[@]}"; do
+            [[ -n "${assigned[$seed]:-}" ]] && continue
+            (( EPOCHSECONDS - ${seen_at[$seed]:-0} > LABEL_TTL )) && continue
+            printf '%s\t%s\t%s\n' "$seed" "${remembered[$seed]}" "${seen_at[$seed]:-0}"
+        done
+    } > "$tmp" 2>/dev/null && mv "$tmp" "$LABEL_MAP" 2>/dev/null || rm -f "$tmp" 2>/dev/null
+}
+
+# note_row <text>: a single full-width item that is not a PR - an error, or the cold start.
+#
+# Field 1 is "-" rather than empty, which matters more than it looks: with --track and
+# --id-nth=1 fzf follows the current item across a reload BY that field, and an empty id
+# never resolves against the reloaded list. The first fetch would then land, the list would
+# genuinely reload to 23 pull requests, and the popup would go on drawing the "fetching …"
+# row it could no longer find - the cold start never repainted. Every consumer of field 1
+# already rejects a non-numeric id, so "-" is inert everywhere else.
+note_row() {
+    printf -- '-\t%s%s%s\n' "$E_DIM" "$1" "$RESET"
+}
+
+# render: one fzf item per line, as "number<TAB>display".
+# Field 1 is the identity fzf tracks across reloads (--id-nth=1) and what the preview and
+# open bindings receive; field 2 is what gets shown and searched. There is no --nth: it
+# applies to the string AFTER --with-nth has reduced the item to field 2, so --nth=2 would
+# look for a second field that no longer exists and match nothing.
+render() {
+    if ! need_repo; then
+        note_row "$REPO_ERR"
+        return 0
+    fi
+
+    # fzf exports FZF_COLUMNS to the processes it spawns, but on the `start` event it has not
+    # measured itself yet and reports 0 (observed: 0 at start, 115 on the resize a second
+    # later). Taken literally that yields a negative budget, the ticket column collapses to
+    # its floor, and the pinned column-name row paints truncated. Anything implausibly narrow
+    # therefore means "not known yet", not "very narrow window".
+    local cols="${FZF_COLUMNS:-0}"
+    [[ "$cols" == *[!0-9]* ]] && cols=0
+    (( cols < 40 )) && cols=100
+
+    # The ticket column takes what is left, but only up to a point: a parsed key is 7 or 8
+    # cells, so on a wide pane an uncapped column would stretch the row across the popup and
+    # leave the author and assignee marooned on the far right. The cap is sized for the
+    # other case - a PR with no ticket in its title, which shows the whole title here.
+    local ident_w=$(( cols - W_LABEL - W_NUM - W_STATE - W_AUTHOR - W_ASSIGN - W_UNRES ))
+    (( ident_w > 44 )) && ident_w=44
+    (( ident_w < 12 )) && ident_w=12
+
+    # The table's own header row, emitted as the first item so fzf can pin it directly above
+    # the list with --header-lines=1. Built from the same pad calls as the rows, so the
+    # names cannot drift out of alignment with the data underneath them.
+    local c_label c_num c_state c_ident c_author c_assign c_unres
+    pad c_label "key" "$W_LABEL"
+    pad c_num "pr" "$W_NUM"
+    pad c_state "state" "$W_STATE"
+    pad c_ident "ticket / title" "$ident_w"
+    pad c_author "author" "$W_AUTHOR"
+    pad c_assign "assignee" "$W_ASSIGN"
+    padl c_unres "unres" "$W_UNRES"
+    printf '\t%s%s%s%s%s%s%s%s%s\n' \
+        "$E_DIM" "$c_label" "$c_num" "$c_state" "$c_ident" "$c_author" "$c_assign" "$c_unres" "$RESET"
+
+    if [[ -s "$ERRF" ]]; then
+        note_row "$(head -n 1 "$ERRF")"
+        return 0
+    fi
+    if [[ ! -r "$JSON" ]]; then
+        note_row "fetching $OWNER/$NAME …"
+        return 0
+    fi
+
+    local label num state ident author assign unres url
+    local glyph text colour unres_colour
+    local any=0
+
+    while IFS=$'\t' read -r label num state ident author assign unres url; do
+        any=1
+        case "$state" in
+            draft)    glyph="○"; text="draft";    colour="$E_IDLE" ;;
+            changes)  glyph="▲"; text="changes";  colour="$E_NEED" ;;
+            ci)       glyph="✖"; text="ci red";   colour="$E_FAIL" ;;
+            conflict) glyph="⚠"; text="conflict"; colour="$E_NEED" ;;
+            approved) glyph="✓"; text="approved"; colour="$E_WORK" ;;
+            building) glyph="◐"; text="building"; colour="$E_AGENT" ;;
+            *)        glyph="●"; text="review";   colour="$E_AGENT" ;;
+        esac
+        # A zero recedes; anything else is the reason you opened this popup. Chosen with a
+        # test rather than a $( ) so the row costs no fork - see the palette note above.
+        if [[ "$unres" == "0" ]]; then unres_colour="$E_DIM"; else unres_colour="$E_NEED"; fi
+
+        pad c_label "[$label]" "$W_LABEL"
+        pad c_num "#$num" "$W_NUM"
+        pad c_state "$glyph $text" "$W_STATE"
+        pad c_ident "$ident" "$ident_w"
+        pad c_author "$author" "$W_AUTHOR"
+        pad c_assign "$assign" "$W_ASSIGN"
+        padl c_unres "$unres" "$W_UNRES"
+
+        printf '%s\t%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+            "$num" \
+            "$E_LABEL" "$c_label" \
+            "$E_DIM"   "$c_num" \
+            "$colour"  "$c_state" \
+            "$E_LOC"   "$c_ident" \
+            "$E_SUB"   "$c_author$c_assign" \
+            "$unres_colour" "$c_unres" \
+            "$RESET"
+    done < <(jq -r "$LIST_JQ" "$JSON" 2>/dev/null | assign_labels)
+
+    (( any )) || note_row "no open pull requests in $OWNER/$NAME"
+}
+
+# -- preview -------------------------------------------------------------------
+
+# preview <number>: the PR's unresolved review threads, rendered by the sibling jq program.
+#
+# Also records the furthest offset that still moves anything, which is the clamp pscroll
+# needs. It is the line count MINUS the height of the window, not the line count: fzf will
+# not scroll past the last line, so a counter that climbed to 94 on a 94-line preview in a
+# 24-row pane would sit ~70 presses beyond the end, and ctrl-b would do nothing visible for
+# the next 70 presses. Both numbers are known only here, at render time.
+preview() {
+    local num="${1:-}"
+    [[ "$num" == *[!0-9]* || -z "$num" ]] && return 0
+    need_repo || return 0
+    [[ -r "$JSON" ]] || return 0
+
+    local -a out=()
+    mapfile -t out < <(jq -r \
+        --argjson W "${FZF_PREVIEW_COLUMNS:-100}" \
+        --argjson NOW "$EPOCHSECONDS" \
+        --argjson PR "$num" \
+        -f "$PREVIEW_JQ" "$JSON" 2>/dev/null)
+
+    printf '%s\n' "${out[@]}"
+
+    local max=$(( ${#out[@]} - ${FZF_PREVIEW_LINES:-20} + 1 ))
+    (( max < 1 )) && max=1
+    [[ -n "${PR_HERD_UI:-}" ]] && printf '%s' "$max" > "$PR_HERD_UI.maxoff"
+    return 0
+}
+
+# -- preview scrolling ---------------------------------------------------------
+#
+# The user's scroll offset lives in a file and is re-applied through the --preview-window
+# spec, NOT through fzf's preview-down / preview-up actions.
+#
+# Verified, because it is the whole reason ctrl-f and ctrl-b work here: fzf resets its
+# transient preview scroll to the top on any reload AND on refresh-preview, and exposes no
+# way to read or preserve it (--listen's state JSON does not carry the offset). The +SCROLL
+# component of --preview-window, by contrast, is re-applied on every preview render. So
+# keeping the offset in the spec survives exactly the events that would otherwise lose it.
+
+pw_spec() {
+    local idx="${1:-0}" off="${2:-1}"
+    if [[ "${PW_SIZES[$idx]}" == "hidden" ]]; then
+        printf 'hidden'
+    else
+        printf '%s,+%s' "${PW_SIZES[$idx]}" "$off"
+    fi
+}
+
+# pscroll <delta|reset>: move the offset and emit the spec that applies it.
+pscroll() {
+    local arg="$1" off idx max
+    off="$(cat "$PR_HERD_UI.off" 2>/dev/null || printf '1')"
+    idx="$(cat "$PR_HERD_UI.size" 2>/dev/null || printf '0')"
+    [[ "$off" == *[!0-9]* || -z "$off" ]] && off=1
+    [[ "$idx" == *[!0-9]* || -z "$idx" ]] && idx=0
+
+    if [[ "$arg" == "reset" ]]; then
+        # A different PR is in front of us, so its threads start at the top. Emitting
+        # nothing when the offset is already 1 matters: change-preview-window is a no-op for
+        # an unchanged spec, but the every(1) tick would still be one action heavier.
+        (( off == 1 )) && return 0
+        off=1
+    else
+        max="$(cat "$PR_HERD_UI.maxoff" 2>/dev/null || printf '1')"
+        [[ "$max" == *[!0-9]* || -z "$max" ]] && max=1
+        off=$(( off + arg ))
+        (( off < 1 )) && off=1
+        (( off > max )) && off="$max"
+    fi
+
+    printf '%s' "$off" > "$PR_HERD_UI.off"
+    printf 'change-preview-window(%s)' "$(pw_spec "$idx" "$off")"
+}
+
+# pwsize: cycle the preview between two thirds, most of the popup, and gone. Written out as
+# an explicit spec rather than fzf's `|` rotation set, because a rotation set stores its own
+# spec and would fight with the offset pscroll keeps writing into that same spec.
+pwsize() {
+    local idx off
+    idx="$(cat "$PR_HERD_UI.size" 2>/dev/null || printf '0')"
+    off="$(cat "$PR_HERD_UI.off" 2>/dev/null || printf '1')"
+    [[ "$idx" == *[!0-9]* || -z "$idx" ]] && idx=0
+    [[ "$off" == *[!0-9]* || -z "$off" ]] && off=1
+    idx=$(( (idx + 1) % ${#PW_SIZES[@]} ))
+    printf '%s' "$idx" > "$PR_HERD_UI.size"
+    printf 'change-preview-window(%s)' "$(pw_spec "$idx" "$off")"
+}
+
+# -- the every(1) tick ---------------------------------------------------------
+
+# footer: the live line under the list - which repo, how many PRs, how fresh the data is.
+# It carries the clock so the legend above never has to be rebuilt, and so nothing on the
+# tick path has to touch the item list.
+footer() {
+    local stamp ago_s n="" msg
+    stamp="$(cat "$STAMP" 2>/dev/null)"
+    [[ "$stamp" == *[!0-9]* ]] && stamp=""
+    age ago_s "$stamp"
+
+    if [[ -s "$ERRF" ]]; then
+        # This string is handed to fzf inside change-footer(...), whose argument ends at the
+        # matching paren. A gh error message is arbitrary text, so strip what would close
+        # the action early rather than trust it.
+        IFS= read -r msg < "$ERRF"
+        msg="${msg//[()]/}"
+        printf '%s%s: %s%s' "$E_FAIL" "$OWNER/$NAME" "$msg" "$RESET"
+        return 0
+    fi
+    if [[ -z "$ago_s" ]]; then
+        printf '%s%s · fetching …%s' "$E_DIM" "$OWNER/$NAME" "$RESET"
+        return 0
+    fi
+    [[ -e "$FORCE" ]] && n=" · refreshing"
+    printf '%s%s · updated %s ago%s%s' "$E_DIM" "$OWNER/$NAME" "$ago_s" "$n" "$RESET"
+}
+
+# tick: the every(1) transform. Repaints the footer clock every second, and reloads the list
+# ONLY when a fetch has actually landed.
+#
+# The gate is the point. An unconditional every(1):reload would reset the preview scroll and
+# swallow keystrokes that land while it is in flight - measured, five rapid ctrl-f presses
+# arriving as four. Gating on the stamp means the steady state is a footer repaint and
+# nothing else, and a reload happens once per fetch, which is when the list actually changed.
+tick() {
+    local stamp last actions
+    stamp="$(cat "$STAMP" 2>/dev/null)"
+    last="$(cat "$PR_HERD_UI.seen" 2>/dev/null)"
+
+    printf -v actions 'change-footer(%s)' "$(footer)"
+    if [[ "$stamp" != "$last" ]]; then
+        printf '%s' "$stamp" > "$PR_HERD_UI.seen"
+        printf "%s+reload-sync('%s' render)+refresh-preview" "$actions" "$self"
+    else
+        printf '%s' "$actions"
+    fi
+}
+
+# refresh: ctrl-r. Ask the fetcher to go now rather than fetching on the UI thread, which
+# would freeze the popup for the length of the call.
+refresh() {
+    : > "$FORCE" 2>/dev/null
+    printf 'change-footer(%s)' "$(footer)"
+}
+
+# -- opening -------------------------------------------------------------------
+
+url_of() {
+    local num="$1"
+    [[ -r "$JSON" ]] || return 1
+    jq -r --argjson PR "$num" \
+        '.data.repository.pullRequests.nodes[] | select(.number == $PR) | .url' \
+        "$JSON" 2>/dev/null
+}
+
+open_pr() {
+    local num="${1:-}" url
+    [[ "$num" == *[!0-9]* || -z "$num" ]] && return 1
+    need_repo || return 1
+    url="$(url_of "$num")"
+    [[ -z "$url" || "$url" == "null" ]] && url="https://github.com/$OWNER/$NAME/pull/$num"
+
+    if command -v open >/dev/null 2>&1; then
+        open "$url" >/dev/null 2>&1
+    elif command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$url" >/dev/null 2>&1
+    else
+        tmux display-message "pr-herd: $url" 2>/dev/null
+        return 0
+    fi
+}
+
+# open-label <char>: resolve the label against a fresh list, so a label pressed after the
+# set changed can never open a PR that has since moved position.
+open_label() {
+    local want="$1" label num rest
+    need_repo || return 1
+    while IFS=$'\t' read -r label num rest; do
+        if [[ "$label" == "$want" ]]; then
+            open_pr "$num"
+            return $?
+        fi
+    done < <(jq -r "$LIST_JQ" "$JSON" 2>/dev/null | assign_labels)
+    tmux display-message "pr-herd: no pull request labelled '$want'" 2>/dev/null
+    return 1
+}
+
+# hop <label> <query> <current_number>: the two-stage label press, called by fzf's transform.
+#
+# First press of a lowercase label moves the cursor onto that row, which also brings its
+# threads up in the preview - so a label is a way to READ a PR, not only a way to leave for
+# it. Press the same label again, now that it is the current row, and it opens in a browser.
+# Shift+label skips the look and opens straight away.
+#
+# Deciding which of the two it is means comparing the row the label points at with the row
+# the cursor is on, which is why fzf passes {1} - the number of the current item.
+hop() {
+    local want="$1" query="${2:-}" cur="${3:-}"
+    local label num rest n=0 rank=0 target=""
+    need_repo || return 0
+
+    while IFS=$'\t' read -r label num rest; do
+        n=$(( n + 1 ))
+        [[ "$label" == "$want" ]] || continue
+        target="$num"; rank="$n"
+        break
+    done < <(jq -r "$LIST_JQ" "$JSON" 2>/dev/null | assign_labels)
+
+    # No such label: emit nothing rather than an action, so the keypress is a no-op.
+    [[ -z "$target" ]] && return 0
+
+    if [[ "$target" == "$cur" ]]; then
+        printf "become('%s' open-pr %s)" "$self" "$target"
+        return 0
+    fi
+
+    # A filter can now outlive filter mode, and pos() counts the rows fzf is SHOWING, not the
+    # rows that exist: with two matches, pos(2) lands on the second MATCH, and anything past
+    # the end clamps silently onto the last one (verified both). So a rank taken from the full
+    # list would quietly send the cursor to the wrong pull request.
+    #
+    # Rather than reimplement fzf's matching, ask fzf: --filter is the same matcher the UI
+    # runs, and with --no-sort it returns the matches in input order - the order pos() counts
+    # in (verified against the interactive list). Only paid while a filter is up.
+    if [[ -n "$query" ]]; then
+        rank=0
+        n=0
+        while IFS=$'\t' read -r num rest; do
+            n=$(( n + 1 ))
+            [[ "$num" == "$target" ]] || continue
+            rank="$n"
+            break
+        done < <("$self" render | tail -n +2 |
+                 fzf --filter="$query" --delimiter=$'\t' --with-nth=2 --no-sort --ansi 2>/dev/null)
+        # The label names a pull request the filter is hiding. Moving the cursor somewhere
+        # arbitrary would be worse than doing nothing.
+        (( rank == 0 )) && return 0
+    fi
+
+    printf 'pos(%d)' "$rank"
+    return 0
+}
+
+# -- modal filter --------------------------------------------------------------
+
+# Every letter is bound to a hop, so `/` has to lift those bindings before the query line
+# can accept text, and Esc has to put them back. fzf cannot swap a key's action at runtime,
+# so all three keys go through `transform` and this function decides what to emit based on a
+# mode file. In label mode Esc means quit; in filter mode it means go back to the labels.
+#
+# Leaving filter mode KEEPS the query. Narrowing the list and then hopping to a row by its
+# key is the whole point of typing the filter, and clearing the query on the way out meant
+# the list snapped back to full width before a label could be pressed. The query stays
+# visible on the input line, and the prompt says [filter] so the shortened list is never a
+# mystery. ctrl-/ is the only thing that drops it.
+mode() {
+    local which="$1" query="${2:-}" c actions=""
+
+    case "$which" in
+        filter)
+            for c in "${LABEL_POOL[@]}"; do actions+="unbind($c)+unbind(${c^^})+"; done
+            actions+="change-prompt(filter> )"
+            : > "$PR_HERD_UI.filter"
+            ;;
+        esc)
+            if [[ -e "$PR_HERD_UI.filter" ]]; then
+                rm -f "$PR_HERD_UI.filter"
+                for c in "${LABEL_POOL[@]}"; do actions+="rebind($c)+rebind(${c^^})+"; done
+                if [[ -n "$query" ]]; then
+                    actions+="change-prompt(pr [filter]> )"
+                else
+                    actions+="change-prompt(pr> )"
+                fi
+            else
+                actions="abort"
+            fi
+            ;;
+        clear)
+            # Works from either mode, and stays in the one it was called from.
+            if [[ -e "$PR_HERD_UI.filter" ]]; then
+                actions="clear-query+change-prompt(filter> )"
+            else
+                actions="clear-query+change-prompt(pr> )"
+            fi
+            ;;
+    esac
+
+    printf '%s' "$actions"
+}
+
+# -- ui ------------------------------------------------------------------------
+
+ui() {
+    mkdir -p "$PR_DIR"
+
+    if ! need_repo; then
+        tmux display-message "pr-herd: $REPO_ERR" 2>/dev/null || printf 'pr-herd: %s\n' "$REPO_ERR" >&2
+        return 0
+    fi
+
+    # Children fzf spawns (reload, transform, preview) inherit these, which is how they find
+    # the same repo and the same per-UI state without resolving anything again.
+    export PR_HERD_OWNER="$OWNER" PR_HERD_NAME="$NAME" PR_HERD_SLUG="$SLUG"
+    export PR_HERD_UI
+    printf '1' > "$PR_HERD_UI.off"
+    printf '0' > "$PR_HERD_UI.size"
+    rm -f "$PR_HERD_UI.filter" "$PR_HERD_UI.seen" "$PR_HERD_UI.maxoff"
+
+    # Sweep anything a previous run left behind when it was killed hard enough that its trap
+    # never ran. Every one of these is suffixed with the pid that owns it, so a dead pid is a
+    # safe delete and a live one belongs to a popup open on another client.
+    local orphan opid base
+    for orphan in "$PR_DIR"/ui.*; do
+        [[ -e "$orphan" ]] || continue
+        base="${orphan##*/ui.}"
+        opid="${base%%.*}"
+        [[ "$opid" == *[!0-9]* ]] && continue
+        kill -0 "$opid" 2>/dev/null || rm -f "$orphan"
+    done
+    for orphan in "$PR_DIR"/*.json.* "$PR_DIR"/*.err.* "$PR_DIR"/labels.*; do
+        [[ -e "$orphan" ]] || continue
+        opid="${orphan##*.}"
+        [[ "$opid" == *[!0-9]* ]] && continue
+        kill -0 "$opid" 2>/dev/null || rm -f "$orphan"
+    done
+
+    # The fetcher outlives fzf unless we reap it - `enter` and the label keys use fzf's
+    # `become`, which execs over the fzf process, so this shell's EXIT trap is the only thing
+    # that still runs. HUP matters as much as INT and TERM: closing the terminal or a tmux
+    # kill-session delivers SIGHUP.
+    "$self" fetcher "$$" >/dev/null 2>&1 &
+    local fetch_pid=$!
+    # shellcheck disable=SC2064  # all values must expand now, not at trap time
+    trap "kill $fetch_pid 2>/dev/null; rm -f '$PR_HERD_UI'.*" EXIT INT TERM HUP
+
+    local -a binds=()
+    local c
+    for c in "${LABEL_POOL[@]}"; do
+        binds+=(--bind "$c:transform('$self' hop $c {q} {1})")
+        binds+=(--bind "${c^^}:become('$self' open-label $c)")
+    done
+
+    # The key legend, above the prompt line via --header-first. The table's column names are
+    # a different thing in a different place: render() emits them as the first item and
+    # --header-lines=1 pins them directly above the list they describe. Everything that
+    # changes lives in the footer instead, so this string is built once and never rebuilt.
+    # Two lines rather than one: the popup is 90% of the client, so on a 120-column terminal
+    # a single 135-column legend loses its own closing key to the ellipsis.
+    local header
+    header="[key] look, again to open  ⇧[KEY] open now  ↵ open in browser"$'\n'
+    header+="^f/^b threads  ^n/^p list  ⇥ resize  ^r refresh  / filter  ^/ drop it  M-p/⎋ close"
+
+    # Render once up front so the initial cursor can be placed on the row that actually wants
+    # attention rather than on whatever sorted first. Order of preference: the first PR with
+    # unresolved threads, then the first row at all.
+    #
+    # This copy is padded to a default width, because only fzf knows how wide the popup ended
+    # up and it exports that as FZF_COLUMNS to its own children. So `start` immediately
+    # re-renders through fzf, which re-takes the pinned column-name row along with the items
+    # (verified) and lands every column where the real width puts it. Without that the popup
+    # opened with a layout built for 100 columns and kept it until the next fetch landed -
+    # up to a full FETCH_INTERVAL of visibly wrong padding on a warm cache.
+    local rows_file="$PR_HERD_UI.rows"
+    "$self" render > "$rows_file"
+
+    # The rendered rows carry SGR escapes, so the count is read off the projection rather
+    # than off the painted line - the row ends in a reset sequence and every attempt to
+    # recover a cell from it is a parse of our own output.
+    local pos=1 first_unres=""
+    first_unres="$(jq -r "$LIST_JQ" "$JSON" 2>/dev/null \
+        | awk -F'\t' '($6 + 0) > 0 { print NR; exit }')"
+    [[ -n "$first_unres" && "$first_unres" != *[!0-9]* ]] && pos="$first_unres"
+
+    local status=0
+    fzf < "$rows_file" \
+        --ansi \
+        --sync \
+        --delimiter=$'\t' \
+        --with-nth=2 \
+        --id-nth=1 \
+        --track \
+        --no-sort \
+        --cycle \
+        --layout=reverse \
+        --info=inline-right \
+        --prompt='pr> ' \
+        --pointer='▶' \
+        --header="$header" \
+        --header-first \
+        --header-lines=1 \
+        --footer="$(footer)" \
+        --color='header:#71717a,footer:#71717a' \
+        --bind "start:pos($pos)+reload-sync('$self' render)" \
+        --bind "resize:reload-sync('$self' render)" \
+        --preview="'$self' preview {1}" \
+        --preview-window="$(pw_spec 0 1)" \
+        --preview-label=' unresolved review threads ' \
+        --bind "every(1):transform('$self' tick)" \
+        --bind "focus:transform('$self' pscroll reset)" \
+        --bind "ctrl-f:transform('$self' pscroll 1)" \
+        --bind "ctrl-b:transform('$self' pscroll -1)" \
+        --bind "ctrl-d:transform('$self' pscroll 10)" \
+        --bind "ctrl-u:transform('$self' pscroll -10)" \
+        --bind "ctrl-r:transform('$self' refresh)" \
+        --bind "tab:transform('$self' pwsize)" \
+        --bind "enter:become('$self' open-pr {1})" \
+        --bind "/:transform('$self' mode filter)" \
+        --bind "esc:transform('$self' mode esc {q})" \
+        --bind "ctrl-/:transform('$self' mode clear)" \
+        --bind 'alt-p:abort' \
+        "${binds[@]}" || status=$?
+
+    # Closing the popup is not a failure, but the key bindings run this through tmux's
+    # run-shell, which reports ANY non-zero status as a "... returned 130" message the user
+    # then has to dismiss with a second keypress. Normalise the expected exits:
+    #   130      aborted with Esc or ctrl-c
+    #   1        nothing matched, or a `become` target that had nothing to open
+    #   >= 128   killed by a signal, i.e. the popup was torn down
+    # Anything else is a real bug in this script and should stay loud.
+    if (( status == 1 || status >= 128 )); then
+        return 0
+    fi
+    return "$status"
+}
+
+open_popup() {
+    if [[ -z "${TMUX:-}" ]]; then
+        exec "$self" ui
+    fi
+
+    # -d is what makes "the repo you launched from" true: without it the popup would inherit
+    # the server's working directory and every pane would show the same repo.
+    local status=0
+    tmux display-popup -E -w 90% -h 80% -b rounded -T ' pull requests ' \
+        -d '#{pane_current_path}' "'$self' ui" || status=$?
+    if (( status == 1 || status >= 128 )); then
+        return 0
+    fi
+    return "$status"
+}
+
+# -- dispatch ------------------------------------------------------------------
+
+case "${1:-open}" in
+    open)        open_popup ;;
+    ui)          ui ;;
+    render)      render ;;
+    preview)     preview "${2:-}" ;;
+    open-pr)     open_pr "${2:-}" ;;
+    open-label)  open_label "${2:?label required}" ;;
+    hop)         hop "${2:?label required}" "${3:-}" "${4:-}" ;;
+    fetch)       fetch ;;
+    fetcher)     need_repo && fetcher "${2:?parent pid required}" ;;
+    tick)        need_repo && tick ;;
+    pscroll)     pscroll "${2:?delta required}" ;;
+    pwsize)      pwsize ;;
+    refresh)     need_repo && refresh ;;
+    mode)        mode "${2:?mode required}" "${3:-}" ;;
+    *)           printf 'usage: %s [open|ui|render|preview <number>|open-pr <number>|fetch]\n' "${0##*/}" >&2; exit 2 ;;
+esac

@@ -27,6 +27,12 @@ bind-key C-w run-shell "tmux neww ~/repos/dotfiles/bin/tmux-window-picker"
 bind-key a run-shell "~/repos/dotfiles/bin/tmux-claude-herd"
 bind-key -n M-a run-shell "~/repos/dotfiles/bin/tmux-claude-herd"
 
+# tmux-pr-herd: the same popup for the open pull requests of the repo in this pane - what
+# each one is waiting on, and its unresolved review threads in the miniature.
+# M-p is a ROOT binding, same reasoning as M-a above. There is no prefix twin for this one:
+# prefix-p is paste-buffer and prefix-C-p is the last-session toggle below.
+bind-key -n M-p run-shell "~/repos/dotfiles/bin/tmux-pr-herd"
+
 # enter copy mode without releasing ctrl
 bind-key C-[ copy-mode
 

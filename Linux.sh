@@ -6,7 +6,7 @@
 # Package Installation Sources:
 # - APT (Ubuntu repos): git, curl, wget, zsh, ripgrep, jq, hexedit, tmux, fzf, cmake,
 #   exiftool, erlang, rebar3, llvm, boost, gcal, duff, luarocks, tidy, lua, fd-find, bat
-# - APT (Official repos): neovim (PPA), httpie, postgresql-16, ngrok
+# - APT (Official repos): neovim (PPA), httpie, postgresql-16, ngrok, gh
 # - NPM: diff-so-fancy, fx, tree-sitter-cli, neovim, @nikensss/sauna, supabase, @railway/cli
 # - Cargo: silicon, fnm, hexyl, cargo-nextest, tailspin, nixpacks
 # - Snap: sleek
@@ -66,12 +66,17 @@ wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-
 curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
 echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
 
+# GitHub CLI official repository - gh is not in the Ubuntu repos, and Darwin.sh has
+# installed it since the beginning, so a Linux box was the only one without it.
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/trusted.gpg.d/githubcli-archive-keyring.gpg >/dev/null
+echo "deb https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list
+
 echo "${BLUE}Updating package lists...${RESET}"
 sudo apt-get update
 
 echo "${BLUE}Installing core packages via apt...${RESET}"
 sudo apt-get install -y \
-  curl wget zsh git neovim ripgrep jq hexedit tmux fzf cmake exiftool \
+  curl wget zsh git gh neovim ripgrep jq hexedit tmux fzf cmake exiftool \
   erlang rebar3 llvm libboost-all-dev gcal duff luarocks tidy \
   lua5.4 liblua5.4-dev luajit libluajit-5.1-dev \
   librsvg2-bin fd-find bat httpie ngrok postgresql-16 \
