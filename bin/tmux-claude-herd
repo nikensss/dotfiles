@@ -40,9 +40,11 @@
 #   preview <pane_id>     miniature of a pane's current screen
 #   switch <pane_id>      jump the client to a pane
 #   switch-label <char>   resolve a hop label against the live list, then switch
-#   hop <char> <pane_id>  two-stage label press, called by fzf's transform
+#   hop <char> <query> <pane_id>
+#                         two-stage label press, called by fzf's transform
 #   probe <parent_pid>    background screen-diff loop, dies with its parent
-#   mode <filter|esc>     modal filter / label-jump toggle, called by fzf's transform
+#   mode <filter|esc|clear>
+#                         modal filter / label-jump toggle, called by fzf's transform
 
 set -uo pipefail
 export LC_ALL=en_US.UTF-8
@@ -589,22 +591,51 @@ switch_label() {
 # switches. Shift+label skips the look and goes straight there.
 #
 # Deciding which of the two it is means comparing the row the label points at with the row
-# the cursor is on, which is why fzf passes {1} - the pane id of the current item. Position
-# is only used for pos(), and label keys are unbound while filtering, so in label mode the
-# row number and the list position are the same thing.
+# the cursor is on, which is why fzf passes {1} - the pane id of the current item.
 hop() {
-    local want="$1" cur="${2:-}" label pane_id rest n=0
+    local want="$1" query="${2:-}" cur="${3:-}"
+    local label pane_id rest n=0 rank=0 target=""
+
     while IFS=$'\t' read -r label pane_id rest; do
         n=$(( n + 1 ))
         [[ "$label" == "$want" ]] || continue
-        if [[ "$pane_id" == "$cur" ]]; then
-            printf "become('%s' switch %s)" "$self" "$pane_id"
-        else
-            printf 'pos(%d)' "$n"
-        fi
-        return 0
+        target="$pane_id"; rank="$n"
+        break
     done < <(collect | assign_labels)
+
     # No such label: emit nothing rather than an action, so the keypress is a no-op.
+    [[ -z "$target" ]] && return 0
+
+    if [[ "$target" == "$cur" ]]; then
+        printf "become('%s' switch %s)" "$self" "$target"
+        return 0
+    fi
+
+    # A filter now outlives filter mode, so the row number and the list position are no
+    # longer the same thing. pos() counts the rows fzf is SHOWING: with two matches, pos(2)
+    # lands on the second MATCH, and anything past the end clamps silently onto the last one
+    # (verified both). A rank taken from the full list would quietly send the cursor to the
+    # wrong agent.
+    #
+    # Rather than reimplement fzf's matching, ask fzf: --filter is the same matcher the UI
+    # runs, and with --no-sort it returns the matches in input order - which is the order
+    # pos() counts in (verified against the interactive list). Only paid while a filter is up.
+    if [[ -n "$query" ]]; then
+        rank=0
+        n=0
+        while IFS=$'\t' read -r pane_id rest; do
+            n=$(( n + 1 ))
+            [[ "$pane_id" == "$target" ]] || continue
+            rank="$n"
+            break
+        done < <("$self" render | tail -n +2 |
+                 fzf --filter="$query" --delimiter=$'\t' --with-nth=2 --no-sort --ansi 2>/dev/null)
+        # The label names an agent the filter is hiding. Moving the cursor somewhere
+        # arbitrary would be worse than doing nothing.
+        (( rank == 0 )) && return 0
+    fi
+
+    printf 'pos(%d)' "$rank"
     return 0
 }
 
@@ -663,12 +694,19 @@ probe() {
 
 # Every letter is bound to a jump, so `/` has to lift those bindings before the query
 # line can accept text, and Esc has to put them back. fzf cannot swap a key's action at
-# runtime, so both keys go through `transform` and this function decides what to emit
-# based on a mode file. In label mode Esc means quit; in filter mode it means go back.
+# runtime, so all three keys go through `transform` and this function decides what to emit
+# based on a mode file. In label mode Esc means quit; in filter mode it means go back to
+# the labels.
+#
+# Leaving filter mode KEEPS the query. Narrowing the list and then hopping to a row by its
+# key is the whole point of typing the filter, and clearing the query on the way out meant
+# the list snapped back to every agent on the server before a label could be pressed. The
+# query stays visible on the input line and the prompt says [filter], so a shortened list
+# is never a mystery. ctrl-/ is the only thing that drops it.
 mode() {
-    local which="$1" c actions=""
+    local which="$1" query="${2:-}" c actions=""
 
-    # Both cases: the lowercase key hops, the uppercase one jumps, and while filtering
+    # Every case: the lowercase key hops, the uppercase one jumps, and while filtering
     # neither may swallow a keystroke meant for the query.
     case "$which" in
         filter)
@@ -680,9 +718,21 @@ mode() {
             if [[ -e "$MODE_FILE" ]]; then
                 rm -f "$MODE_FILE"
                 for c in "${LABEL_POOL[@]}"; do actions+="rebind($c)+rebind(${c^^})+"; done
-                actions+="clear-query+change-prompt(herd> )"
+                if [[ -n "$query" ]]; then
+                    actions+="change-prompt(herd [filter]> )"
+                else
+                    actions+="change-prompt(herd> )"
+                fi
             else
                 actions="abort"
+            fi
+            ;;
+        clear)
+            # Works from either mode, and stays in the one it was called from.
+            if [[ -e "$MODE_FILE" ]]; then
+                actions="clear-query+change-prompt(filter> )"
+            else
+                actions="clear-query+change-prompt(herd> )"
             fi
             ;;
     esac
@@ -745,7 +795,7 @@ ui() {
     local -a binds=()
     local c
     for c in "${LABEL_POOL[@]}"; do
-        binds+=(--bind "$c:transform('$self' hop $c {1})")
+        binds+=(--bind "$c:transform('$self' hop $c {q} {1})")
         binds+=(--bind "${c^^}:become('$self' switch-label $c)")
     done
 
@@ -759,7 +809,7 @@ ui() {
     # because a screen diff says nothing about when anything happened.
     local header
     header="[key] look, again to go  ⇧[KEY] go now  ↵ open  ⇥ preview  ^r reload"
-    header+="  / filter  M-a/⎋ close  ·  * = inferred"
+    header+="  / filter  ^/ drop it  M-a/⎋ close  ·  * = inferred"
 
     # Render once up front so the initial cursor can be placed on the row that actually
     # wants attention, instead of on whatever happens to sort first - which, invoked from
@@ -814,7 +864,8 @@ ui() {
         --bind 'tab:change-preview-window(down,75%,border-top|hidden|down,55%,border-top)' \
         --bind "enter:become('$self' switch {1})" \
         --bind "/:transform('$self' mode filter)" \
-        --bind "esc:transform('$self' mode esc)" \
+        --bind "esc:transform('$self' mode esc {q})" \
+        --bind "ctrl-/:transform('$self' mode clear)" \
         --bind 'alt-a:abort' \
         "${binds[@]}" || status=$?
 
@@ -857,8 +908,8 @@ case "${1:-open}" in
     preview)      preview "${2:?pane id required}" ;;
     switch)       switch_to "${2:?pane id required}" ;;
     switch-label) switch_label "${2:?label required}" ;;
-    hop)          hop "${2:?label required}" "${3:-}" ;;
+    hop)          hop "${2:?label required}" "${3:-}" "${4:-}" ;;
     probe)        probe "${2:?parent pid required}" ;;
-    mode)         mode "${2:?mode required}" ;;
+    mode)         mode "${2:?mode required}" "${3:-}" ;;
     *)            printf 'usage: %s [open|ui|render|preview <pane>|switch <pane>]\n' "${0##*/}" >&2; exit 2 ;;
 esac
