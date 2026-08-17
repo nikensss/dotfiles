@@ -31,6 +31,10 @@
 # remembered in the cache dir, so a PR keeps its key as the list reorders under it (the API
 # returns most-recently-updated first, so it reorders constantly). See assign_labels.
 #
+# The one thing that overrides last-touched order is a stack: its PRs are pulled together into
+# one block, bottom of the stack first, wherever its most recently updated member would have
+# sorted. See the STACKS note above LIST_JQ.
+#
 # Columns, named in the legend header:
 #   key       the hop label - press it to put the cursor (and the preview) on that PR,
 #             press it again to open the PR in a browser, or press it shifted to open now
@@ -39,8 +43,12 @@
 #   state     what the PR is waiting on - draft, changes, ci, conflict, approved, review
 #   ticket    the ticket key parsed out of the title (NAI-651), or the whole title when
 #             there is no key to parse
+#   stack     position in its stack of PRs, bottom first, or "—" when it stands alone. Read
+#             off the base branches, so it does not care how the titles are written
 #   author    who opened it
 #   assignee  who owns it, "+n" when there is more than one
+#   files     how many files the PR touches
+#   lines     added and removed lines, green over red, thousands compacted to "1.2k"
 #   unres     unresolved review threads, bots included - the number in the miniature
 #
 # Subcommands (only `open` is meant for humans):
@@ -112,14 +120,16 @@ mkesc() {
 }
 
 mkesc E_LABEL "#c4b5fd"   # violet-300 - hop key
-mkesc E_WORK  "#86efac"   # green-300  - approved
+mkesc E_WORK  "#86efac"   # green-300  - approved, and the added half of the diff column
 mkesc E_AGENT "#7dd3fc"   # sky-300    - waiting on review
 mkesc E_NEED  "#fb923c"   # orange-400 - wants your attention: changes, conflicts
 mkesc E_FAIL  "#f87171"   # red-400    - CI is red. The one meaning herd never had, and
-                          #              the one thing here that is broken rather than busy
+                          #              the one thing here that is broken rather than busy.
+                          #              Also the removed half of the diff column, where
+                          #              green over red is the reading everyone already has
 mkesc E_IDLE  "#71717a"   # zinc-500   - draft
 mkesc E_LOC   "#e4e4e4"   # white      - ticket / title
-mkesc E_SUB   "#a1a1aa"   # zinc-400   - author, assignee
+mkesc E_SUB   "#a1a1aa"   # zinc-400   - author, assignee, position in a stack
 mkesc E_DIM   "#52525b"   # zinc-600   - numbers, zero counts, chrome
 
 # Column widths, shared by the rows in render() and the legend header in ui() so the two
@@ -129,6 +139,11 @@ W_NUM=7
 W_STATE=12
 W_AUTHOR=16
 W_ASSIGN=16
+W_STACK=6
+W_FILES=6
+# Wide enough for the worst cell num_k can build, "+123k -123k", so the diff column can never
+# push the row past what the widths here reserve.
+W_LINES=12
 W_UNRES=6
 
 # -- small helpers -------------------------------------------------------------
@@ -154,6 +169,35 @@ padl() {
     local __s="$2" __w="$3"
     (( ${#__s} > __w )) && __s="${__s:0:__w}"
     printf -v __out '%*s' "$__w" "$__s"
+}
+
+# num_k <outvar> <n>: compact a line count. Four-digit diffs are the common case and a
+# regenerated lockfile reaches six, so printing them in full would spend the width the ticket
+# column needs on digits nobody reads past the second one.
+num_k() {
+    local -n __out="$1"
+    local __n="$2"
+    if   (( __n < 1000 ));    then __out="$__n"
+    elif (( __n < 10000 ));   then printf -v __out '%d.%dk' $(( __n / 1000 )) $(( (__n % 1000) / 100 ))
+    elif (( __n < 1000000 )); then printf -v __out '%dk' $(( __n / 1000 ))
+    else                           printf -v __out '%dM' $(( __n / 1000000 ))
+    fi
+}
+
+# churn <outvar> <additions> <deletions> <width>: the diff cell, right-aligned to <width>.
+#
+# Coloured in two halves, so it cannot go through padl: the padding is measured on the plain
+# text and the escapes are added afterwards, because padl counts display cells and an SGR
+# sequence would eat most of the column.
+churn() {
+    local -n __out="$1"
+    local __a __d __plain __gap
+    num_k __a "${2:-0}"
+    num_k __d "${3:-0}"
+    __plain="+$__a -$__d"
+    __gap=$(( $4 - ${#__plain} ))
+    (( __gap < 0 )) && __gap=0
+    printf -v __out '%*s%s+%s %s-%s' "$__gap" '' "$E_WORK" "$__a" "$E_FAIL" "$__d"
 }
 
 # age <outvar> <epoch>: compact age, empty for unknown.
@@ -267,6 +311,8 @@ query($owner:String!, $name:String!) {
     pullRequests(states:OPEN, first:50, orderBy:{field:UPDATED_AT, direction:DESC}) {
       nodes {
         number title isDraft url updatedAt
+        additions deletions changedFiles
+        headRefName baseRefName isCrossRepository
         author { login }
         assignees(first:5) { nodes { login } }
         reviewDecision
@@ -346,14 +392,70 @@ fetcher() {
 
 # -- render --------------------------------------------------------------------
 
-# The list projection. One jq pass over the cache turns each PR into the six cells a row
-# needs plus its URL, so render() never parses JSON itself and never forks per cell.
+# The list projection. One jq pass over the cache turns each PR into the cells a row needs plus
+# its URL, so render() never parses JSON itself and never forks per cell.
+#
+# The unresolved count stays field 6: ui() picks the opening cursor position with an awk over
+# this same projection, by field number. New cells go after it, never in front of it.
 #
 # The ticket is the first Linear-style key found anywhere in the title, which covers both
 # shapes that occur in practice: "[NAI-651] ..." and "feat(checkout): ... (LIP-394)". A
 # title with no key at all keeps the whole title.
+#
+# STACKS
+#
+# A stack is read off the base-branch graph, not off the title. "[NAI-705] (A)" is one person's
+# convention and the letter would be missed for everyone who writes "(1/7)", "part 2", or
+# nothing at all; a PR based on another open PR's branch is what a stack IS, whatever the title
+# says. So: head branch -> PR gives the child-to-parent edge through baseRefName, walking up to
+# a base nobody has open (staging) gives the depth, and the PRs that share a root are one stack.
+#
+# What the cell shows is depth over the deepest chain in that stack, so the bottom PR - the only
+# one that can merge - is always 1/n and the tip is n/n. A stack that forks (two PRs based on
+# the same branch) has two PRs at the same depth, which read as the same i/n; they are genuinely
+# at the same level, and inventing a per-branch denominator would make two members of one stack
+# disagree about how deep it is.
+#
+# The rows are then re-ordered so a stack reads bottom-to-top: each stack becomes one block,
+# the block sits where its most recently updated member would have sorted, and inside the block
+# the order is depth. Without that, seven PRs for the same ticket arrive interleaved in
+# last-touched order and the list gives no clue which one comes first. Everything that resolves
+# a hop label reads this same projection, so the list and the labels cannot disagree on order.
 read -r -d '' LIST_JQ <<'JQ'
-.data.repository.pullRequests.nodes[]
+# stack_of: walk from a PR up to the root of its stack. The seen list is a cycle guard - a
+# retargeted pair of PRs really can end up based on each other, and jq's until would not stop.
+def stack_of($parent; $num):
+  { at: $num, depth: 1, seen: [$num] }
+  | until( ($parent[(.at|tostring)] // null) as $p
+           | $p == null or (.seen | index($p)) != null;
+           ($parent[(.at|tostring)]) as $p
+           | { at: $p, depth: (.depth + 1), seen: (.seen + [$p]) } )
+  | { root: .at, depth: .depth };
+
+.data.repository.pullRequests.nodes as $prs
+# Cross-repository PRs are skipped here on purpose: their head branch lives in a fork, so no
+# base ref in this repo can point at it, and a fork branch that happens to share a name with a
+# local one would otherwise invent a parent.
+| ( [ $prs[] | select(.isCrossRepository | not) | { key: .headRefName, value: .number } ]
+    | from_entries ) as $by_head
+| ( [ $prs[] | { key: (.number|tostring), value: ($by_head[.baseRefName] // null) } ]
+    | from_entries ) as $parent
+| ( [ $prs | to_entries[] | { key: (.value.number|tostring), value: .key } ]
+    | from_entries ) as $rank
+| ( [ $prs[] | { num: .number } + stack_of($parent; .number) ] ) as $stacks
+| ( [ $stacks[] | { key: (.num|tostring), value: . } ] | from_entries ) as $stack
+| ( $stacks | group_by(.root)
+    | [ .[] | { key: (.[0].root|tostring),
+                value: { n: ([ .[].depth ] | max),
+                         anchor: ([ .[] | $rank[(.num|tostring)] ] | min) } } ]
+    | from_entries ) as $meta
+| [ $prs[]
+    | ($stack[(.number|tostring)]) as $s
+    | { pr: ., i: $s.depth, n: $meta[($s.root|tostring)].n,
+        anchor: $meta[($s.root|tostring)].anchor, rank: $rank[(.number|tostring)] } ]
+| sort_by(.anchor, .i, .rank)[]
+| . as { $i, $n }
+| .pr
 | (.commits.nodes[0].commit.statusCheckRollup.state // "") as $ci
 | [ (.number|tostring),
     (if   .isDraft                             then "draft"
@@ -371,6 +473,10 @@ read -r -d '' LIST_JQ <<'JQ'
        else "\(.[0].login) +\(length - 1)" end),
     (([.reviewThreads.nodes[] | select(.isResolved | not)] | length | tostring)
      + (if .reviewThreads.totalCount > (.reviewThreads.nodes | length) then "+" else "" end)),
+    (if $n <= 1 then "—" else "\($i)/\($n)" end),
+    (.changedFiles|tostring),
+    (.additions|tostring),
+    (.deletions|tostring),
     .url
   ] | @tsv
 JQ
@@ -503,23 +609,35 @@ render() {
     # cells, so on a wide pane an uncapped column would stretch the row across the popup and
     # leave the author and assignee marooned on the far right. The cap is sized for the
     # other case - a PR with no ticket in its title, which shows the whole title here.
-    local ident_w=$(( cols - W_LABEL - W_NUM - W_STATE - W_AUTHOR - W_ASSIGN - W_UNRES ))
+    # The trailing 2 is the pointer gutter fzf draws to the left of every item and does not
+    # subtract from FZF_COLUMNS (tmux-claude-herd reserves the same two cells). Without it the
+    # row is two cells wider than the space it has and the rightmost column loses its edge -
+    # invisible while the ticket column was capped well short of the window, and not invisible
+    # once files and lines took those cells.
+    local ident_w=$(( cols - W_LABEL - W_NUM - W_STATE - W_AUTHOR - W_ASSIGN \
+                           - W_STACK - W_FILES - W_LINES - W_UNRES - 2 ))
     (( ident_w > 44 )) && ident_w=44
     (( ident_w < 12 )) && ident_w=12
 
     # The table's own header row, emitted as the first item so fzf can pin it directly above
     # the list with --header-lines=1. Built from the same pad calls as the rows, so the
     # names cannot drift out of alignment with the data underneath them.
-    local c_label c_num c_state c_ident c_author c_assign c_unres
+    local c_label c_num c_state c_ident c_stack c_author c_assign c_files c_lines c_unres
     pad c_label "key" "$W_LABEL"
     pad c_num "pr" "$W_NUM"
     pad c_state "state" "$W_STATE"
     pad c_ident "ticket / title" "$ident_w"
+    # Left-aligned, unlike the other counts: "3/7" is one token rather than a column of
+    # digits, and left-aligning it is what leaves a gap before the author column.
+    pad c_stack "stack" "$W_STACK"
     pad c_author "author" "$W_AUTHOR"
     pad c_assign "assignee" "$W_ASSIGN"
+    padl c_files "files" "$W_FILES"
+    padl c_lines "lines" "$W_LINES"
     padl c_unres "unres" "$W_UNRES"
-    printf '\t%s%s%s%s%s%s%s%s%s\n' \
-        "$E_DIM" "$c_label" "$c_num" "$c_state" "$c_ident" "$c_author" "$c_assign" "$c_unres" "$RESET"
+    printf '\t%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+        "$E_DIM" "$c_label" "$c_num" "$c_state" "$c_ident" "$c_stack" "$c_author" "$c_assign" \
+        "$c_files" "$c_lines" "$c_unres" "$RESET"
 
     if [[ -s "$ERRF" ]]; then
         note_row "$(head -n 1 "$ERRF")"
@@ -530,11 +648,11 @@ render() {
         return 0
     fi
 
-    local label num state ident author assign unres url
-    local glyph text colour unres_colour
+    local label num state ident author assign unres stack files adds dels url
+    local glyph text colour unres_colour stack_colour
     local any=0
 
-    while IFS=$'\t' read -r label num state ident author assign unres url; do
+    while IFS=$'\t' read -r label num state ident author assign unres stack files adds dels url; do
         any=1
         case "$state" in
             draft)    glyph="○"; text="draft";    colour="$E_IDLE" ;;
@@ -548,22 +666,34 @@ render() {
         # A zero recedes; anything else is the reason you opened this popup. Chosen with a
         # test rather than a $( ) so the row costs no fork - see the palette note above.
         if [[ "$unres" == "0" ]]; then unres_colour="$E_DIM"; else unres_colour="$E_NEED"; fi
+        # A PR on its own says so with a dash and nothing more; a stacked one is carrying a
+        # position that the row above and below it share, so it reads in the same tone as the
+        # other identity cells.
+        if [[ "$stack" == "—" ]]; then stack_colour="$E_DIM"; else stack_colour="$E_SUB"; fi
 
         pad c_label "[$label]" "$W_LABEL"
         pad c_num "#$num" "$W_NUM"
         pad c_state "$glyph $text" "$W_STATE"
         pad c_ident "$ident" "$ident_w"
+        pad c_stack "$stack" "$W_STACK"
         pad c_author "$author" "$W_AUTHOR"
         pad c_assign "$assign" "$W_ASSIGN"
+        padl c_files "$files" "$W_FILES"
+        churn c_lines "$adds" "$dels" "$W_LINES"
         padl c_unres "$unres" "$W_UNRES"
 
-        printf '%s\t%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
+        # c_lines carries its own colours, so it is the one cell printed without an escape in
+        # front of it.
+        printf '%s\t%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s\n' \
             "$num" \
             "$E_LABEL" "$c_label" \
             "$E_DIM"   "$c_num" \
             "$colour"  "$c_state" \
             "$E_LOC"   "$c_ident" \
+            "$stack_colour" "$c_stack" \
             "$E_SUB"   "$c_author$c_assign" \
+            "$E_DIM"   "$c_files" \
+            "$c_lines" \
             "$unres_colour" "$c_unres" \
             "$RESET"
     done < <(jq -r "$LIST_JQ" "$JSON" 2>/dev/null | assign_labels)
