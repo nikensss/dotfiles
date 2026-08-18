@@ -4,10 +4,70 @@ return {
 		local actions = require('diffview.actions')
 
 		require('diffview').setup({
+			file_panel = {
+				win_config = function()
+					local editor_width = vim.o.columns
+					local editor_height = vim.o.lines - vim.o.cmdheight - 1
+					local width = math.floor(editor_width * 0.5)
+					local height = math.floor(editor_height * 0.8)
+
+					return {
+						type = 'float',
+						relative = 'editor',
+						border = 'rounded',
+						width = width,
+						height = height,
+						col = math.floor((editor_width - width) / 2),
+						row = math.floor((editor_height - height - 2) / 2),
+					}
+				end,
+			},
+			hooks = {
+				-- The file panel is summoned with <leader>fs, so a view starts without it.
+				view_opened = function(view)
+					local DiffView = require('diffview.scene.views.diff.diff_view').DiffView
+
+					if view:instanceof(DiffView) then
+						view.panel:close()
+					end
+				end,
+			},
 			keymaps = {
+				view = {
+					{
+						'n',
+						'<leader>fs',
+						actions.toggle_files,
+						{ desc = 'Toggle the file panel' },
+					},
+					{
+						'n',
+						'<c-n>',
+						actions.select_next_entry,
+						{ desc = 'Open the diff for the next file' },
+					},
+					{
+						'n',
+						'<c-p>',
+						actions.select_prev_entry,
+						{ desc = 'Open the diff for the previous file' },
+					},
+				},
 				file_panel = {
 					['<tab>'] = false,
 					['<s-tab>'] = false,
+					{
+						'n',
+						'<leader>fs',
+						actions.toggle_files,
+						{ desc = 'Toggle the file panel' },
+					},
+					{
+						'n',
+						'q',
+						actions.toggle_files,
+						{ desc = 'Close the file panel' },
+					},
 					{
 						'n',
 						'<c-e>',
