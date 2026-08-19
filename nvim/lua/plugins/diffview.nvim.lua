@@ -3,6 +3,22 @@ return {
 	config = function()
 		local actions = require('diffview.actions')
 
+		-- Summoning the panel drops the cursor on the file that is open in the diff. diffview only highlights the
+		-- current file while the panel is open, so a panel that was closed while switching files opens out of sync.
+		local function toggle_file_panel()
+			local view = require('diffview.lib').get_current_view()
+
+			if not view then
+				return
+			end
+
+			view.panel:toggle(true)
+
+			if view.panel:is_open() then
+				view.panel:highlight_cur_file()
+			end
+		end
+
 		require('diffview').setup({
 			file_panel = {
 				win_config = function()
@@ -37,7 +53,7 @@ return {
 					{
 						'n',
 						'<leader>fs',
-						actions.toggle_files,
+						toggle_file_panel,
 						{ desc = 'Toggle the file panel' },
 					},
 					{
@@ -59,12 +75,18 @@ return {
 					{
 						'n',
 						'<leader>fs',
-						actions.toggle_files,
+						toggle_file_panel,
 						{ desc = 'Toggle the file panel' },
 					},
 					{
 						'n',
 						'q',
+						actions.toggle_files,
+						{ desc = 'Close the file panel' },
+					},
+					{
+						'n',
+						'<esc>',
 						actions.toggle_files,
 						{ desc = 'Close the file panel' },
 					},
