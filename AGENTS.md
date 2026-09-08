@@ -58,3 +58,26 @@ conversation BEFORE stating the claim.
 
 For long audits or multi-subagent investigations: each unverified claim becomes
 foundation for the next; errors compound.
+
+## Comments
+
+Default to zero. Names and structure carry the meaning; a comment is an admission they didn't.
+
+Write one only when a competent reader of this code could not derive it, and then one line
+stating the _reason_, not the mechanism:
+
+- a constraint the code can't show (bundle budget, deploy-time behaviour, platform quirk)
+- duplicated logic that must change together — name the twin
+- a deliberate choice that looks wrong (why NOT the obvious thing)
+
+Never write a comment that restates the line, the function name, or a field name; describes
+what a field holds when the field is already named that; narrates steps ("first…, then…");
+re-explains a term defined elsewhere; or carries rationale belonging in the commit message
+or the ticket. Don't comment a test to say what its assertions already say.
+
+Delete docblocks on small pure functions — if the body is under ~10 lines and the name is
+accurate, the docblock is waste. When a comment feels necessary, rename or extract until it
+isn't.
+
+Comments should be a rounding error in a diff, not 15% of it. More than one or two in a
+change means code that should have been simplified instead.
