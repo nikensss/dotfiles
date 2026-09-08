@@ -61,23 +61,48 @@ foundation for the next; errors compound.
 
 ## Comments
 
-Default to zero. Names and structure carry the meaning; a comment is an admission they didn't.
+Default to zero. Names, structure, and types carry the meaning; a comment is an admission they
+didn't. AI-written comments are net negative for humans and for the model: code drifts and the
+comment doesn't, so a stale comment becomes a confident false statement sitting next to the truth.
+A human skims past it; a model weights it as asserted context. Comment prose also poisons grep and
+embedding search (false matches send the reader into the wrong file) and burns context that could
+have been spent on code.
 
-Write one only when a competent reader of this code could not derive it, and then one line
-stating the _reason_, not the mechanism:
+Write one only when a competent reader could not derive it from the file in front of them, and
+then one line stating the _reason_, not the mechanism.
 
-- a constraint the code can't show (bundle budget, deploy-time behaviour, platform quirk)
-- duplicated logic that must change together — name the twin
+**Keep:**
+
+- a fact from outside this file: third-party API quirk or contract, platform behaviour, bundle or
+  deploy-time constraint
+- an ordering or concurrency constraint
+- a bug workaround, with the trigger that causes it
 - a deliberate choice that looks wrong (why NOT the obvious thing)
+- duplicated logic that must change together - name the exact twin path, so the claim is checkable
+- intent on a genuinely cryptic abstraction (point-free pipelines, lens stacks, conditional types),
+  the one place a docblock on a small function is warranted
+- lint and type directives, pragmas, license headers: `eslint-disable`, `@ts-expect-error`,
+  `prettier-ignore`. Never strip these.
 
-Never write a comment that restates the line, the function name, or a field name; describes
-what a field holds when the field is already named that; narrates steps ("first…, then…");
-re-explains a term defined elsewhere; or carries rationale belonging in the commit message
-or the ticket. Don't comment a test to say what its assertions already say.
+**Delete:**
 
-Delete docblocks on small pure functions — if the body is under ~10 lines and the name is
-accurate, the docblock is waste. When a comment feels necessary, rename or extract until it
-isn't.
+- restates the line, the function name, or a field name, or says what a field holds when the field
+  is already named that
+- narrates steps ("first..., then...") or captions a block
+- JSDoc restating a typed signature - in TS that is duplicated, unchecked type information
+- describes what the code used to be, or references code that no longer exists
+- vague coupling claims about distant code ("ordered this way because module Z expects it") - the
+  fastest-rotting kind; either name the twin precisely or delete it
+- re-explains a term defined elsewhere
+- echoes rationale that belongs in the commit message, the ticket, or CLAUDE.md
+- states what a test's assertions already say
 
-Comments should be a rounding error in a diff, not 15% of it. More than one or two in a
-change means code that should have been simplified instead.
+Delete docblocks on small pure functions - if the body is under ~10 lines and the name is accurate,
+the docblock is waste. When a comment feels necessary, rename or extract until it isn't. In doubt
+on a genuine _why_, keep it and trim it to two lines.
+
+Durable knowledge goes in CLAUDE.md or the knowledge tree, not scattered inline: one canonical
+place, loaded regardless of which file gets opened, higher signal per token.
+
+Comments should be a rounding error in a diff, not 15% of it. More than one or two in a change
+means code that should have been simplified instead.
