@@ -76,6 +76,43 @@ function M.on_attach(client, bufnr)
 
 	opts.desc = 'Restart LSP'
 	keymap.set('n', '<leader>rs', ':LspRestart<CR>', opts)
+
+	if client:supports_method('textDocument/inlayHint') then
+		opts.desc = 'Toggle inlay hints'
+		keymap.set('n', '<leader>ih', function()
+			vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr }), { bufnr = bufnr })
+		end, opts)
+	end
+end
+
+local native_typescript_binary_by_root = {}
+
+function M.typescript_project_root(bufnr)
+	return vim.fs.root(bufnr, { 'pnpm-lock.yaml', 'package-lock.json', 'yarn.lock', 'bun.lock', 'bun.lockb' })
+end
+
+-- TypeScript 7+ ships a native `--lsp` server instead of the tsserver.js that typescript-tools drives.
+function M.native_typescript_binary(root)
+	if not root then
+		return nil
+	end
+
+	if native_typescript_binary_by_root[root] == nil then
+		native_typescript_binary_by_root[root] = false
+		for _, name in ipairs({ 'tsgo', 'tsrs', 'tsc' }) do
+			local binary = vim.fs.joinpath(root, 'node_modules/.bin', name)
+			if vim.fn.executable(binary) == 1 then
+				local version = vim.system({ binary, '--version' }, { text = true }):wait().stdout or ''
+				local major = tonumber(version:match('(%d+)%.%d+'))
+				if major and major >= 7 then
+					native_typescript_binary_by_root[root] = binary
+					break
+				end
+			end
+		end
+	end
+
+	return native_typescript_binary_by_root[root] or nil
 end
 
 function M.capabilities()

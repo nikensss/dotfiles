@@ -90,6 +90,49 @@ return function()
 		},
 	})
 
+	local function with_base_on_attach(server)
+		local base_on_attach = vim.lsp.config[server].on_attach
+		return function(client, bufnr)
+			if base_on_attach then
+				base_on_attach(client, bufnr)
+			end
+			on_attach(client, bufnr)
+		end
+	end
+
+	vim.lsp.config('eslint', {
+		capabilities = capabilities,
+		on_attach = with_base_on_attach('eslint'),
+	})
+
+	vim.lsp.config('oxlint', {
+		capabilities = capabilities,
+		on_attach = with_base_on_attach('oxlint'),
+		-- lspconfig's root_dir calls on_dir(nil) when no marker is found, which starts a rootless server in any project.
+		root_dir = function(bufnr, on_dir)
+			local root = vim.fs.root(bufnr, { '.oxlintrc.json', '.oxlintrc.jsonc', 'oxlint.config.ts' })
+			if root and vim.fn.executable(vim.fs.joinpath(root, 'node_modules/.bin/oxlint')) == 1 then
+				on_dir(root)
+			end
+		end,
+	})
+
+	vim.lsp.config('tsc', {
+		capabilities = capabilities,
+		on_attach = with_base_on_attach('tsc'),
+		cmd = function(dispatchers, config)
+			return vim.lsp.rpc.start({ lsp_helpers.native_typescript_binary(config.root_dir), '--lsp', '--stdio' }, dispatchers)
+		end,
+		root_dir = function(bufnr, on_dir)
+			local root = lsp_helpers.typescript_project_root(bufnr)
+			if lsp_helpers.native_typescript_binary(root) then
+				on_dir(root)
+			end
+		end,
+	})
+
+	vim.lsp.enable({ 'eslint', 'oxlint', 'tsc' })
+
 	local format_diagnostic_message = function(diagnostic)
 		local severity = vim.diagnostic.severity[diagnostic.severity]
 		local message = ''

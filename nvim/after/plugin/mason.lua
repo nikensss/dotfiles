@@ -23,6 +23,7 @@ mason_lspconfig.setup({
 		'clangd',
 		'cssls',
 		'emmet_language_server',
+		'eslint',
 		'graphql',
 		'html',
 		'jsonls',
@@ -41,7 +42,6 @@ mason_tool_installer.setup({
 	ensure_installed = {
 		'biome', -- biome formatter/linter (used when biome.json is present)
 		'clang-format', -- c/c++ formatter
-		'eslint_d', -- fast eslint daemon (used by nvim-lint)
 		'prettier', -- prettier formatter
 		'stylua', -- lua formatter
 	},

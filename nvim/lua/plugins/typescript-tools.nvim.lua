@@ -83,6 +83,9 @@ return {
 
 			require('typescript-tools').setup({
 				root_dir = function(bufnr, on_dir)
+					if lsp_helpers.native_typescript_binary(lsp_helpers.typescript_project_root(bufnr)) then
+						return
+					end
 					local fname = vim.api.nvim_buf_get_name(bufnr)
 					local git_root = vim.fs.root(fname, '.git')
 					on_dir(git_root or vim.fn.getcwd())
@@ -114,6 +117,14 @@ return {
 				settings = {
 					tsserver_file_preferences = {
 						importModuleSpecifierPreference = 'non-relative',
+						includeInlayParameterNameHints = 'all',
+						includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+						includeInlayFunctionParameterTypeHints = true,
+						includeInlayVariableTypeHints = true,
+						includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+						includeInlayPropertyDeclarationTypeHints = true,
+						includeInlayFunctionLikeReturnTypeHints = true,
+						includeInlayEnumMemberValueHints = true,
 					},
 				},
 			})
@@ -126,6 +137,10 @@ return {
 		local function maybe_setup(bufnr)
 			if vim.g.ricard_typescript_tools_setup then
 				return true
+			end
+
+			if lsp_helpers.native_typescript_binary(lsp_helpers.typescript_project_root(bufnr)) then
+				return false
 			end
 
 			if tsserver_exists(bufnr) then
