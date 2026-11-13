@@ -255,4 +255,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   :
 fi
 
+command -v gh >/dev/null && export NPM_GITHUB_TOKEN="$(gh auth token)"
+
 export PATH="$HOME/.local/bin:$PATH"
